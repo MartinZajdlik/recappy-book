@@ -47,4 +47,9 @@ public class RecipeController {
                     return recipeRepository.save(updatedRecipe);
                 });
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteRecipe(@PathVariable Long id) {
+        recipeRepository.deleteById(id);
+    }
 }

@@ -21,14 +21,6 @@
 		<java.version>21</java.version>
 	</properties>
 
-	<!-- Přidání JBoss repozitáře pro community-dialects -->
-	<repositories>
-		<repository>
-			<id>jboss-public-repository-group</id>
-			<name>JBoss Public Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<!-- Základní Spring Boot -->
@@ -79,10 +71,13 @@
 
 		<!-- Hibernate Community Dialects (pro SQLite Dialect) -->
 		<dependency>
-			<groupId>org.hibernate.community</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-community-dialects</artifactId>
-			<version>6.3.0.Final</version>
+			<version>6.2.4.Final</version>
 		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
