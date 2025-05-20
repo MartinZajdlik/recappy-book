@@ -13,15 +13,17 @@ public class Recipe {
     private Long id;
 
     private String title;
-    private String description;
+    private String ingredients;
+    private String instructions;
 
     // --- Konstruktory ---
     public Recipe() {
     }
 
-    public Recipe(String title, String description) {
+    public Recipe(String title, String ingredients, String instructions) {
         this.title = title;
-        this.description = description;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
     }
 
     // --- Gettery a settery ---
@@ -33,8 +35,12 @@ public class Recipe {
         return title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public String getInstructions() {
+        return instructions;
     }
 
     public void setId(Long id) {
@@ -45,7 +51,11 @@ public class Recipe {
         this.title = title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 }
