@@ -2,6 +2,7 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class RecipeController {
     }
 
     @PostMapping
-    public Recipe createRecipe(@RequestBody Recipe recipe) {
+    public Recipe createRecipe(@Valid @RequestBody Recipe recipe) {
         return recipeRepository.save(recipe);
     }
 
@@ -35,7 +36,7 @@ public class RecipeController {
     }
 
     @PutMapping("/{id}")
-    public Recipe updateRecipe(@PathVariable Long id, @RequestBody Recipe updatedRecipe) {
+    public Recipe updateRecipe(@PathVariable Long id,@Valid @RequestBody Recipe updatedRecipe) {
         return recipeRepository.findById(id)
                 .map(recipe -> {
                     recipe.setTitle(updatedRecipe.getTitle());

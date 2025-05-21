@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Recipe {
@@ -12,8 +13,13 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message= "Název receptu nesmí být prázdný")
     private String title;
+
+    @NotBlank(message= "Ingredience nesmí být prázdné")
     private String ingredients;
+
+    @NotBlank(message= "Postup nesmí být prázdný")
     private String instructions;
 
     // --- Konstruktory ---
