@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Recappy Book</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<h1>Správa receptů</h1>
+
+<form id="recipeForm">
+    <label for="title">Název receptu:</label>
+    <input type="text" id="title" name="title" required />
+
+    <label for="ingredients">Ingredience:</label>
+    <textarea id="ingredients" name="ingredients" rows="4" required></textarea>
+
+    <label for="instructions">Postup vaření:</label>
+    <textarea id="instructions" name="instructions" rows="5" required></textarea>
+
+    <button type="submit">Přidat recept</button>
+</form>
+
+<h2>Seznam receptů</h2>
+<ul id="recipeList"></ul>
+
+<script>
+    const apiUrl = 'http://localhost:8080/recepty';
+
+    async function fetchRecipes() {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Chyba při načítání receptů');
+        const recipes = await response.json();
+        displayRecipes(recipes);
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function displayRecipes(recipes) {
+      const list = document.getElementById('recipeList');
+      list.innerHTML = '';
+
+      if (recipes.length === 0) {
+        list.innerHTML = '<li>Žádné recepty.</li>';
+        return;
+      }
+
+      recipes.forEach(r => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <h3>${r.title}</h3>
+          <strong>Ingredience:</strong>
+          <p>${r.ingredients}</p>
+          <strong>Postup:</strong>
+          <p>${r.instructions}</p>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('recipeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const newRecipe = {
+        title: e.target.title.value.trim(),
+        ingredients: e.target.ingredients.value.trim(),
+        instructions: e.target.instructions.value.trim()
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRecipe)
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(Object.values(errData).join(', '));
+        }
+
+        e.target.reset();
+        fetchRecipes();
+      } catch (error) {
+        alert('Chyba při odesílání receptu: ' + error.message);
+      }
+    });
+
+    // Načti recepty při startu
+    fetchRecipes();
+</script>
+</body>
+</html>
