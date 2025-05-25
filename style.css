@@ -49,6 +49,27 @@ form button:hover {
     background-color: #45a049;
 }
 
+form label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: bold;
+    color: #7cc7ff;
+}
+
+form select {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    background-color: #3a3a55;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    appearance: none; /* odstraní defaultní šipku v některých prohlížečích */
+    cursor: pointer;
+}
+
+
 .error {
     color: #ff6b6b;
     margin-bottom: 1rem;
@@ -126,3 +147,10 @@ form button:hover {
 .delete-btn:hover {
     background-color: #a71d2a;
 }
+.category {
+    color: #7cc7ff; /* nějaká barva, můžeš upravit */
+    font-style: italic;
+    margin-top: 0.2rem;
+    display: block;
+}
+

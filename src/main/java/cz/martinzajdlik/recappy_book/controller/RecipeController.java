@@ -41,6 +41,7 @@ public class RecipeController {
         return recipeRepository.findById(id)
                 .map(recipe -> {
                     recipe.setTitle(updatedRecipe.getTitle());
+                    recipe.setCategory(updatedRecipe.getCategory());
                     recipe.setIngredients(updatedRecipe.getIngredients());
                     recipe.setInstructions(updatedRecipe.getInstructions());
                     return recipeRepository.save(recipe);

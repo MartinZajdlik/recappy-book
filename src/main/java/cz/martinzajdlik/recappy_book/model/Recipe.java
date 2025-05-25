@@ -22,12 +22,16 @@ public class Recipe {
     @NotBlank(message= "Postup nesmí být prázdný")
     private String instructions;
 
+    @NotBlank(message = "Kategorie nesmí být prázdná")
+    private String category;
+
     // --- Konstruktory ---
     public Recipe() {
     }
 
-    public Recipe(String title, String ingredients, String instructions) {
+    public Recipe(String title,String category, String ingredients, String instructions) {
         this.title = title;
+        this.category = category;
         this.ingredients = ingredients;
         this.instructions = instructions;
     }
@@ -64,4 +68,12 @@ public class Recipe {
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
 }

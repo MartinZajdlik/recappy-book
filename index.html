@@ -11,6 +11,16 @@
 
     <form id="recipeForm">
         <input type="text" id="title" placeholder="Název receptu" required>
+
+        <select id="category" required>
+            <option value="" disabled selected>Vyberte kategorii</option>
+            <option value="Polévky">Polévky</option>
+            <option value="Hlavní jídla">Hlavní jídla</option>
+            <option value="Dezerty">Dezerty</option>
+            <option value="Snídaně">Snídaně</option>
+            <option value="Svačiny">Svačiny</option>
+        </select>
+
         <textarea id="ingredients" placeholder="Ingredience" required></textarea>
         <textarea id="instructions" placeholder="Postup" required></textarea>
         <button type="submit">Přidat recept</button>
@@ -38,6 +48,7 @@
                         const li = document.createElement("li");
                         li.innerHTML = `
                             <strong>${recipe.title}</strong><br>
+                                <em class="category">${recipe.category}</em><br>
                                <em>${recipe.ingredients}</em><br>
                             <p>${recipe.instructions}</p>
                             <div class="recipe-buttons">
@@ -58,6 +69,7 @@
             e.preventDefault();
             const recipe = {
                 title: document.getElementById("title").value,
+                category: document.getElementById("category").value,
                 ingredients: document.getElementById("ingredients").value,
                 instructions: document.getElementById("instructions").value,
             };
@@ -94,6 +106,7 @@
                 .then(res => res.json())
                 .then(recipe => {
                     document.getElementById("title").value = recipe.title;
+                    document.getElementById("category").value = recipe.category;
                     document.getElementById("ingredients").value = recipe.ingredients;
                     document.getElementById("instructions").value = recipe.instructions;
                     editingId = id;
