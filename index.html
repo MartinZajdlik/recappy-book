@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>📖 Recepty</h1>
+    <h1>📖 RecAPPy BOOK</h1>
 
     <form id="recipeForm">
         <input type="text" id="title" placeholder="Název receptu" required>
@@ -27,6 +27,8 @@
         const recipeList = document.getElementById("recipeList");
         const errorDiv = document.getElementById("error");
 
+        let editingId = null;
+
         function loadRecipes() {
             fetch("http://localhost:8080/recepty")
                 .then(res => res.json())
@@ -36,14 +38,18 @@
                         const li = document.createElement("li");
                         li.innerHTML = `
                             <strong>${recipe.title}</strong><br>
-                            <em>${recipe.ingredients}</em><br>
+                               <em>${recipe.ingredients}</em><br>
                             <p>${recipe.instructions}</p>
-                            <button class="delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                            <div class="recipe-buttons">
+                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                         </div>
                         `;
+
                         recipeList.appendChild(li);
                     });
                 })
-                .catch(err => {
+                .catch(() => {
                     errorDiv.textContent = "Chyba při načítání receptů.";
                 });
         }
@@ -56,8 +62,11 @@
                 instructions: document.getElementById("instructions").value,
             };
 
-            fetch("http://localhost:8080/recepty", {
-                method: "POST",
+            const url = editingId ? `http://localhost:8080/recepty/${editingId}` : "http://localhost:8080/recepty";
+            const method = editingId ? "PUT" : "POST";
+
+            fetch(url, {
+                method: method,
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(recipe)
             })
@@ -67,6 +76,7 @@
                 })
                 .then(() => {
                     recipeForm.reset();
+                    editingId = null;
                     errorDiv.textContent = "";
                     loadRecipes();
                 })
@@ -78,6 +88,17 @@
                     }
                 });
         });
+
+        window.editRecipe = function (id) {
+            fetch(`http://localhost:8080/recepty/${id}`)
+                .then(res => res.json())
+                .then(recipe => {
+                    document.getElementById("title").value = recipe.title;
+                    document.getElementById("ingredients").value = recipe.ingredients;
+                    document.getElementById("instructions").value = recipe.instructions;
+                    editingId = id;
+                });
+        };
 
         window.deleteRecipe = function (id) {
             fetch(`http://localhost:8080/recepty/${id}`, {

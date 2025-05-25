@@ -1,5 +1,5 @@
 body {
-    background-color: #1e1e2f;
+    background-color: #101021;
     color: #f0f0f0;
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
@@ -9,10 +9,10 @@ body {
 .container {
     max-width: 600px;
     margin: 2rem auto;
-    background-color: #2a2a40;
+    background-color: #25252b;
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 h1 {
@@ -85,17 +85,44 @@ form button:hover {
     line-height: 1.5;
 }
 
-.delete-btn {
-    margin-top: 0.8rem;
-    background-color: #d9534f;
+/* Tlačítka pod receptem */
+.recipe-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 1rem;
+}
+
+.action-btn {
+    flex: 1;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
+    border-radius: 6px;
+    font-weight: bold;
     color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+/* Styl pro tlačítko Upravit */
+.edit-btn {
+    background-color: #007bff;
+}
+
+.edit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Styl pro tlačítko Smazat */
+.delete-btn {
+    background-color: #dc3545;
 }
 
 .delete-btn:hover {
-    background-color: #c9302c;
+    background-color: #a71d2a;
 }
