@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Tajný klíč musí být alespoň 256 bitů (32 bajtů)
+
     private final SecretKey key = Keys.hmacShaKeyFor("supertajnyklicsupertajnyklicsupertajnyklic12".getBytes());
 
     public String generateToken(String username, String role) {

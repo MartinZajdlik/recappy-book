@@ -22,14 +22,14 @@ public class RecipeController {
         this.recipeRepository = recipeRepository;
     }
 
-    // ✅ Jen pro admina
+    //  Jen pro admina
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Recipe createRecipe(@Valid @RequestBody Recipe recipe) {
         return recipeRepository.save(recipe);
     }
 
-    // ✅ Pro běžné uživatele i admina
+    // Pro běžné uživatele i admina
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
     public List<Recipe> getAllRecipes() {
@@ -42,7 +42,7 @@ public class RecipeController {
         return recipeRepository.findById(id);
     }
 
-    // ✅ Jen admin může upravovat
+    // Jen admin může upravovat
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Recipe updateRecipe(@PathVariable Long id, @Valid @RequestBody Recipe updatedRecipe) {
@@ -60,7 +60,7 @@ public class RecipeController {
                 });
     }
 
-    // ✅ Jen admin může mazat
+    // Jen admin může mazat
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteRecipe(@PathVariable Long id) {
