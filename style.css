@@ -69,7 +69,6 @@ form select {
     cursor: pointer;
 }
 
-
 .error {
     color: #ff6b6b;
     margin-bottom: 1rem;
@@ -147,6 +146,7 @@ form select {
 .delete-btn:hover {
     background-color: #a71d2a;
 }
+
 .category {
     color: #7cc7ff; /* nějaká barva, můžeš upravit */
     font-style: italic;
@@ -154,3 +154,49 @@ form select {
     display: block;
 }
 
+/* --- Přidané styly pro login vedle nadpisu --- */
+
+/* Styl pro nadpis vedle sebe s RecAPPy a BOOK */
+.title {
+    font-weight: 900;
+    font-size: 2.5rem;
+    display: flex;
+    gap: 0.5rem;
+    color: #7cc7ff;
+}
+
+.title .highlight {
+    color: #ffcc00; /* zvýrazněná část BOOK */
+}
+
+/* Login formulář ve sloupci s uživatelským jménem, heslem a tlačítkem */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    width: 220px;
+    gap: 0.5rem;
+}
+
+/* Přidání paddingu a přizpůsobení inputů a tlačítka v login formuláři */
+.login-form input,
+.login-form button {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    border: none;
+    font-size: 1rem;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+}
+
+/* Inputy pro login mají tmavší pozadí */
+.login-form input {
+    background-color: #3a3a55;
+}
+
+/* Tlačítko přihlásit v login formuláři */
+.login-form button {
+    background-color: #4caf50;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0

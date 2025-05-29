@@ -51,14 +51,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // povolit OPTIONS všude
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/admin/users/**").hasRole("ADMIN")
-                        .requestMatchers("/recepty/**").hasAnyRole("USER", "ADMIN")  // přístup pro čtení receptů
-                        .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")  // přidání receptu jen admin
-                        .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")   // úpravy jen admin
-                        .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasRole("ADMIN") // mazání jen admin
+                        .requestMatchers("/recepty/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

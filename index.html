@@ -1,46 +1,86 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Recepty</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="container">
-    <h1>📖 RecAPPy BOOK</h1>
+    <div class="header-login" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 class="title">📖 RecAPPy <span class="highlight">BOOK</span></h1>
+        <form id="loginForm" class="login-form">
+            <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required />
+            <input type="password" id="loginPassword" placeholder="Heslo" required />
+            <button type="submit">Přihlásit</button>
+        </form>
+    </div>
 
-    <form id="recipeForm">
-        <input type="text" id="title" placeholder="Název receptu" required>
+    <div id="loggedInSection" style="display:none;">
+        <form id="recipeForm">
+            <input type="text" id="title" placeholder="Název receptu" required />
 
-        <select id="category" required>
-            <option value="" disabled selected>Vyberte kategorii</option>
-            <option value="Polévky">Polévky</option>
-            <option value="Hlavní jídla">Hlavní jídla</option>
-            <option value="Dezerty">Dezerty</option>
-            <option value="Snídaně">Snídaně</option>
-            <option value="Svačiny">Svačiny</option>
-        </select>
+            <select id="category" required>
+                <option value="" disabled selected>Vyberte kategorii</option>
+                <option value="Polévky">Polévky</option>
+                <option value="Hlavní jídla">Hlavní jídla</option>
+                <option value="Dezerty">Dezerty</option>
+                <option value="Snídaně">Snídaně</option>
+                <option value="Svačiny">Svačiny</option>
+            </select>
 
-        <textarea id="ingredients" placeholder="Ingredience" required></textarea>
-        <textarea id="instructions" placeholder="Postup" required></textarea>
-        <button type="submit">Přidat recept</button>
-    </form>
+            <textarea id="ingredients" placeholder="Ingredience" required></textarea>
+            <textarea id="instructions" placeholder="Postup" required></textarea>
+            <button type="submit">Přidat recept</button>
+        </form>
 
-    <div id="error" class="error"></div>
+        <div id="error" class="error"></div>
 
-    <ul id="recipeList" class="recipe-list"></ul>
+        <ul id="recipeList" class="recipe-list"></ul>
+    </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const loginForm = document.getElementById("loginForm");
+        const loggedInSection = document.getElementById("loggedInSection");
         const recipeForm = document.getElementById("recipeForm");
         const recipeList = document.getElementById("recipeList");
         const errorDiv = document.getElementById("error");
 
         let editingId = null;
+        let jwtToken = null;
+
+        loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const username = document.getElementById("loginUsername").value;
+            const password = document.getElementById("loginPassword").value;
+
+            fetch("http://localhost:8080/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
+                    return res.json();
+                })
+                .then(data => {
+                    jwtToken = data.token;
+                    errorDiv.textContent = "";
+                    loginForm.style.display = "none";
+                    loggedInSection.style.display = "block";
+                    loadRecipes();
+                })
+                .catch(err => {
+                    errorDiv.textContent = err.message || "Chyba při přihlášení";
+                });
+        });
 
         function loadRecipes() {
-            fetch("http://localhost:8080/recepty")
+            fetch("http://localhost:8080/recepty", {
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
                 .then(res => res.json())
                 .then(data => {
                     recipeList.innerHTML = "";
@@ -48,15 +88,14 @@
                         const li = document.createElement("li");
                         li.innerHTML = `
                             <strong>${recipe.title}</strong><br>
-                                <em class="category">${recipe.category}</em><br>
-                               <em>${recipe.ingredients}</em><br>
+                            <em class="category">${recipe.category}</em><br>
+                            <em>${recipe.ingredients}</em><br>
                             <p>${recipe.instructions}</p>
                             <div class="recipe-buttons">
                                 <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
                                 <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
-                         </div>
+                            </div>
                         `;
-
                         recipeList.appendChild(li);
                     });
                 })
@@ -79,7 +118,10 @@
 
             fetch(url, {
                 method: method,
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + jwtToken
+                },
                 body: JSON.stringify(recipe)
             })
                 .then(res => {
@@ -102,7 +144,9 @@
         });
 
         window.editRecipe = function (id) {
-            fetch(`http://localhost:8080/recepty/${id}`)
+            fetch(`http://localhost:8080/recepty/${id}`, {
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
                 .then(res => res.json())
                 .then(recipe => {
                     document.getElementById("title").value = recipe.title;
@@ -115,15 +159,14 @@
 
         window.deleteRecipe = function (id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
-                method: "DELETE"
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + jwtToken }
             })
                 .then(() => loadRecipes())
                 .catch(() => {
                     errorDiv.textContent = "Chyba při mazání receptu.";
                 });
         };
-
-        loadRecipes();
     });
 </script>
 </body>
