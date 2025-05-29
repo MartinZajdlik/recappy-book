@@ -5,6 +5,7 @@ import cz.martinzajdlik.recappy_book.security.JwtRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -51,6 +52,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers("/recepty/**").hasAnyRole("USER", "ADMIN")  // přístup pro čtení receptů
+                        .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")  // přidání receptu jen admin
+                        .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")   // úpravy jen admin
+                        .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasRole("ADMIN") // mazání jen admin
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -59,4 +65,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
