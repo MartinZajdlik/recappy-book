@@ -21,7 +21,7 @@ public class RecappyBookApplication {
 			if (userRepository.findByUsername("admin").isEmpty()) {
 				User admin = new User();
 				admin.setUsername("admin");
-				admin.setPassword(passwordEncoder.encode("tajneHesloAdmin123"));
+				admin.setPassword(passwordEncoder.encode("admin123"));
 				admin.setRole("ROLE_ADMIN");
 				userRepository.save(admin);
 				System.out.println("Vytvořen uživatel admin s přednastaveným heslem.");
