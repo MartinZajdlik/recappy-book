@@ -4,6 +4,8 @@ body {
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
+    align-items: center;
+    justify-content: center;
 }
 
 .container {
@@ -13,6 +15,7 @@ body {
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    align-items: center;
 }
 
 h1 {
@@ -161,9 +164,21 @@ form select {
     font-weight: 900;
     font-size: 2.5rem;
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.3rem;
     color: #7cc7ff;
 }
+
+
+
+.title svg {
+    display: block;
+    height: 2.5rem;
+    width: 2.5rem;
+    margin: 0;
+    padding: 0;
+}
+
 
 .title .highlight {
     color: #ffcc00; /* zvýrazněná část BOOK */

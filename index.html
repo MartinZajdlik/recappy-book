@@ -1,42 +1,79 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Recepty</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="container">
-    <div class="header-login" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h1 class="title">📖 RecAPPy <span class="highlight">BOOK</span></h1>
-        <form id="loginForm" class="login-form">
-            <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required />
-            <input type="password" id="loginPassword" placeholder="Heslo" required />
-            <button type="submit">Přihlásit</button>
-        </form>
-    </div>
+    <div class="header-login">
+        <div class="header-title">
+            <h1 class="title">
+                <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="gradLeft" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#7cc7ff"/>
+                            <stop offset="100%" stop-color="#3a3a55"/>
+                        </linearGradient>
+                        <linearGradient id="gradRight" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#ffcc00"/>
+                            <stop offset="100%" stop-color="#b38f00"/>
+                        </linearGradient>
+                    </defs>
 
-    <div id="loggedInSection" style="display:none;">
-        <form id="recipeForm">
-            <input type="text" id="title" placeholder="Název receptu" required />
+                    <!-- Levá (modrá) strana knihy -->
+                    <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="url(#gradLeft)" stroke="#1e1e2f" stroke-width="1.5"/>
 
-            <select id="category" required>
-                <option value="" disabled selected>Vyberte kategorii</option>
-                <option value="Polévky">Polévky</option>
-                <option value="Hlavní jídla">Hlavní jídla</option>
-                <option value="Dezerty">Dezerty</option>
-                <option value="Snídaně">Snídaně</option>
-                <option value="Svačiny">Svačiny</option>
-            </select>
+                    <!-- Pravá (žlutá) strana knihy -->
+                    <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="url(#gradRight)" stroke="#7a6e00" stroke-width="1.5"/>
 
-            <textarea id="ingredients" placeholder="Ingredience" required></textarea>
-            <textarea id="instructions" placeholder="Postup" required></textarea>
-            <button type="submit">Přidat recept</button>
-        </form>
+                    <!-- Čáry na levé straně (rovnoběžné s horní hranou stránky vlevo) -->
+                    <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
+                    <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
+                    <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
+                    <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
 
-        <div id="error" class="error"></div>
+                    <!-- Čáry na pravé straně (rovnoběžné s horní hranou stránky vpravo) -->
+                    <line x1="38" y1="35" x2="54" y2="27" stroke="#7a6e00" stroke-width="1"/>
+                    <line x1="38" y1="39" x2="54" y2="31" stroke="#7a6e00" stroke-width="1"/>
+                    <line x1="38" y1="43" x2="54" y2="35" stroke="#7a6e00" stroke-width="1"/>
+                    <line x1="38" y1="47" x2="54" y2="39" stroke="#7a6e00" stroke-width="1"/>
+                </svg>
 
-        <ul id="recipeList" class="recipe-list"></ul>
+                <svg ...>...</svg>
+                RecAPPy <span class="highlight">BOOK</span>
+            </h1>
+
+            <form id="loginForm" class="login-form">
+                <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required/>
+                <input type="password" id="loginPassword" placeholder="Heslo" required/>
+                <button type="submit">Přihlásit</button>
+            </form>
+        </div>
+
+        <div id="loggedInSection" style="display:none;">
+            <form id="recipeForm">
+                <input type="text" id="title" placeholder="Název receptu" required/>
+
+                <select id="category" required>
+                    <option value="" disabled selected>Vyberte kategorii</option>
+                    <option value="Polévky">Polévky</option>
+                    <option value="Hlavní jídla">Hlavní jídla</option>
+                    <option value="Dezerty">Dezerty</option>
+                    <option value="Snídaně">Snídaně</option>
+                    <option value="Svačiny">Svačiny</option>
+                </select>
+
+                <textarea id="ingredients" placeholder="Ingredience" required></textarea>
+                <textarea id="instructions" placeholder="Postup" required></textarea>
+                <button type="submit">Přidat recept</button>
+            </form>
+
+            <div id="error" class="error"></div>
+
+            <ul id="recipeList" class="recipe-list"></ul>
+        </div>
     </div>
 </div>
 
