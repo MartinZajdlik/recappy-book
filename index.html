@@ -126,7 +126,7 @@
                         li.innerHTML = `
                             <strong>${recipe.title}</strong><br>
                             <em class="category">${recipe.category}</em><br>
-                            <em>${recipe.ingredients}</em><br>
+                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
                             <p>${recipe.instructions}</p>
                             <div class="recipe-buttons">
                                 <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
