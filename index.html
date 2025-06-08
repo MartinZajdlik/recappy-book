@@ -204,6 +204,19 @@
                     errorDiv.textContent = "Chyba při mazání receptu.";
                 });
         };
+
+        const ingredientsTextarea = document.getElementById("ingredients");
+        ingredientsTextarea.addEventListener("input", function () {
+            this.style.height = "auto"; // reset výšky
+             this.style.height = (this.scrollHeight) + "px"; // výška podle obsahu
+        });
+
+        const instructionsTextarea = document.getElementById("instructions");
+        instructionsTextarea.addEventListener("input", function () {
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+        });
+
     });
 </script>
 </body>
