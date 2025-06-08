@@ -2,57 +2,71 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8"/>
-    <title>Recepty</title>
+    <title>RecAPPy BOOK</title>
     <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <div class="container">
-    <div class="header-login">
-        <div class="header-title">
-            <h1 class="title">
-                <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="gradLeft" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#7cc7ff"/>
-                            <stop offset="100%" stop-color="#3a3a55"/>
-                        </linearGradient>
-                        <linearGradient id="gradRight" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stop-color="#ffcc00"/>
-                            <stop offset="100%" stop-color="#b38f00"/>
-                        </linearGradient>
-                    </defs>
 
-                    <!-- Levá (modrá) strana knihy -->
-                    <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="url(#gradLeft)" stroke="#1e1e2f" stroke-width="1.5"/>
+    <header class="header">
+        <h1 class="title">
+            <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="gradLeft" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#7cc7ff"/>
+                        <stop offset="100%" stop-color="#3a3a55"/>
+                    </linearGradient>
+                    <linearGradient id="gradRight" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#ffcc00"/>
+                        <stop offset="100%" stop-color="#b38f00"/>
+                    </linearGradient>
+                </defs>
 
-                    <!-- Pravá (žlutá) strana knihy -->
-                    <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="url(#gradRight)" stroke="#7a6e00" stroke-width="1.5"/>
+                <!-- Levá (modrá) strana knihy -->
+                <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="url(#gradLeft)" stroke="#1e1e2f" stroke-width="1.5"/>
 
-                    <!-- Čáry na levé straně (rovnoběžné s horní hranou stránky vlevo) -->
-                    <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
-                    <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
-                    <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
-                    <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
+                <!-- Pravá (žlutá) strana knihy -->
+                <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="url(#gradRight)" stroke="#7a6e00" stroke-width="1.5"/>
 
-                    <!-- Čáry na pravé straně (rovnoběžné s horní hranou stránky vpravo) -->
-                    <line x1="38" y1="35" x2="54" y2="27" stroke="#7a6e00" stroke-width="1"/>
-                    <line x1="38" y1="39" x2="54" y2="31" stroke="#7a6e00" stroke-width="1"/>
-                    <line x1="38" y1="43" x2="54" y2="35" stroke="#7a6e00" stroke-width="1"/>
-                    <line x1="38" y1="47" x2="54" y2="39" stroke="#7a6e00" stroke-width="1"/>
-                </svg>
+                <!-- Čáry na levé straně (rovnoběžné s horní hranou stránky vlevo) -->
+                <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
+                <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
+                <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
+                <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
 
-                <svg ...>...</svg>
-                RecAPPy <span class="highlight">BOOK</span>
-            </h1>
+                <!-- Čáry na pravé straně (rovnoběžné s horní hranou stránky vpravo) -->
+                <line x1="38" y1="35" x2="54" y2="27" stroke="#7a6e00" stroke-width="1"/>
+                <line x1="38" y1="39" x2="54" y2="31" stroke="#7a6e00" stroke-width="1"/>
+                <line x1="38" y1="43" x2="54" y2="35" stroke="#7a6e00" stroke-width="1"/>
+                <line x1="38" y1="47" x2="54" y2="39" stroke="#7a6e00" stroke-width="1"/>
+            </svg>
 
+            <svg ...>...</svg>
+            RecAPPy <span class="highlight">BOOK</span>
+        </h1>
+
+        <button id="adminBtn" title="Admin přihlášení" aria-label="Admin přihlášení">⚙️</button>
+    </header>
+
+    <main>
+        <section id="publicRecipes">
+            <h2>Recepty:</h2>
+            <ul id="publicRecipeList" class="recipe-list"></ul>
+        </section>
+
+
+        <!-- Login formulář schovaný -->
+        <section id="loginSection" class="hidden">
             <form id="loginForm" class="login-form">
                 <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required/>
                 <input type="password" id="loginPassword" placeholder="Heslo" required/>
                 <button type="submit">Přihlásit</button>
             </form>
-        </div>
+            <div id="error" class="error"></div>
+        </section>
 
-        <div id="loggedInSection" style="display:none;">
+        <!-- Admin panel schovaný -->
+        <section id="adminPanel" class="hidden">
             <form id="recipeForm">
                 <input type="text" id="title" placeholder="Název receptu" required/>
 
@@ -70,25 +84,38 @@
                 <button type="submit">Přidat recept</button>
             </form>
 
-            <div id="error" class="error"></div>
-
             <ul id="recipeList" class="recipe-list"></ul>
-        </div>
-    </div>
+        </section>
+    </main>
+
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", () => {
+        const adminBtn = document.getElementById("adminBtn");
+        const loginSection = document.getElementById("loginSection");
+        const adminPanel = document.getElementById("adminPanel");
         const loginForm = document.getElementById("loginForm");
-        const loggedInSection = document.getElementById("loggedInSection");
-        const recipeForm = document.getElementById("recipeForm");
-        const recipeList = document.getElementById("recipeList");
         const errorDiv = document.getElementById("error");
+        const recipeList = document.getElementById("recipeList");
+        const recipeForm = document.getElementById("recipeForm");
 
-        let editingId = null;
         let jwtToken = null;
+        let editingId = null;
 
-        loginForm.addEventListener("submit", function (e) {
+        adminBtn.addEventListener("click", () => {
+            if (!loginSection.classList.contains("hidden")) {
+                loginSection.classList.add("hidden");
+                adminPanel.classList.add("hidden");
+                errorDiv.textContent = "";
+            } else {
+                loginSection.classList.remove("hidden");
+                adminPanel.classList.add("hidden");
+                errorDiv.textContent = "";
+            }
+        });
+
+        loginForm.addEventListener("submit", e => {
             e.preventDefault();
             const username = document.getElementById("loginUsername").value;
             const password = document.getElementById("loginPassword").value;
@@ -98,50 +125,50 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
             })
-                .then(res => {
-                    if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
-                    return res.json();
-                })
-                .then(data => {
-                    jwtToken = data.token;
-                    errorDiv.textContent = "";
-                    loginForm.style.display = "none";
-                    loggedInSection.style.display = "block";
-                    loadRecipes();
-                })
-                .catch(err => {
-                    errorDiv.textContent = err.message || "Chyba při přihlášení";
-                });
+            .then(res => {
+                if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
+                return res.json();
+            })
+            .then(data => {
+                jwtToken = data.token;
+                errorDiv.textContent = "";
+                loginSection.classList.add("hidden");
+                adminPanel.classList.remove("hidden");
+                loadRecipes();
+            })
+            .catch(err => {
+                errorDiv.textContent = err.message || "Chyba při přihlášení";
+            });
         });
 
         function loadRecipes() {
             fetch("http://localhost:8080/recepty", {
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
-                .then(res => res.json())
-                .then(data => {
-                    recipeList.innerHTML = "";
-                    data.forEach(recipe => {
-                        const li = document.createElement("li");
-                        li.innerHTML = `
-                            <strong>${recipe.title}</strong><br>
-                            <em class="category">${recipe.category}</em><br>
-                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
-                            <p>${recipe.instructions}</p>
-                            <div class="recipe-buttons">
-                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
-                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
-                            </div>
-                        `;
-                        recipeList.appendChild(li);
-                    });
-                })
-                .catch(() => {
-                    errorDiv.textContent = "Chyba při načítání receptů.";
+            .then(res => res.json())
+            .then(data => {
+                recipeList.innerHTML = "";
+                data.forEach(recipe => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <strong>${recipe.title}</strong><br>
+                        <em class="category">${recipe.category}</em><br>
+                        <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                        <p>${recipe.instructions}</p>
+                        <div class="recipe-buttons">
+                            <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                            <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                        </div>
+                    `;
+                    recipeList.appendChild(li);
                 });
+            })
+            .catch(() => {
+                errorDiv.textContent = "Chyba při načítání receptů.";
+            });
         }
 
-        recipeForm.addEventListener("submit", function (e) {
+        recipeForm.addEventListener("submit", e => {
             e.preventDefault();
             const recipe = {
                 title: document.getElementById("title").value,
@@ -161,61 +188,88 @@
                 },
                 body: JSON.stringify(recipe)
             })
-                .then(res => {
-                    if (!res.ok) return res.json().then(err => Promise.reject(err));
-                    return res.json();
-                })
-                .then(() => {
-                    recipeForm.reset();
-                    editingId = null;
-                    errorDiv.textContent = "";
-                    loadRecipes();
-                })
-                .catch(err => {
-                    if (err && typeof err === "object") {
-                        errorDiv.textContent = Object.values(err).join(", ");
-                    } else {
-                        errorDiv.textContent = "Chyba při odesílání receptu.";
-                    }
-                });
+            .then(res => {
+                if (!res.ok) return res.json().then(err => Promise.reject(err));
+                return res.json();
+            })
+            .then(() => {
+                recipeForm.reset();
+                editingId = null;
+                errorDiv.textContent = "";
+                loadRecipes();
+            })
+            .catch(err => {
+                if (err && typeof err === "object") {
+                    errorDiv.textContent = Object.values(err).join(", ");
+                } else {
+                    errorDiv.textContent = "Chyba při odesílání receptu.";
+                }
+            });
         });
 
-        window.editRecipe = function (id) {
+        window.editRecipe = function(id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
-                .then(res => res.json())
-                .then(recipe => {
-                    document.getElementById("title").value = recipe.title;
-                    document.getElementById("category").value = recipe.category;
-                    document.getElementById("ingredients").value = recipe.ingredients;
-                    document.getElementById("instructions").value = recipe.instructions;
-                    editingId = id;
-                });
+            .then(res => res.json())
+            .then(recipe => {
+                document.getElementById("title").value = recipe.title;
+                document.getElementById("category").value = recipe.category;
+                document.getElementById("ingredients").value = recipe.ingredients;
+                document.getElementById("instructions").value = recipe.instructions;
+                editingId = id;
+            });
         };
 
-        window.deleteRecipe = function (id) {
+        window.deleteRecipe = function(id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
                 method: "DELETE",
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
-                .then(() => loadRecipes())
-                .catch(() => {
-                    errorDiv.textContent = "Chyba při mazání receptu.";
-                });
+            .then(() => loadRecipes())
+            .catch(() => {
+                errorDiv.textContent = "Chyba při mazání receptu.";
+            });
         };
 
+        // Auto roztažení textarea
         const ingredientsTextarea = document.getElementById("ingredients");
-        ingredientsTextarea.addEventListener("input", function () {
-            this.style.height = "auto"; // reset výšky
-             this.style.height = (this.scrollHeight) + "px"; // výška podle obsahu
+        ingredientsTextarea.addEventListener("input", () => {
+            ingredientsTextarea.style.height = "auto";
+            ingredientsTextarea.style.height = ingredientsTextarea.scrollHeight + "px";
         });
 
         const instructionsTextarea = document.getElementById("instructions");
-        instructionsTextarea.addEventListener("input", function () {
-            this.style.height = "auto";
-            this.style.height = (this.scrollHeight) + "px";
+        instructionsTextarea.addEventListener("input", () => {
+            instructionsTextarea.style.height = "auto";
+            instructionsTextarea.style.height = instructionsTextarea.scrollHeight + "px";
         });
+
+function loadPublicRecipes() {
+            fetch("http://localhost:8080/recepty")
+                .then(res => res.json())
+                .then(data => {
+                    const publicList = document.getElementById("publicRecipeList");
+                    publicList.innerHTML = "";
+
+                    data.forEach(recipe => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            <strong>${recipe.title}</strong><br>
+                            <em class="category">${recipe.category}</em><br>
+                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                            <p>${recipe.instructions}</p>
+                        `;
+                        publicList.appendChild(li);
+                    });
+                })
+                .catch(() => {
+                    const publicList = document.getElementById("publicRecipeList");
+                    publicList.innerHTML = "<li>Chyba při načítání receptů.</li>";
+                });
+        }
+
+        loadPublicRecipes();
 
     });
 </script>

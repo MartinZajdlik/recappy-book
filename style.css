@@ -1,3 +1,8 @@
+.hidden {
+    display: none !important;
+}
+
+
 body {
     background-color: #101021;
     color: #f0f0f0;
@@ -16,13 +21,12 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 
-    display: flex;           /* přidá flexbox */
-    flex-direction: column;  /* děti pod sebou */
-    align-items: center;     /* vycentruje děti horizontálně */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-    overflow: visible; /* přidáno */
+    overflow: visible;
 }
-
 
 h1 {
     text-align: center;
@@ -74,7 +78,7 @@ form select {
     border-radius: 5px;
     color: #fff;
     font-size: 1rem;
-    appearance: none; /* odstraní defaultní šipku v některých prohlížečích */
+    appearance: none;
     cursor: pointer;
 }
 
@@ -114,7 +118,6 @@ form select {
     line-height: 1.5;
 }
 
-/* Tlačítka pod receptem */
 .recipe-buttons {
     display: flex;
     justify-content: space-between;
@@ -138,7 +141,6 @@ form select {
     text-align: center;
 }
 
-/* Styl pro tlačítko Upravit */
 .edit-btn {
     background-color: #007bff;
 }
@@ -147,7 +149,6 @@ form select {
     background-color: #0056b3;
 }
 
-/* Styl pro tlačítko Smazat */
 .delete-btn {
     background-color: #dc3545;
 }
@@ -157,15 +158,12 @@ form select {
 }
 
 .category {
-    color: #7cc7ff; /* nějaká barva, můžeš upravit */
+    color: #7cc7ff;
     font-style: italic;
     margin-top: 0.2rem;
     display: block;
 }
 
-/* --- Přidané styly pro login vedle nadpisu --- */
-
-/* Styl pro nadpis vedle sebe s RecAPPy a BOOK */
 .title {
     font-weight: 900;
     font-size: 2.5rem;
@@ -184,54 +182,5 @@ form select {
     padding: 0;
 }
 
-
 .title .highlight {
-    color: #ffcc00; /* zvýrazněná část BOOK */
-}
-
-/* Login formulář ve sloupci s uživatelským jménem, heslem a tlačítkem */
-.login-form {
-    display: flex;
-    flex-direction: column;
-    width: 220px;
-    gap: 0.5rem;
-}
-
-/* Přidání paddingu a přizpůsobení inputů a tlačítka v login formuláři */
-.login-form input,
-.login-form button {
-    width: 100%;
-    padding: 0.6rem 0.8rem;
-    border-radius: 6px;
-    border: none;
-    font-size: 1rem;
-    font-family: 'Segoe UI', sans-serif;
-    color: #fff;
-}
-
-/* Inputy pro login mají tmavší pozadí */
-.login-form input {
-    background-color: #3a3a55;
-}
-
-/* Tlačítko přihlásit v login formuláři */
-.login-form button {
-    background-color: #4caf50;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0
-
-textarea {
-    resize: none;
-    min-height: 80px;  /* nebo více, podle potřeby */
-    max-height: 500px; /* volitelné, můžeš upravit */
-    overflow: hidden;
-}
-
-#loggedInSection {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    overflow: visible; /* důležité pro roztahování */
-}
+    color

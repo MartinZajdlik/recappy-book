@@ -29,8 +29,6 @@ public class RecipeController {
         return recipeRepository.save(recipe);
     }
 
-    // Pro běžné uživatele i admina
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
     public List<Recipe> getAllRecipes() {
         return recipeRepository.findAll();
