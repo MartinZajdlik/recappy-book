@@ -22,26 +22,20 @@
                     </linearGradient>
                 </defs>
 
-                <!-- Levá (modrá) strana knihy -->
                 <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="url(#gradLeft)" stroke="#1e1e2f" stroke-width="1.5"/>
-
-                <!-- Pravá (žlutá) strana knihy -->
                 <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="url(#gradRight)" stroke="#7a6e00" stroke-width="1.5"/>
 
-                <!-- Čáry na levé straně (rovnoběžné s horní hranou stránky vlevo) -->
                 <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
 
-                <!-- Čáry na pravé straně (rovnoběžné s horní hranou stránky vpravo) -->
                 <line x1="38" y1="35" x2="54" y2="27" stroke="#7a6e00" stroke-width="1"/>
                 <line x1="38" y1="39" x2="54" y2="31" stroke="#7a6e00" stroke-width="1"/>
                 <line x1="38" y1="43" x2="54" y2="35" stroke="#7a6e00" stroke-width="1"/>
                 <line x1="38" y1="47" x2="54" y2="39" stroke="#7a6e00" stroke-width="1"/>
             </svg>
 
-            <svg ...>...</svg>
             RecAPPy <span class="highlight">BOOK</span>
         </h1>
 
@@ -55,12 +49,11 @@
 
     <main>
         <section id="publicRecipes">
-            <h2>Recepty:</h2>
+            <h2 id="categoriesTitle">Kategorie:</h2>
+            <div id="categoriesList"></div>
             <ul id="publicRecipeList" class="recipe-list"></ul>
         </section>
 
-
-        <!-- Login formulář schovaný -->
         <section id="loginSection" class="hidden">
             <form id="loginForm" class="login-form">
                 <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required/>
@@ -70,7 +63,6 @@
             <div id="error" class="error"></div>
         </section>
 
-        <!-- Admin panel schovaný -->
         <section id="adminPanel" class="hidden">
             <form id="recipeForm">
                 <input type="text" id="title" placeholder="Název receptu" required/>
@@ -194,23 +186,65 @@
                 body: JSON.stringify(recipe)
             })
             .then(res => {
-                if (!res.ok) return res.json().then(err => Promise.reject(err));
+                if (!res.ok) throw new Error("Chyba při ukládání receptu.");
                 return res.json();
             })
             .then(() => {
                 recipeForm.reset();
                 editingId = null;
-                errorDiv.textContent = "";
                 loadRecipes();
             })
             .catch(err => {
-                if (err && typeof err === "object") {
-                    errorDiv.textContent = Object.values(err).join(", ");
-                } else {
-                    errorDiv.textContent = "Chyba při odesílání receptu.";
-                }
+                errorDiv.textContent = err.message;
             });
         });
+
+        const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
+        const categoriesList = document.getElementById("categoriesList");
+        const publicRecipeList = document.getElementById("publicRecipeList");
+
+        function renderCategories() {
+            categoriesList.innerHTML = "";
+            categories.forEach(category => {
+                const btn = document.createElement("button");
+                btn.textContent = category;
+                btn.addEventListener("click", () => loadPublicRecipes(category));
+                categoriesList.appendChild(btn);
+            });
+        }
+
+        function loadPublicRecipes(category) {
+            let url = "http://localhost:8080/recepty";
+            if (category) {
+                url += "?category=" + encodeURIComponent(category);
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    publicRecipeList.innerHTML = "";
+                    if (data.length === 0) {
+                        publicRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
+                        return;
+                    }
+                    data.forEach(recipe => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            <strong>${recipe.title}</strong><br>
+                            <em class="category">${recipe.category}</em><br>
+                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                            <p>${recipe.instructions}</p>
+                        `;
+                        publicRecipeList.appendChild(li);
+                    });
+                })
+                .catch(() => {
+                    publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
+                });
+        }
+
+        renderCategories();
+        //loadPublicRecipes();
 
         window.editRecipe = function(id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
@@ -223,60 +257,28 @@
                 document.getElementById("ingredients").value = recipe.ingredients;
                 document.getElementById("instructions").value = recipe.instructions;
                 editingId = id;
+            })
+            .catch(() => {
+                errorDiv.textContent = "Chyba při načítání receptu.";
             });
         };
 
         window.deleteRecipe = function(id) {
+            if (!confirm("Opravdu chcete recept smazat?")) return;
             fetch(`http://localhost:8080/recepty/${id}`, {
                 method: "DELETE",
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
-            .then(() => loadRecipes())
-            .catch(() => {
-                errorDiv.textContent = "Chyba při mazání receptu.";
+            .then(res => {
+                if (!res.ok) throw new Error("Chyba při mazání receptu.");
+                loadRecipes();
+            })
+            .catch(err => {
+                errorDiv.textContent = err.message;
             });
         };
-
-        // Auto roztažení textarea
-        const ingredientsTextarea = document.getElementById("ingredients");
-        ingredientsTextarea.addEventListener("input", () => {
-            ingredientsTextarea.style.height = "auto";
-            ingredientsTextarea.style.height = ingredientsTextarea.scrollHeight + "px";
-        });
-
-        const instructionsTextarea = document.getElementById("instructions");
-        instructionsTextarea.addEventListener("input", () => {
-            instructionsTextarea.style.height = "auto";
-            instructionsTextarea.style.height = instructionsTextarea.scrollHeight + "px";
-        });
-
-function loadPublicRecipes() {
-            fetch("http://localhost:8080/recepty")
-                .then(res => res.json())
-                .then(data => {
-                    const publicList = document.getElementById("publicRecipeList");
-                    publicList.innerHTML = "";
-
-                    data.forEach(recipe => {
-                        const li = document.createElement("li");
-                        li.innerHTML = `
-                            <strong>${recipe.title}</strong><br>
-                            <em class="category">${recipe.category}</em><br>
-                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
-                            <p>${recipe.instructions}</p>
-                        `;
-                        publicList.appendChild(li);
-                    });
-                })
-                .catch(() => {
-                    const publicList = document.getElementById("publicRecipeList");
-                    publicList.innerHTML = "<li>Chyba při načítání receptů.</li>";
-                });
-        }
-
-        loadPublicRecipes();
-
     });
 </script>
+
 </body>
 </html>

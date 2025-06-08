@@ -30,15 +30,26 @@ public class RecipeController {
     }
 
     @GetMapping
-    public List<Recipe> getAllRecipes() {
-        return recipeRepository.findAll();
+    public List<Recipe> getRecipesByCategory(@RequestParam(required = false) String category) {
+        if (category == null || category.isEmpty()) {
+            return recipeRepository.findAll();
+        } else {
+            return recipeRepository.findByCategory(category);
+        }
     }
+
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public Optional<Recipe> getRecipeById(@PathVariable Long id) {
         return recipeRepository.findById(id);
     }
+
+    @GetMapping("/categories")
+    public List<String> getAllCategories() {
+        return recipeRepository.findDistinctCategories();
+    }
+
 
     // Jen admin může upravovat
     @PreAuthorize("hasRole('ADMIN')")

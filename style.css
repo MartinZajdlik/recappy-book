@@ -207,3 +207,72 @@ form select {
 #adminBtn:hover {
     transform: rotate(20deg);
 }
+#categoriesList {
+    display: flex;
+    flex-direction: column;  /* kategorie pod sebou */
+    align-items: flex-start; /* zarovnání vlevo */
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#categoriesList button {
+    width: 100%;      /* tlačítko roztáhlé na celou šířku kontejneru */
+    text-align: left; /* text vlevo */
+    padding: 0.7rem 1rem;
+    background-color: #3a3a55;
+    border: none;
+    border-radius: 5px;
+    color: #7cc7ff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem; /* zvětšené písmo */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* volitelně moderní písmo */
+}
+
+#categoriesList button:hover {
+    background-color: #5a5a7a;
+}
+
+#categoriesTitle {
+    font-family: Comic Sans MS;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffc107;
+    background-color: #33334d;      /* světlá modrá */
+    padding: 0.4rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.05em;
+    user-select: none;
+    /* žádný hover efekt */
+}
+
+#categoriesList {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#categoriesList button {
+    width: 100%;
+    text-align: left;
+    padding: 0.7rem 1rem;
+    background-color: #739adf;      /* tmavší světle modrá */
+    border: none;
+    border-radius: 5px;
+    color: #0d1a33;                 /* tmavší modrá, skoro námořnická */
+    font-weight: 600;
+    font-size: 1.1rem;
+    font-family: Comic Sans MS, cursive, sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#categoriesList button:hover {
+    background-color: #1e3a6e;      /* tmavá modrá, ale stále modrá */
+    color: #d0d9ff;                 /* světle modrá pro lepší čitelnost */
+}
