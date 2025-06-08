@@ -172,6 +172,7 @@ form select {
     justify-content: center;
     gap: 0.3rem;
     color: #7cc7ff;
+    margin: 0;
 }
 
 .title svg {
@@ -184,3 +185,25 @@ form select {
 
 .title .highlight {
     color
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+#adminBtn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #7cc7ff;
+    padding: 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+#adminBtn:hover {
+    transform: rotate(20deg);
+}
