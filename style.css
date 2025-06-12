@@ -277,3 +277,12 @@ form select {
     color: #d0d9ff;                 /* světle modrá pro lepší čitelnost */
 }
 
+.footer {
+  text-align: center;
+  color: #ccc;
+  font-size: 0.9rem;
+  padding: 20px;
+  background-color: #1e1e26;
+  border-top: 1px solid #333;
+  margin-top: 40px;
+}
