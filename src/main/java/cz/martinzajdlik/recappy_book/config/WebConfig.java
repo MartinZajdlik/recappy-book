@@ -17,7 +17,6 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:3000")// přidej další adresy pokud budeš potřebovat
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
                         .allowCredentials(false)
                         .maxAge(3600);
             }

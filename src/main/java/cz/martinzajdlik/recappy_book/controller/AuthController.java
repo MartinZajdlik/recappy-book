@@ -3,6 +3,8 @@ package cz.martinzajdlik.recappy_book.controller;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;  // import na JWT utilitu (musíš vytvořit)
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +44,23 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
         return userRepository.findByUsername(user.getUsername())
                 .map(dbUser -> {
                     if (passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
                         // Vygeneruj JWT token
                         String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole());
-                        // Vrať token klientovi v JSON
+
+                        // Nastav cookie s tokenem
+                        Cookie cookie = new Cookie("jwt", token);
+                        cookie.setHttpOnly(true);
+                        cookie.setSecure(false); // na produkci true a HTTPS
+                        cookie.setPath("/");
+                        cookie.setMaxAge(10 * 60 * 60); // 10 hodin
+
+                        response.addCookie(cookie);
+
+                        // ⬇️ Nově pošleme token i v těle odpovědi
                         return ResponseEntity.ok(new JwtResponse(token));
                     } else {
                         return ResponseEntity.status(401).body("Špatné heslo.");
@@ -56,6 +68,20 @@ public class AuthController {
                 })
                 .orElse(ResponseEntity.status(404).body("Uživatel nenalezen."));
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // na produkci true a HTTPS
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // smaže cookie
+
+        response.addCookie(cookie);
+        return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
+    }
+
 
     @GetMapping("/users")
     public List<User> getAllUsers() {

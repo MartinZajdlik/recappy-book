@@ -120,23 +120,26 @@
             fetch("http://localhost:8080/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password }),
+                credentials: "include"
             })
             .then(res => {
                 if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
-                return res.json();
+                jwtToken = res.headers.get("Authorization")?.replace("Bearer ", "");
+                if (!jwtToken) throw new Error("Chybějící token v odpovědi");
+                return res.text();
             })
-            .then(data => {
-                jwtToken = data.token;
+            .then(message => {
                 errorDiv.textContent = "";
                 loginSection.classList.add("hidden");
                 adminPanel.classList.remove("hidden");
-                loadRecipes();
+                loadRecipes(); // načte recepty jako admin
             })
             .catch(err => {
                 errorDiv.textContent = err.message || "Chyba při přihlášení";
             });
         });
+
 
         function loadRecipes() {
             fetch("http://localhost:8080/recepty", {
