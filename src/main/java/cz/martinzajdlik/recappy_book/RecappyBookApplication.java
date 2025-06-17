@@ -16,16 +16,24 @@ public class RecappyBookApplication {
 	}
 
 	@Bean
-	CommandLineRunner createAdminIfNotExists(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	CommandLineRunner run(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
 			if (userRepository.findByUsername("admin").isEmpty()) {
 				User admin = new User();
 				admin.setUsername("admin");
-				admin.setPassword(passwordEncoder.encode("admin123"));
-				admin.setRole("ROLE_ADMIN");
+				admin.setPassword(passwordEncoder.encode("admin")); // zašifrované heslo
+				admin.setRole("ROLE_ADMIN"); // POZOR na správný název role
 				userRepository.save(admin);
-				System.out.println("Vytvořen uživatel admin s přednastaveným heslem.");
+			}
+
+			if (userRepository.findByUsername("user").isEmpty()) {
+				User user = new User();
+				user.setUsername("user");
+				user.setPassword(passwordEncoder.encode("user")); // jednoduché heslo na test
+				user.setRole("ROLE_USER"); // běžný uživatel
+				userRepository.save(user);
 			}
 		};
 	}
+
 }

@@ -120,7 +120,7 @@
             fetch("http://localhost:8080/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({username, password}),
                 credentials: "include"
             })
             .then(res => {
@@ -182,6 +182,8 @@
 
             fetch(url, {
                 method: method,
+                mode: "cors",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + jwtToken

@@ -19,6 +19,7 @@ public class JwtUtil {
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role",role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hodin
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -34,6 +35,17 @@ public class JwtUtil {
 
         return claims.getSubject();
     }
+
+    public String extractRole(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("role", String.class);
+    }
+
 
     public boolean validateToken(String token, String username) {
         String tokenUsername = extractUsername(token);
