@@ -125,16 +125,17 @@
             })
             .then(res => {
                 if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
-                jwtToken = res.headers.get("Authorization")?.replace("Bearer ", "");
-                if (!jwtToken) throw new Error("Chybějící token v odpovědi");
-                return res.text();
+                return res.json(); // ← přečte JSON tělo odpovědi
             })
-            .then(message => {
+            .then(data => {
+                jwtToken = data.token;
+                if (!jwtToken) throw new Error("Chybějící token v odpovědi");
                 errorDiv.textContent = "";
                 loginSection.classList.add("hidden");
                 adminPanel.classList.remove("hidden");
                 loadRecipes(); // načte recepty jako admin
             })
+
             .catch(err => {
                 errorDiv.textContent = err.message || "Chyba při přihlášení";
             });
