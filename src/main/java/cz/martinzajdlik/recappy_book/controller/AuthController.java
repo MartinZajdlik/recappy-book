@@ -6,6 +6,7 @@ import cz.martinzajdlik.recappy_book.security.JwtUtil;  // import na JWT utilitu
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5500", allowCredentials = "true")
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -57,8 +58,11 @@ public class AuthController {
                         cookie.setSecure(false); // na produkci true a HTTPS
                         cookie.setPath("/");
                         cookie.setMaxAge(10 * 60 * 60); // 10 hodin
-
                         response.addCookie(cookie);
+
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.add("Authorization", "Bearer " + token);
+
 
                         // ⬇️ Nově pošleme token i v těle odpovědi
                         return ResponseEntity.ok(new JwtResponse(token));
