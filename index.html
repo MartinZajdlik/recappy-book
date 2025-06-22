@@ -196,6 +196,9 @@
                 recipeForm.reset();
                 editingId = null;
                 loadRecipes();
+                adminPanel.classList.remove("hidden");
+                loginSection.classList.add("hidden");
+                document.getElementById("publicRecipes").classList.add("hidden");
             })
             .catch(err => {
                 errorDiv.textContent = err.message;
@@ -221,6 +224,11 @@
             if (category) {
                 url += "?category=" + encodeURIComponent(category);
             }
+
+            adminPanel.classList.add("hidden");
+            document.getElementById("publicRecipes").classList.remove("hidden");
+
+
 
             fetch(url)
                 .then(res => res.json())

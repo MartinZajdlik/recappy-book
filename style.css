@@ -13,8 +13,19 @@ body {
     justify-content: center;
 }
 
+main > section,
+#publicRecipes,
+#loginSection,
+#adminPanel,
+#categoriesList,
+.recipe-list li {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .container {
-    max-width: 600px;
+    width: 100%;
+    max-width: 1000px;
     margin: 2rem auto;
     background-color: #25252b;
     padding: 2rem;
@@ -23,7 +34,7 @@ body {
 
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 
     overflow: visible;
 }
@@ -95,6 +106,7 @@ form select {
 }
 
 .recipe-list li {
+    width: 100%;
     background-color: #33334d;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -184,7 +196,7 @@ form select {
 }
 
 .title .highlight {
-    color
+    color: #ffc107;
 }
 .header {
     display: flex;
@@ -250,32 +262,44 @@ form select {
 }
 
 #categoriesList {
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
+
 
 #categoriesList button {
     width: 100%;
     text-align: left;
     padding: 0.7rem 1rem;
-    background-color: #739adf;      /* tmavší světle modrá */
+    background-color: #739adf;
     border: none;
     border-radius: 5px;
-    color: #0d1a33;                 /* tmavší modrá, skoro námořnická */
+    color: #0d1a33;
     font-weight: 600;
     font-size: 1.1rem;
     font-family: Comic Sans MS, cursive, sans-serif;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
+    box-sizing: border-box;
 }
+
 
 #categoriesList button:hover {
     background-color: #1e3a6e;      /* tmavá modrá, ale stále modrá */
     color: #d0d9ff;                 /* světle modrá pro lepší čitelnost */
 }
+
+#publicRecipes,
+#loginSection,
+#adminPanel {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 
 .footer {
     text-align: center;
@@ -296,4 +320,10 @@ form select {
         padding: 0.8rem 0.5rem;
         word-break: break-word;
     }
+}
+
+#publicRecipes,
+#adminPanel {
+    width: 100%;
+    box-sizing: border-box;
 }
