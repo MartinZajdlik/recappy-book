@@ -86,19 +86,6 @@ public class AuthController {
         return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
     }
 
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    //promazat ( delete users používát jen pro vývoj )
-    @DeleteMapping("/delete-all")
-    public String deleteAllUsers() {
-        userRepository.deleteAll();
-        return "Všichni uživatelé byli smazáni.";
-    }
-
     // Pomocná třída pro JSON odpověď s tokenem
     public static class JwtResponse {
         private String token;
