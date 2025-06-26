@@ -54,14 +54,30 @@
             <ul id="publicRecipeList" class="recipe-list"></ul>
         </section>
 
-        <section id="loginSection" class="hidden">
-            <form id="loginForm" class="login-form">
-                <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required/>
-                <input type="password" id="loginPassword" placeholder="Heslo" required/>
+        <section id="authSection">
+            <div class="auth-tabs">
+                <button id="loginTab" class="active">Přihlásit</button>
+                <button id="registerTab">Registrovat</button>
+            </div>
+
+            <!-- Přihlášení -->
+            <form id="loginForm" class="auth-form">
+                <input type="text" id="loginUsername" placeholder="Uživatelské jméno" required>
+                <input type="password" id="loginPassword" placeholder="Heslo" required>
                 <button type="submit">Přihlásit</button>
             </form>
-            <div id="error" class="error"></div>
+
+            <!-- Registrace -->
+            <form id="registerForm" class="auth-form hidden">
+                <input type="text" id="registerUsername" placeholder="Uživatelské jméno" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Heslo" required>
+                <button type="submit">Registrovat</button>
+            </form>
+
+            <div id="authError" class="error"></div>
         </section>
+
 
         <section id="adminPanel" class="hidden">
             <form id="recipeForm">
@@ -90,33 +106,54 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const adminBtn = document.getElementById("adminBtn");
-        const loginSection = document.getElementById("loginSection");
+        const loginSection = document.getElementById("authSection");
         const adminPanel = document.getElementById("adminPanel");
         const loginForm = document.getElementById("loginForm");
-        const errorDiv = document.getElementById("error");
+        const errorDiv = document.getElementById("error");       // Tento element v tvém HTML nevidím, asi ho nepoužíváš
+        const authError = document.getElementById("authError");
         const recipeList = document.getElementById("recipeList");
         const recipeForm = document.getElementById("recipeForm");
-
+        const loginTab = document.getElementById("loginTab");
+        const registerTab = document.getElementById("registerTab");
+        const loginFormEl = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+    
         let jwtToken = null;
         let editingId = null;
-
+    
         adminBtn.addEventListener("click", () => {
             if (!loginSection.classList.contains("hidden")) {
                 loginSection.classList.add("hidden");
                 adminPanel.classList.add("hidden");
-                errorDiv.textContent = "";
+                authError.textContent = "";
             } else {
                 loginSection.classList.remove("hidden");
                 adminPanel.classList.add("hidden");
-                errorDiv.textContent = "";
+                authError.textContent = "";
             }
         });
-
+    
+        loginTab.addEventListener("click", () => {
+            loginTab.classList.add("active");
+            registerTab.classList.remove("active");
+            loginFormEl.classList.remove("hidden");
+            registerForm.classList.add("hidden");
+            authError.textContent = "";
+        });
+    
+        registerTab.addEventListener("click", () => {
+            registerTab.classList.add("active");
+            loginTab.classList.remove("active");
+            registerForm.classList.remove("hidden");
+            loginFormEl.classList.add("hidden");
+            authError.textContent = "";
+        });
+    
         loginForm.addEventListener("submit", e => {
             e.preventDefault();
             const username = document.getElementById("loginUsername").value;
             const password = document.getElementById("loginPassword").value;
-
+    
             fetch("http://localhost:8080/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -125,23 +162,52 @@
             })
             .then(res => {
                 if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
-                return res.json(); // ← přečte JSON tělo odpovědi
+                return res.json();
             })
             .then(data => {
                 jwtToken = data.token;
                 if (!jwtToken) throw new Error("Chybějící token v odpovědi");
-                errorDiv.textContent = "";
+                authError.textContent = "";
                 loginSection.classList.add("hidden");
                 adminPanel.classList.remove("hidden");
-                loadRecipes(); // načte recepty jako admin
+                loadRecipes();
             })
-
             .catch(err => {
-                errorDiv.textContent = err.message || "Chyba při přihlášení";
+                authError.textContent = err.message || "Chyba při přihlášení";
             });
         });
-
-
+    
+        // === KROK 3: Registrace uživatele ===
+        registerForm.addEventListener("submit", e => {
+            e.preventDefault();
+            const username = document.getElementById("registerUsername").value;
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+    
+            fetch("http://localhost:8080/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, email, password }),
+                credentials: "include"
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Chyba při registraci uživatele");
+                return res.json();
+            })
+            .then(() => {
+                authError.textContent = "Registrace proběhla úspěšně. Nyní se přihlaš.";
+                registerForm.reset();
+                // Přepnutí zpět na přihlašovací záložku
+                registerTab.classList.remove("active");
+                loginTab.classList.add("active");
+                registerForm.classList.add("hidden");
+                loginFormEl.classList.remove("hidden");
+            })
+            .catch(err => {
+                authError.textContent = err.message || "Chyba při registraci.";
+            });
+        });
+    
         function loadRecipes() {
             fetch("http://localhost:8080/recepty", {
                 headers: { "Authorization": "Bearer " + jwtToken }
@@ -165,10 +231,10 @@
                 });
             })
             .catch(() => {
-                errorDiv.textContent = "Chyba při načítání receptů.";
+                authError.textContent = "Chyba při načítání receptů.";
             });
         }
-
+    
         recipeForm.addEventListener("submit", e => {
             e.preventDefault();
             const recipe = {
@@ -177,10 +243,10 @@
                 ingredients: document.getElementById("ingredients").value,
                 instructions: document.getElementById("instructions").value,
             };
-
+    
             const url = editingId ? `http://localhost:8080/recepty/${editingId}` : "http://localhost:8080/recepty";
             const method = editingId ? "PUT" : "POST";
-
+    
             fetch(url, {
                 method: method,
                 mode: "cors",
@@ -201,14 +267,14 @@
                 document.getElementById("publicRecipes").classList.add("hidden");
             })
             .catch(err => {
-                errorDiv.textContent = err.message;
+                authError.textContent = err.message;
             });
         });
-
+    
         const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
         const categoriesList = document.getElementById("categoriesList");
         const publicRecipeList = document.getElementById("publicRecipeList");
-
+    
         function renderCategories() {
             categoriesList.innerHTML = "";
             categories.forEach(category => {
@@ -218,18 +284,16 @@
                 categoriesList.appendChild(btn);
             });
         }
-
+    
         function loadPublicRecipes(category) {
             let url = "http://localhost:8080/recepty";
             if (category) {
                 url += "?category=" + encodeURIComponent(category);
             }
-
+    
             adminPanel.classList.add("hidden");
             document.getElementById("publicRecipes").classList.remove("hidden");
-
-
-
+    
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -253,10 +317,10 @@
                     publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
                 });
         }
-
+    
         renderCategories();
         //loadPublicRecipes();
-
+    
         window.editRecipe = function(id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
                 headers: { "Authorization": "Bearer " + jwtToken }
@@ -270,10 +334,10 @@
                 editingId = id;
             })
             .catch(() => {
-                errorDiv.textContent = "Chyba při načítání receptu.";
+                authError.textContent = "Chyba při načítání receptu.";
             });
         };
-
+    
         window.deleteRecipe = function(id) {
             if (!confirm("Opravdu chcete recept smazat?")) return;
             fetch(`http://localhost:8080/recepty/${id}`, {
@@ -285,11 +349,12 @@
                 loadRecipes();
             })
             .catch(err => {
-                errorDiv.textContent = err.message;
+                authError.textContent = err.message;
             });
         };
     });
-</script>
+    </script>
+    
 <footer class="footer">
     &copy; <strong>RecAPPy Book</strong> — Martin Žajdlík © 2025
 </footer>

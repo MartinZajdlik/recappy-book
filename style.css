@@ -327,3 +327,56 @@ form select {
     width: 100%;
     box-sizing: border-box;
 }
+
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.auth-tabs button {
+    padding: 0.5rem 1.5rem;
+    font-weight: bold;
+    background-color: #3a3a55;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.auth-tabs button.active,
+.auth-tabs button:hover {
+    background-color: #ffc107;
+    color: #25252b;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form input {
+    padding: 0.8rem;
+    background-color: #3a3a55;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.auth-form button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.auth-form button:hover {
+    background-color: #388e3c;
+}
