@@ -4,6 +4,7 @@ import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,11 +24,13 @@ public class RecipeController {
     }
 
     //  Jen pro admina
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Recipe createRecipe(@Valid @RequestBody Recipe recipe) {
-        return recipeRepository.save(recipe);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody Recipe recipe) {
+        Recipe saved = recipeRepository.save(recipe);
+        return ResponseEntity.ok(saved);
     }
+
 
     @GetMapping
     public List<Recipe> getRecipesByCategory(@RequestParam(required = false) String category) {

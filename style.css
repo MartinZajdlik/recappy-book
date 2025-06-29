@@ -207,6 +207,7 @@ form select {
 
 
 #adminBtn {
+    pointer-events: none;
     background: none;
     border: none;
     font-size: 2rem;
@@ -380,3 +381,32 @@ form select {
 .auth-form button:hover {
     background-color: #388e3c;
 }
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.username {
+    color: #ffc107;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.logout-btn {
+    padding: 0.4rem 0.8rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+    background-color: #a71d2a;
+}
+

@@ -65,7 +65,7 @@ public class AuthController {
 
 
                         // ⬇️ Nově pošleme token i v těle odpovědi
-                        return ResponseEntity.ok(new JwtResponse(token));
+                        return ResponseEntity.ok(new JwtResponse(token, dbUser.getRole()));
                     } else {
                         return ResponseEntity.status(401).body("Špatné heslo.");
                     }
@@ -89,9 +89,11 @@ public class AuthController {
     // Pomocná třída pro JSON odpověď s tokenem
     public static class JwtResponse {
         private String token;
+        private String role;
 
-        public JwtResponse(String token) {
+        public JwtResponse(String token, String role) {
             this.token = token;
+            this.role = role;
         }
 
         public String getToken() {
@@ -100,6 +102,14 @@ public class AuthController {
 
         public void setToken(String token) {
             this.token = token;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
         }
     }
 }

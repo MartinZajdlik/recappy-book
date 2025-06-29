@@ -39,16 +39,24 @@
             RecAPPy <span class="highlight">BOOK</span>
         </h1>
 
-        <button id="adminBtn" title="Admin přihlášení" aria-label="Admin přihlášení" style="background: none; border: none; cursor: pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#7cc7ff" viewBox="0 0 24 24">
-                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-            </svg>
-        </button>
+
+        <div class="user-info">
+            <span id="usernameDisplay" class="username hidden"></span>
+            <button id="logoutBtn" class="logout-btn hidden" title="Odhlásit se">Odhlásit</button>
+            <button id="adminBtn" title="Admin přihlášení" aria-label="Admin přihlášení" style="background: none; border: none; cursor: pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#7cc7ff" viewBox="0 0 24 24">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                </svg>
+            </button>
+        </div>
+
+
+
 
     </header>
 
     <main>
-        <section id="publicRecipes">
+        <section id="publicRecipes" class="hidden">
             <h2 id="categoriesTitle">Kategorie:</h2>
             <div id="categoriesList"></div>
             <ul id="publicRecipeList" class="recipe-list"></ul>
@@ -117,9 +125,15 @@
         const registerTab = document.getElementById("registerTab");
         const loginFormEl = document.getElementById("loginForm");
         const registerForm = document.getElementById("registerForm");
+        const usernameDisplay = document.getElementById("usernameDisplay");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+
+
     
         let jwtToken = null;
         let editingId = null;
+        let userRole = null;
     
         adminBtn.addEventListener("click", () => {
             if (!loginSection.classList.contains("hidden")) {
@@ -158,20 +172,32 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({username, password}),
-                credentials: "include"
             })
             .then(res => {
                 if (!res.ok) throw new Error("Neplatné přihlašovací údaje");
                 return res.json();
             })
             .then(data => {
-                jwtToken = data.token;
-                if (!jwtToken) throw new Error("Chybějící token v odpovědi");
+            jwtToken = data.token;
+            userRole = data.role;
+            if (!jwtToken) throw new Error("Chybějící token v odpovědi");
                 authError.textContent = "";
                 loginSection.classList.add("hidden");
+
+                usernameDisplay.textContent = username;
+                usernameDisplay.classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
+
+
+            if (data.role === "ROLE_ADMIN") {
                 adminPanel.classList.remove("hidden");
                 loadRecipes();
-            })
+            } else {
+                document.getElementById("publicRecipes").classList.remove("hidden");
+                loadPublicRecipes();  // pro běžného uživatele
+            }
+        })
+
             .catch(err => {
                 authError.textContent = err.message || "Chyba při přihlášení";
             });
@@ -188,7 +214,6 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, email, password }),
-                credentials: "include"
             })
             .then(res => {
                 if (!res.ok) throw new Error("Chyba při registraci uživatele");
@@ -250,7 +275,6 @@
             fetch(url, {
                 method: method,
                 mode: "cors",
-                credentials: "include",
                 headers: {"Content-Type": "application/json","Authorization": "Bearer " + jwtToken},
                 body: JSON.stringify(recipe)
             })
@@ -267,8 +291,11 @@
                 document.getElementById("publicRecipes").classList.add("hidden");
             })
             .catch(err => {
+                console.error("Chyba při ukládání receptu:", err);
+                console.log("JWT token byl:", jwtToken);
                 authError.textContent = err.message;
             });
+
         });
     
         const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
@@ -352,6 +379,20 @@
                 authError.textContent = err.message;
             });
         };
+
+        logoutBtn.addEventListener("click", () => {
+            jwtToken = null;
+            editingId = null;
+            usernameDisplay.textContent = "";
+            usernameDisplay.classList.add("hidden");
+            logoutBtn.classList.add("hidden");
+
+            loginSection.classList.remove("hidden");
+            adminPanel.classList.add("hidden");
+            document.getElementById("publicRecipes").classList.add("hidden");
+
+            authError.textContent = "";
+        });
     });
     </script>
     
