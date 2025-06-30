@@ -117,7 +117,6 @@
         const loginSection = document.getElementById("authSection");
         const adminPanel = document.getElementById("adminPanel");
         const loginForm = document.getElementById("loginForm");
-        const errorDiv = document.getElementById("error");       // Tento element v tvém HTML nevidím, asi ho nepoužíváš
         const authError = document.getElementById("authError");
         const recipeList = document.getElementById("recipeList");
         const recipeForm = document.getElementById("recipeForm");
@@ -131,9 +130,22 @@
 
 
     
-        let jwtToken = null;
+        let jwtToken = localStorage.getItem("jwtToken") || null;
         let editingId = null;
         let userRole = null;
+        let currentUsername = localStorage.getItem("currentUsername") || null;
+
+
+        if (jwtToken && currentUsername) {
+            usernameDisplay.textContent = currentUsername;
+            usernameDisplay.classList.remove("hidden");
+            logoutBtn.classList.remove("hidden");
+            loginSection.classList.add("hidden");
+            adminPanel.classList.remove("hidden");
+            loadRecipes();
+        } else {
+            recipeList.innerHTML = "";
+        }
     
         adminBtn.addEventListener("click", () => {
             if (!loginSection.classList.contains("hidden")) {
@@ -178,15 +190,19 @@
                 return res.json();
             })
             .then(data => {
-            jwtToken = data.token;
-            userRole = data.role;
-            if (!jwtToken) throw new Error("Chybějící token v odpovědi");
-                authError.textContent = "";
-                loginSection.classList.add("hidden");
+                jwtToken = data.token;
+                userRole = data.role;
+                currentUsername = username;
+                if (!jwtToken) throw new Error("Chybějící token v odpovědi");
+                    authError.textContent = "";
+                    loginSection.classList.add("hidden");
 
-                usernameDisplay.textContent = username;
-                usernameDisplay.classList.remove("hidden");
-                logoutBtn.classList.remove("hidden");
+                    usernameDisplay.textContent = username;
+                    usernameDisplay.classList.remove("hidden");
+                    logoutBtn.classList.remove("hidden");
+
+                localStorage.setItem("jwtToken", jwtToken);    
+                localStorage.setItem("currentUsername", currentUsername);
 
 
             if (data.role === "ROLE_ADMIN") {
@@ -194,7 +210,7 @@
                 loadRecipes();
             } else {
                 document.getElementById("publicRecipes").classList.remove("hidden");
-                loadPublicRecipes();  // pro běžného uživatele
+                loadPublicRecipes(); 
             }
         })
 
@@ -237,7 +253,16 @@
             fetch("http://localhost:8080/recepty", {
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                    } else {
+                        throw new Error("Chyba při načítání receptů.");
+                    }
+                }
+                return res.json();
+            })
             .then(data => {
                 recipeList.innerHTML = "";
                 data.forEach(recipe => {
@@ -255,10 +280,14 @@
                     recipeList.appendChild(li);
                 });
             })
-            .catch(() => {
-                authError.textContent = "Chyba při načítání receptů.";
+            .catch(err => {
+                authError.textContent = err.message;
+                if (err.message.includes("odhlášen")) {
+                    logoutBtn.click();
+                }
             });
         }
+
     
         recipeForm.addEventListener("submit", e => {
             e.preventDefault();
@@ -268,35 +297,62 @@
                 ingredients: document.getElementById("ingredients").value,
                 instructions: document.getElementById("instructions").value,
             };
-    
+
             const url = editingId ? `http://localhost:8080/recepty/${editingId}` : "http://localhost:8080/recepty";
             const method = editingId ? "PUT" : "POST";
-    
+
             fetch(url, {
                 method: method,
-                mode: "cors",
-                headers: {"Content-Type": "application/json","Authorization": "Bearer " + jwtToken},
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + jwtToken
+                },
                 body: JSON.stringify(recipe)
             })
             .then(res => {
-                if (!res.ok) throw new Error("Chyba při ukládání receptu.");
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                    }
+                    throw new Error("Chyba při ukládání receptu.");
+                }
                 return res.json();
             })
+
             .then(() => {
                 recipeForm.reset();
                 editingId = null;
                 loadRecipes();
+                console.log("Recept přidán/aktualizován, token stále:", jwtToken);
+
+                usernameDisplay.classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
+                usernameDisplay.textContent = currentUsername;
+
                 adminPanel.classList.remove("hidden");
                 loginSection.classList.add("hidden");
                 document.getElementById("publicRecipes").classList.add("hidden");
+
             })
             .catch(err => {
                 console.error("Chyba při ukládání receptu:", err);
                 console.log("JWT token byl:", jwtToken);
-                authError.textContent = err.message;
+                if (err.message.includes("401") || err.message.includes("403")) {
+                    authError.textContent = "Byl jsi odhlášen. Přihlas se znovu.";
+                    jwtToken = null;
+                    usernameDisplay.textContent = "";
+                    usernameDisplay.classList.add("hidden");
+                    logoutBtn.classList.add("hidden");
+                    loginSection.classList.remove("hidden");
+                    adminPanel.classList.add("hidden");
+                    document.getElementById("publicRecipes").classList.add("hidden");
+                } else {
+                    authError.textContent = err.message || "Chyba při ukládání receptu.";
+                }
             });
 
         });
+
     
         const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
         const categoriesList = document.getElementById("categoriesList");
@@ -346,7 +402,6 @@
         }
     
         renderCategories();
-        //loadPublicRecipes();
     
         window.editRecipe = function(id) {
             fetch(`http://localhost:8080/recepty/${id}`, {
@@ -372,17 +427,34 @@
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
             .then(res => {
-                if (!res.ok) throw new Error("Chyba při mazání receptu.");
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                    } else {
+                        throw new Error("Chyba při mazání receptu.");
+                    }
+                }
                 loadRecipes();
             })
             .catch(err => {
                 authError.textContent = err.message;
+                if (err.message.includes("odhlášen")) {
+                    logoutBtn.click();
+                }
             });
         };
+
 
         logoutBtn.addEventListener("click", () => {
             jwtToken = null;
             editingId = null;
+            currentUsername = null; 
+
+            
+            localStorage.removeItem("jwtToken");       
+            localStorage.removeItem("currentUsername"); 
+
+
             usernameDisplay.textContent = "";
             usernameDisplay.classList.add("hidden");
             logoutBtn.classList.add("hidden");

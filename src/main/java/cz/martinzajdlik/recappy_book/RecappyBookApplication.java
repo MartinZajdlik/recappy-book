@@ -34,6 +34,8 @@ public class RecappyBookApplication {
 				userRepository.save(user);
 			}
 		};
+
 	}
+
 
 }

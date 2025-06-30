@@ -2,7 +2,7 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
-import cz.martinzajdlik.recappy_book.security.JwtUtil;  // import na JWT utilitu (musíš vytvořit)
+import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,10 +47,10 @@ public class AuthController {
         return userRepository.findByUsername(user.getUsername())
                 .map(dbUser -> {
                     if (passwordEncoder.matches(user.getPassword(), dbUser.getPassword())) {
-                        // Vygeneruj JWT token
+
                         String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole());
 
-                        // Nastav cookie s tokenem
+
                         Cookie cookie = new Cookie("jwt", token);
                         cookie.setHttpOnly(true);
                         cookie.setSecure(false); // na produkci true a HTTPS
@@ -64,7 +62,7 @@ public class AuthController {
                         headers.add("Authorization", "Bearer " + token);
 
 
-                        // ⬇️ Nově pošleme token i v těle odpovědi
+
                         return ResponseEntity.ok(new JwtResponse(token, dbUser.getRole()));
                     } else {
                         return ResponseEntity.status(401).body("Špatné heslo.");

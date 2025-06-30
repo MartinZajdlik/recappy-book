@@ -30,13 +30,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwt = null;
         String username = null;
 
-        // Nejprve zkus token z hlavičky Authorization
+
         final String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
         }
 
-        // Pokud žádný token v hlavičce, zkus token z cookie "jwt"
+
         if (jwt == null && request.getCookies() != null) {
             for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
@@ -50,14 +50,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
-                // Token je neplatný nebo expirovaný – můžeš logovat případně
+
             }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
+            if (jwtUtil.validateToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

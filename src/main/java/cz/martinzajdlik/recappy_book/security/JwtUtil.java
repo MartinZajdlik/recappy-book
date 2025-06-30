@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -47,10 +48,11 @@ public class JwtUtil {
     }
 
 
-    public boolean validateToken(String token, String username) {
-        String tokenUsername = extractUsername(token);
-        return tokenUsername.equals(username) && !isTokenExpired(token);
+    public boolean validateToken(String token, org.springframework.security.core.userdetails.UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
 
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
