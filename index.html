@@ -2,6 +2,7 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RecAPPy BOOK</title>
     <link rel="stylesheet" href="style.css"/>
 </head>
@@ -108,6 +109,10 @@
             <ul id="recipeList" class="recipe-list"></ul>
         </section>
     </main>
+
+    <footer class="footer">
+        &copy; <strong>RecAPPy Book</strong> — Martin Žajdlík © 2025
+    </footer>
 
 </div>
 
@@ -377,6 +382,11 @@
             adminPanel.classList.add("hidden");
             document.getElementById("publicRecipes").classList.remove("hidden");
     
+            if (!category) {
+                publicRecipeList.innerHTML = ""; 
+                return; 
+            }
+
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
@@ -467,12 +477,6 @@
         });
     });
     </script>
-    
-<footer class="footer">
-    &copy; <strong>RecAPPy Book</strong> — Martin Žajdlík © 2025
-</footer>
-
-
 
 </body>
 </html>

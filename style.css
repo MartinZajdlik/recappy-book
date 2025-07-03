@@ -1,3 +1,18 @@
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
+}
+
+
+
+* {
+    box-sizing: border-box;
+  }
+  
+
 .hidden {
     display: none !important;
 }
@@ -9,9 +24,10 @@ body {
     font-family: 'Segoe UI', sans-serif;
     margin: 0;
     padding: 0;
-    align-items: center;
+    display: flex;
     justify-content: center;
 }
+
 
 main > section,
 #publicRecipes,
@@ -26,6 +42,7 @@ main > section,
 .container {
     width: 100%;
     max-width: 1000px;
+    min-height: 100vh;
     margin: 2rem auto;
     background-color: #25252b;
     padding: 2rem;
@@ -132,15 +149,17 @@ form select {
 
 .recipe-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-top: 1rem;
     gap: 1rem;
+    flex-wrap: nowrap;
 }
 
 .action-btn {
-    flex: 1;
+    flex: none;
     height: 40px;
     padding: 0;
+    min-width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -151,6 +170,8 @@ form select {
     cursor: pointer;
     transition: background-color 0.2s ease;
     text-align: center;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
 }
 
 .edit-btn {
@@ -314,15 +335,6 @@ form select {
     border-radius: 0 0 10px 10px;
 }
 
-/* Responsivní úpravy pro mobily */
-@media (max-width: 480px) {
-    .footer {
-        font-size: 0.8rem;
-        padding: 0.8rem 0.5rem;
-        word-break: break-word;
-    }
-}
-
 #publicRecipes,
 #adminPanel {
     width: 100%;
@@ -408,5 +420,110 @@ form select {
 
 .logout-btn:hover {
     background-color: #a71d2a;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+        margin: 1rem;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    .title {
+        font-size: 2rem;
+        flex-direction: row;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+
+    .title svg {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .user-info {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0 1rem;
+        justify-content: center;
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .username {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .logout-btn {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+    }
+
+    .auth-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .auth-tabs button {
+        width: 100%;
+        font-size: 0.95rem;
+    }
+
+    form input,
+    form textarea,
+    form select {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+        border-radius: 4px;
+    }
+
+    form button,
+    .auth-form button {
+        font-size: 0.95rem;
+        padding: 0.7rem;
+        border-radius: 4px;
+    }
+
+    .recipe-list li {
+        padding: 0.8rem;
+        margin-bottom: 0.7rem;
+        border-radius: 5px;
+    }
+
+    .recipe-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    #categoriesTitle {
+        font-size: 1.4rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+    }
+
+    #categoriesList button {
+        font-size: 1rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 5px;
+    }
+
+    .footer {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+        border-radius: 0 0 6px 6px;
+    }
 }
 
