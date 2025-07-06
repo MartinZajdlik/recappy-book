@@ -1,5 +1,6 @@
 package cz.martinzajdlik.recappy_book.controller;
 
+import cz.martinzajdlik.recappy_book.dto.UserDTO;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,17 @@ public class AdminUserController {
 
     // Získat všechny uživatele
     @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getRole()))
+                .toList();
     }
+
 
     // Změnit roli uživatele
     @PutMapping("/{id}/role")

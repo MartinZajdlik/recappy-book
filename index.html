@@ -10,7 +10,7 @@
 <div class="container">
 
     <header class="header">
-        <h1 class="title">
+        <h1 class="title" id="homeTitle" style="cursor: pointer;">
             <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id="gradLeft" x1="0" y1="0" x2="0" y2="1">
@@ -107,6 +107,26 @@
             </form>
 
             <ul id="recipeList" class="recipe-list"></ul>
+
+            <section id="adminUsersSection" class="hidden" style="margin-top: 2rem;">
+                <h2>Správa uživatelů</h2>
+                <table id="usersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Uživatelské jméno</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Akce</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Uživatelské řádky se doplní dynamicky -->
+                  </tbody>
+                </table>
+              </section>
+              
+
         </section>
     </main>
 
@@ -213,6 +233,7 @@
             if (data.role === "ROLE_ADMIN") {
                 adminPanel.classList.remove("hidden");
                 loadRecipes();
+                loadUsers();
             } else {
                 document.getElementById("publicRecipes").classList.remove("hidden");
                 loadPublicRecipes(); 
@@ -230,7 +251,7 @@
             const username = document.getElementById("registerUsername").value;
             const email = document.getElementById("registerEmail").value;
             const password = document.getElementById("registerPassword").value;
-    
+
             fetch("http://localhost:8080/auth/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -241,18 +262,53 @@
                 return res.json();
             })
             .then(() => {
-                authError.textContent = "Registrace proběhla úspěšně. Nyní se přihlaš.";
+                // Po úspěšné registraci automaticky přihlásit
+                return fetch("http://localhost:8080/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                });
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Automatické přihlášení selhalo");
+                return res.json();
+            })
+            .then(data => {
+                jwtToken = data.token;
+                userRole = data.role;
+                currentUsername = username;
+
+                localStorage.setItem("jwtToken", jwtToken);
+                localStorage.setItem("currentUsername", currentUsername);
+
+                authError.textContent = "";
+                loginSection.classList.add("hidden");
+
+                usernameDisplay.textContent = currentUsername;
+                usernameDisplay.classList.remove("hidden");
+                logoutBtn.classList.remove("hidden");
+
+                if (data.role === "ROLE_ADMIN") {
+                    adminPanel.classList.remove("hidden");
+                    loadRecipes();
+                    loadUsers();
+                } else {
+                    document.getElementById("publicRecipes").classList.remove("hidden");
+                    loadPublicRecipes();
+                }
+
+                // Reset formuláře registrace a přepnutí záložky
                 registerForm.reset();
-                // Přepnutí zpět na přihlašovací záložku
                 registerTab.classList.remove("active");
                 loginTab.classList.add("active");
                 registerForm.classList.add("hidden");
                 loginFormEl.classList.remove("hidden");
             })
             .catch(err => {
-                authError.textContent = err.message || "Chyba při registraci.";
+                authError.textContent = err.message || "Chyba při registraci nebo přihlášení.";
             });
         });
+
     
         function loadRecipes() {
             fetch("http://localhost:8080/recepty", {
@@ -475,6 +531,136 @@
 
             authError.textContent = "";
         });
+
+        document.getElementById("homeTitle").addEventListener("click", () => {
+            // Odhlásit uživatele
+            jwtToken = null;
+            editingId = null;
+            currentUsername = null;
+
+            localStorage.removeItem("jwtToken");
+            localStorage.removeItem("currentUsername");
+
+            usernameDisplay.textContent = "";
+            usernameDisplay.classList.add("hidden");
+            logoutBtn.classList.add("hidden");
+
+            // Skrýt sekce a zobrazit přihlášení
+            loginSection.classList.remove("hidden");
+            adminPanel.classList.add("hidden");
+            document.getElementById("publicRecipes").classList.add("hidden");
+
+            // Přepnout zpět na login záložku
+            loginTab.classList.add("active");
+            registerTab.classList.remove("active");
+            loginFormEl.classList.remove("hidden");
+            registerForm.classList.add("hidden");
+
+            // Smazat chybové hlášení
+            authError.textContent = "";
+        });
+        const adminUsersSection = document.getElementById("adminUsersSection");
+        const usersTableBody = document.querySelector("#usersTable tbody");
+
+        // Načtení uživatelů z backendu
+        function loadUsers() {
+            fetch("http://localhost:8080/admin/users", {
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    if (res.status === 401 || res.status === 403) {
+                        throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                    } else {
+                        throw new Error("Chyba při načítání uživatelů.");
+                    }
+                }
+                return res.json();
+            })
+            .then(users => {
+                usersTableBody.innerHTML = "";
+                users.forEach(user => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>
+                        <select data-user-id="${user.id}" class="role-select">
+                            <option value="ROLE_USER" ${user.role === "ROLE_USER" ? "selected" : ""}>USER</option>
+                            <option value="ROLE_ADMIN" ${user.role === "ROLE_ADMIN" ? "selected" : ""}>ADMIN</option>
+                        </select>
+                        </td>
+                        <td>
+                        <button class="delete-user-btn" data-user-id="${user.id}">🗑️ Smazat</button>
+                        </td>
+                    `;
+                    usersTableBody.appendChild(tr);
+                });
+
+                adminUsersSection.classList.remove("hidden");  // ODHAL sekci!
+
+
+                // Přidáme event listener pro změnu role
+                document.querySelectorAll(".role-select").forEach(select => {
+                    select.addEventListener("change", e => {
+                        const id = e.target.getAttribute("data-user-id");
+                        const newRole = e.target.value;
+                        changeUserRole(id, newRole);
+                    });
+                });
+
+                // Přidáme event listener pro mazání uživatele
+                document.querySelectorAll(".delete-user-btn").forEach(btn => {
+                    btn.addEventListener("click", e => {
+                        const id = e.target.getAttribute("data-user-id");
+                        if (confirm("Opravdu chcete smazat tohoto uživatele?")) {
+                            deleteUser(id);
+                        }
+                    });
+                });
+            })
+            .catch(err => {
+                alert(err.message);
+                if (err.message.includes("odhlášen")) logoutBtn.click();
+            });
+        }
+
+        function changeUserRole(id, role) {
+            fetch(`http://localhost:8080/admin/users/${id}/role?role=${role}`, {
+                method: "PUT",
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Chyba při změně role uživatele.");
+                alert("Role uživatele byla změněna.");
+                loadUsers();
+            })
+            .catch(err => {
+                alert(err.message);
+                loadUsers(); // obnovíme seznam kvůli konzistenci
+            });
+        }
+
+        function deleteUser(id) {
+            fetch(`http://localhost:8080/admin/users/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
+            .then(res => {
+                console.log("Delete status:", res.status);
+                if (!res.ok) throw new Error("Chyba při mazání uživatele.");
+                alert("Uživatel byl smazán.");
+                loadUsers();
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+        }
+
+
+
+
     });
     </script>
 

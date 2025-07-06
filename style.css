@@ -526,4 +526,110 @@ form select {
         border-radius: 0 0 6px 6px;
     }
 }
+#adminUsersSection {
+    margin-top: 2rem;
+    background-color: #33334d;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    color: #f0f0f0;
+}
+
+#adminUsersSection h2 {
+    color: #ffc107;
+    margin-bottom: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#usersTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+    color: #f0f0f0;
+}
+
+#usersTable th,
+#usersTable td {
+    border: 1px solid #555577;
+    padding: 0.6rem 1rem;
+    text-align: left;
+}
+
+#usersTable thead {
+    background-color: #25252b;
+}
+
+#usersTable tbody tr:nth-child(even) {
+    background-color: #2f2f4a;
+}
+
+#usersTable tbody tr:hover {
+    background-color: #444466;
+}
+
+.role-select {
+    background-color: #3a3a55;
+    color: #f0f0f0;
+    border: none;
+    border-radius: 5px;
+    padding: 0.3rem 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.role-select:hover {
+    background-color: #5a5a7a;
+}
+
+.delete-user-btn {
+    background-color: #dc3545;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-user-btn:hover {
+    background-color: #a71d2a;
+}
+
+/* Responzivní tabulka */
+@media (max-width: 600px) {
+    #usersTable, #usersTable thead, #usersTable tbody, #usersTable th, #usersTable td, #usersTable tr {
+        display: block;
+    }
+    #usersTable thead tr {
+        display: none;
+    }
+    #usersTable tbody tr {
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #444466;
+        padding-bottom: 1rem;
+    }
+    #usersTable tbody td {
+        padding-left: 50%;
+        position: relative;
+        text-align: left;
+        border: none;
+        border-bottom: 1px solid #555577;
+    }
+    #usersTable tbody td::before {
+        position: absolute;
+        left: 1rem;
+        top: 0.6rem;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #ffc107;
+    }
+    #usersTable tbody td:nth-of-type(1)::before { content: "ID"; }
+    #usersTable tbody td:nth-of-type(2)::before { content: "Uživatelské jméno"; }
+    #usersTable tbody td:nth-of-type(3)::before { content: "Email"; }
+    #usersTable tbody td:nth-of-type(4)::before { content: "Role"; }
+    #usersTable tbody td:nth-of-type(5)::before { content: "Akce"; }
+}
+
 

@@ -22,7 +22,8 @@ public class RecappyBookApplication {
 				User admin = new User();
 				admin.setUsername("admin");
 				admin.setPassword(passwordEncoder.encode("admin")); // zašifrované heslo
-				admin.setRole("ROLE_ADMIN"); // POZOR na správný název role
+				admin.setRole("ROLE_ADMIN");
+				admin.setEmail("m.zajdlik@seznam.cz");
 				userRepository.save(admin);
 			}
 
@@ -31,6 +32,7 @@ public class RecappyBookApplication {
 				user.setUsername("user");
 				user.setPassword(passwordEncoder.encode("user")); // jednoduché heslo na test
 				user.setRole("ROLE_USER"); // běžný uživatel
+				user.setEmail("pomocny@seznam.cz");
 				userRepository.save(user);
 			}
 		};

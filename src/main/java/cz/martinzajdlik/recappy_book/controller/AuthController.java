@@ -1,10 +1,12 @@
 package cz.martinzajdlik.recappy_book.controller;
 
+import cz.martinzajdlik.recappy_book.dto.UserRegistrationDTO;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,14 +32,18 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+    public ResponseEntity<String> register(@RequestBody @Valid UserRegistrationDTO registrationDTO) {
+        if (userRepository.findByUsername(registrationDTO.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Uživatel již existuje.");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole("ROLE_USER");  // každý registrovaný je běžný uživatel
-        userRepository.save(user);
+        User newUser = new User();
+        newUser.setUsername(registrationDTO.getUsername());
+        newUser.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        newUser.setEmail(registrationDTO.getEmail());
+        newUser.setRole("ROLE_USER");
+
+        userRepository.save(newUser);
 
         return ResponseEntity.ok("Registrace proběhla úspěšně.");
     }

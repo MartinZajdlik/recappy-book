@@ -1,6 +1,7 @@
 package cz.martinzajdlik.recappy_book.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -19,6 +20,12 @@ public class User {
 
     @NotBlank
     private String role; // např. "ADMIN" nebo "USER"
+
+    @Column(unique = true)
+    @NotBlank
+    @Email
+    private String email;
+
 
     public User() {
     }
@@ -41,4 +48,10 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getEmail() {return email;}
+    public void setEmail(String email) {this.email = email;}
+
+
+
 }
