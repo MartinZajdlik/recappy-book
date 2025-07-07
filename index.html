@@ -578,7 +578,15 @@
                 return res.json();
             })
             .then(users => {
+                console.log("Uživatelé z backendu:", users);
+                adminUsersSection.classList.remove("hidden");  // ODHAL sekci!
                 usersTableBody.innerHTML = "";
+
+                if (users.length === 0) {
+                    usersTableBody.innerHTML = `<tr><td colspan="5">Žádní uživatelé k zobrazení.</td></tr>`;
+                    return;
+                }
+
                 users.forEach(user => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
@@ -598,11 +606,11 @@
                     usersTableBody.appendChild(tr);
                 });
 
-                adminUsersSection.classList.remove("hidden");  // ODHAL sekci!
+            
 
 
                 // Přidáme event listener pro změnu role
-                document.querySelectorAll(".role-select").forEach(select => {
+                usersTableBody.querySelectorAll(".role-select").forEach(select => {
                     select.addEventListener("change", e => {
                         const id = e.target.getAttribute("data-user-id");
                         const newRole = e.target.value;
@@ -611,7 +619,7 @@
                 });
 
                 // Přidáme event listener pro mazání uživatele
-                document.querySelectorAll(".delete-user-btn").forEach(btn => {
+                usersTableBody.querySelectorAll(".delete-user-btn").forEach(btn => {
                     btn.addEventListener("click", e => {
                         const id = e.target.getAttribute("data-user-id");
                         if (confirm("Opravdu chcete smazat tohoto uživatele?")) {
@@ -648,15 +656,35 @@
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
             .then(res => {
-                console.log("Delete status:", res.status);
-                if (!res.ok) throw new Error("Chyba při mazání uživatele.");
+                console.log("Stav mazání uživatele:", res.status);
+
+                if (res.status === 401 || res.status === 403) {
+                    throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                }
+
+                if (!res.ok) {
+                return res.text().then(text => {
+                    console.warn("Chyba při mazání uživatele:", text);
+                    throw new Error("Chyba při mazání uživatele: " + text);
+                });
+            }
+
+
                 alert("Uživatel byl smazán.");
                 loadUsers();
             })
             .catch(err => {
+                console.log("Chyba při mazání:", err);
                 alert(err.message);
+
+                if (err.message.includes("odhlášen")) {
+                    console.warn("Vyvolávám logout kvůli chybě:", err.message);
+                    logoutBtn.click();
+                }
             });
+
         }
+
 
 
 
