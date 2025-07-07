@@ -259,55 +259,24 @@
             })
             .then(res => {
                 if (!res.ok) throw new Error("Chyba při registraci uživatele");
-                return res.json();
+                return res.text();
             })
             .then(() => {
-                // Po úspěšné registraci automaticky přihlásit
-                return fetch("http://localhost:8080/auth/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password }),
-                });
-            })
-            .then(res => {
-                if (!res.ok) throw new Error("Automatické přihlášení selhalo");
-                return res.json();
-            })
-            .then(data => {
-                jwtToken = data.token;
-                userRole = data.role;
-                currentUsername = username;
+                authError.textContent = "Registrace proběhla úspěšně, prosím přihlaste se.";
 
-                localStorage.setItem("jwtToken", jwtToken);
-                localStorage.setItem("currentUsername", currentUsername);
-
-                authError.textContent = "";
-                loginSection.classList.add("hidden");
-
-                usernameDisplay.textContent = currentUsername;
-                usernameDisplay.classList.remove("hidden");
-                logoutBtn.classList.remove("hidden");
-
-                if (data.role === "ROLE_ADMIN") {
-                    adminPanel.classList.remove("hidden");
-                    loadRecipes();
-                    loadUsers();
-                } else {
-                    document.getElementById("publicRecipes").classList.remove("hidden");
-                    loadPublicRecipes();
-                }
-
-                // Reset formuláře registrace a přepnutí záložky
-                registerForm.reset();
+                // Přepni na login tab a formulář
                 registerTab.classList.remove("active");
                 loginTab.classList.add("active");
                 registerForm.classList.add("hidden");
                 loginFormEl.classList.remove("hidden");
+
+                registerForm.reset();
             })
             .catch(err => {
-                authError.textContent = err.message || "Chyba při registraci nebo přihlášení.";
+                authError.textContent = err.message || "Chyba při registraci.";
             });
         });
+
 
     
         function loadRecipes() {

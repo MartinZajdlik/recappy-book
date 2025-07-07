@@ -2,6 +2,7 @@ package cz.martinzajdlik.recappy_book.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserRegistrationDTO {
@@ -14,7 +15,11 @@ public class UserRegistrationDTO {
     private String password;
 
     @NotBlank(message = "E-mail nesmí být prázdný.")
-    @Email(message = "E-mail nemá správný formát.")
+    @Pattern(
+            regexp = "^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,6}$",
+            message = "E-mail nemá správný formát."
+    )
+
     private String email;
 
     // Gettery a settery
