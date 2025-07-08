@@ -1,9 +1,6 @@
 package cz.martinzajdlik.recappy_book.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -24,6 +21,10 @@ public class Recipe {
 
     @NotBlank(message = "Kategorie nesmí být prázdná")
     private String category;
+
+    @Column(name = "image_path")
+    private String imagePath;
+
 
     // --- Konstruktory ---
     public Recipe() {
@@ -75,5 +76,9 @@ public class Recipe {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    public String getImagePath() {return imagePath; }
+
+    public void setImagePath(String imagePath) {this.imagePath = imagePath; }
 
 }
