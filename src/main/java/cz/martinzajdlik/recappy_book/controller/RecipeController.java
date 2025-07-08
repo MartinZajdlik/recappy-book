@@ -7,9 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -30,6 +37,41 @@ public class RecipeController {
         Recipe saved = recipeRepository.save(recipe);
         return ResponseEntity.ok(saved);
     }
+
+    @PostMapping("/{id}/image")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> uploadImage(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile imageFile) throws IOException {
+
+        Optional<Recipe> recipeOpt = recipeRepository.findById(id);
+        if (recipeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recipe recipe = recipeOpt.get();
+
+        // Ulož obrázek do složky na disku (např. "pictures/")
+        String folder = "pictures/";
+        String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+
+        File dir = new File(folder);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        Path filePath = Paths.get(folder, filename);
+        Files.write(filePath, imageFile.getBytes());
+
+        // Ulož cestu k obrázku do receptu
+        recipe.setImagePath(filename);
+        recipeRepository.save(recipe);
+
+        return ResponseEntity.ok("Obrázek uložen");
+    }
+
+
+
+
+
 
 
     @GetMapping
