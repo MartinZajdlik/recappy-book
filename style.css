@@ -6,17 +6,13 @@ body {
     min-height: 100%;
 }
 
-
-
 * {
     box-sizing: border-box;
-  }
-  
+}
 
 .hidden {
     display: none !important;
 }
-
 
 body {
     background-color: #101021;
@@ -27,7 +23,6 @@ body {
     display: flex;
     justify-content: center;
 }
-
 
 main > section,
 #publicRecipes,
@@ -45,7 +40,7 @@ main > section,
     min-height: 100vh;
     margin: 2rem auto;
     background-color: #25252b;
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 
@@ -54,6 +49,7 @@ main > section,
     align-items: stretch;
 
     overflow: visible;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -123,12 +119,14 @@ form select {
 }
 
 .recipe-list li {
-    width: 100%;
     background-color: #33334d;
-    padding: 1rem;
+    padding: 1rem 1.2rem;
     margin-bottom: 1rem;
     border-radius: 8px;
-    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-sizing: border-box;
 }
 
 .recipe-list strong {
@@ -151,15 +149,15 @@ form select {
     display: flex;
     justify-content: flex-start;
     margin-top: 1rem;
-    gap: 1rem;
-    flex-wrap: nowrap;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .action-btn {
-    flex: none;
+    flex-grow: 1;
+    min-width: 120px;
     height: 40px;
-    padding: 0;
-    min-width: 100px;
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -170,7 +168,6 @@ form select {
     cursor: pointer;
     transition: background-color 0.2s ease;
     text-align: center;
-    padding: 0.5rem 1rem;
     white-space: nowrap;
 }
 
@@ -219,13 +216,13 @@ form select {
 .title .highlight {
     color: #ffc107;
 }
+
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
 }
-
 
 #adminBtn {
     pointer-events: none;
@@ -241,47 +238,6 @@ form select {
 #adminBtn:hover {
     transform: rotate(20deg);
 }
-#categoriesList {
-    display: flex;
-    flex-direction: column;  /* kategorie pod sebou */
-    align-items: flex-start; /* zarovnání vlevo */
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-#categoriesList button {
-    width: 100%;      /* tlačítko roztáhlé na celou šířku kontejneru */
-    text-align: left; /* text vlevo */
-    padding: 0.7rem 1rem;
-    background-color: #3a3a55;
-    border: none;
-    border-radius: 5px;
-    color: #7cc7ff;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 1rem; /* zvětšené písmo */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* volitelně moderní písmo */
-}
-
-#categoriesList button:hover {
-    background-color: #5a5a7a;
-}
-
-#categoriesTitle {
-    font-family: Comic Sans MS;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #ffc107;
-    background-color: #33334d;      /* světlá modrá */
-    padding: 0.4rem 1rem;
-    margin-bottom: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    letter-spacing: 0.05em;
-    user-select: none;
-    /* žádný hover efekt */
-}
 
 #categoriesList {
     width: 100%;
@@ -291,7 +247,6 @@ form select {
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
-
 
 #categoriesList button {
     width: 100%;
@@ -307,12 +262,26 @@ form select {
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
     box-sizing: border-box;
+    display: block;
 }
 
-
 #categoriesList button:hover {
-    background-color: #1e3a6e;      /* tmavá modrá, ale stále modrá */
-    color: #d0d9ff;                 /* světle modrá pro lepší čitelnost */
+    background-color: #1e3a6e;
+    color: #d0d9ff;
+}
+
+#categoriesTitle {
+    font-family: Comic Sans MS;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffc107;
+    background-color: #33334d;
+    padding: 0.4rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.05em;
+    user-select: none;
 }
 
 #publicRecipes,
@@ -321,7 +290,6 @@ form select {
     width: 100%;
     box-sizing: border-box;
 }
-
 
 .footer {
     text-align: center;
@@ -333,12 +301,6 @@ form select {
     border-top: 1px solid #333;
     width: 100%;
     border-radius: 0 0 10px 10px;
-}
-
-#publicRecipes,
-#adminPanel {
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .auth-tabs {
@@ -498,7 +460,7 @@ form select {
     }
 
     .recipe-list li {
-        padding: 0.8rem;
+        padding: 0.8rem 1rem;
         margin-bottom: 0.7rem;
         border-radius: 5px;
     }
@@ -526,6 +488,7 @@ form select {
         border-radius: 0 0 6px 6px;
     }
 }
+
 #adminUsersSection {
     margin-top: 2rem;
     background-color: #33334d;
@@ -632,4 +595,72 @@ form select {
     #usersTable tbody td:nth-of-type(5)::before { content: "Akce"; }
 }
 
+/* --- Obrázky receptů --- */
+/* Levá část s textem */
+.recipe-text {
+    flex: 1 1 60%;
+    min-width: 250px;
+}
 
+/* Pravá část s obrázkem */
+.recipe-image {
+    flex: 1 1 35%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Efekt přiblížení při hoveru */
+.recipe-image:hover {
+    transform: scale(1.05);
+}
+
+/* Pod textem a obrázkem je postup receptu přes celou šířku */
+.recipe-instructions {
+    width: 100%;
+    margin-top: 1rem;
+    color: #ddd;
+    line-height: 1.5;
+}
+
+/* Název receptu */
+.recipe-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffc107;
+    margin: 0 0 0.3rem 0;
+}
+
+/* Kategorie */
+.recipe-category {
+    font-style: italic;
+    color: #7cc7ff;
+    margin-bottom: 0.5rem;
+}
+
+/* Ingredience */
+.recipe-ingredients {
+    margin-bottom: 0;
+    color: #eee;
+}
+
+/* Responzivita pro mobil */
+@media (max-width: 768px) {
+    .recipe-list li {
+        flex-direction: column;
+    }
+    .recipe-text, .recipe-image {
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
+    .recipe-instructions {
+        margin-top: 0.5rem;
+    }
+}

@@ -103,6 +103,7 @@
 
                 <textarea id="ingredients" placeholder="Ingredience" required></textarea>
                 <textarea id="instructions" placeholder="Postup" required></textarea>
+                <input type="file" id="imageInput" accept="image/*">
                 <button type="submit">Přidat recept</button>
             </form>
 
@@ -298,15 +299,24 @@
                 data.forEach(recipe => {
                     const li = document.createElement("li");
                     li.innerHTML = `
-                        <strong>${recipe.title}</strong><br>
-                        <em class="category">${recipe.category}</em><br>
-                        <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
-                        <p>${recipe.instructions}</p>
+                        <div class="recipe-content">
+                            <div class="recipe-left">
+                                <strong>${recipe.title}</strong><br>
+                                <em class="category">${recipe.category}</em><br>
+                                <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                            </div>
+                            <div class="recipe-right">
+                                ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                            </div>
+                        </div>
+                        <p class="recipe-instructions">${recipe.instructions}</p>
                         <div class="recipe-buttons">
                             <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
                             <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
                         </div>
                     `;
+
+
                     recipeList.appendChild(li);
                 });
             })
@@ -321,6 +331,7 @@
     
         recipeForm.addEventListener("submit", e => {
             e.preventDefault();
+
             const recipe = {
                 title: document.getElementById("title").value,
                 category: document.getElementById("category").value,
@@ -328,6 +339,7 @@
                 instructions: document.getElementById("instructions").value,
             };
 
+            const imageFile = document.getElementById("imageInput").files[0];
             const url = editingId ? `http://localhost:8080/recepty/${editingId}` : "http://localhost:8080/recepty";
             const method = editingId ? "PUT" : "POST";
 
@@ -348,12 +360,26 @@
                 }
                 return res.json();
             })
+            .then(data => {
+                // === TADY: pokud máme obrázek a je to nový recept (ne editace), nahrajeme ho
+                if (imageFile && !editingId) {
+                    const formData = new FormData();
+                    formData.append("image", imageFile);
 
+                    return fetch(`http://localhost:8080/recepty/${data.id}/image`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Bearer " + jwtToken
+                        },
+                        body: formData
+                    });
+                }
+            })
             .then(() => {
                 recipeForm.reset();
                 editingId = null;
                 loadRecipes();
-                console.log("Recept přidán/aktualizován, token stále:", jwtToken);
+                console.log("Recept a případně i obrázek uložen.");
 
                 usernameDisplay.classList.remove("hidden");
                 logoutBtn.classList.remove("hidden");
@@ -362,11 +388,9 @@
                 adminPanel.classList.remove("hidden");
                 loginSection.classList.add("hidden");
                 document.getElementById("publicRecipes").classList.add("hidden");
-
             })
             .catch(err => {
-                console.error("Chyba při ukládání receptu:", err);
-                console.log("JWT token byl:", jwtToken);
+                console.error("Chyba při ukládání receptu nebo obrázku:", err);
                 if (err.message.includes("401") || err.message.includes("403")) {
                     authError.textContent = "Byl jsi odhlášen. Přihlas se znovu.";
                     jwtToken = null;
@@ -380,8 +404,8 @@
                     authError.textContent = err.message || "Chyba při ukládání receptu.";
                 }
             });
-
         });
+
 
     
         const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
@@ -423,13 +447,26 @@
                     data.forEach(recipe => {
                         const li = document.createElement("li");
                         li.innerHTML = `
-                            <strong>${recipe.title}</strong><br>
-                            <em class="category">${recipe.category}</em><br>
-                            <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
-                            <p>${recipe.instructions}</p>
+                            <div class="recipe-content">
+                                <div class="recipe-left">
+                                    <strong>${recipe.title}</strong><br>
+                                    <em class="category">${recipe.category}</em><br>
+                                    <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                                </div>
+                                <div class="recipe-right">
+                                    ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                                </div>
+                            </div>
+                            <p class="recipe-instructions">${recipe.instructions}</p>
+                            <div class="recipe-buttons">
+                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                            </div>
                         `;
+
                         publicRecipeList.appendChild(li);
                     });
+
                 })
                 .catch(() => {
                     publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";

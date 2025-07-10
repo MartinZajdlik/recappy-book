@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/pictures/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")
