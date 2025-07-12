@@ -131,7 +131,7 @@ form select {
 
 .recipe-list strong {
     font-size: 1.2rem;
-    color: #ffc107;
+    color: #5ad332;
 }
 
 .recipe-list em {
@@ -206,15 +206,14 @@ form select {
 }
 
 .title svg {
-    display: block;
-    height: 2.5rem;
-    width: 2.5rem;
-    margin: 0;
-    padding: 0;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
 }
 
+
 .title .highlight {
-    color: #ffc107;
+    color: #8ae832;
 }
 
 .header {
@@ -274,7 +273,7 @@ form select {
     font-family: Comic Sans MS;
     font-size: 1.8rem;
     font-weight: 700;
-    color: #ffc107;
+    color: #8ae832;
     background-color: #33334d;
     padding: 0.4rem 1rem;
     margin-bottom: 1rem;
@@ -323,7 +322,7 @@ form select {
 
 .auth-tabs button.active,
 .auth-tabs button:hover {
-    background-color: #ffc107;
+    background-color: #8ae832;
     color: #25252b;
 }
 
@@ -363,14 +362,14 @@ form select {
 }
 
 .username {
-    color: #ffc107;
+    color: #8ae832;
     font-weight: bold;
     font-size: 1.1rem;
 }
 
 .logout-btn {
     padding: 0.4rem 0.8rem;
-    background-color: #dc3545;
+    background-color: #5081eb;
     color: white;
     border: none;
     border-radius: 5px;
@@ -408,9 +407,11 @@ form select {
     }
 
     .title svg {
-        width: 2rem;
-        height: 2rem;
+        width: 100%;
+        max-width: 300px;
+        height: auto;
     }
+    
 
     .user-info {
         flex-direction: row;
@@ -663,4 +664,106 @@ form select {
     .recipe-instructions {
         margin-top: 0.5rem;
     }
+}
+
+.recipe-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* Levá část (text) nech jako je */
+.recipe-left {
+    flex: 1;
+}
+
+/* Pravá část (obrázek) */
+.recipe-right {
+    flex-shrink: 0;
+    max-width: 220px;
+    margin-left: auto;
+    padding: 0;
+}
+
+/* Obrázek */
+.recipe-image {
+    width: 200px;          /* nebo jiná šířka podle potřeby */
+    height: 200px;         /* pevná výška */
+    object-fit: cover;     /* aby obrázek vyplnil prostor hezky */
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    display: block;
+}
+
+
+/* Mobilní verze – obrázek pod text */
+@media (max-width: 768px) {
+    .recipe-content {
+        flex-direction: column;
+        align-items: center;  /* obrázek i text budou bloky pod sebou */
+        text-align: center;   /* celkově, ale pak přepíšeme pro text */
+    }
+
+    .recipe-left {
+        width: 100%;
+        text-align: left;    /* tady přepíšeme na levé zarovnání text */
+    }
+
+    .recipe-right {
+        max-width: 100%;
+        margin-left: 0;
+        margin-top: 1rem;
+
+        display: flex;
+        justify-content: center;  /* obrázek vycentrovaný */
+        width: 100%;
+    }
+
+    .recipe-image {
+        width: 80%;       /* podle vkusu */
+        height: auto;
+        max-height: 250px;
+    }
+}
+.file-upload-label {
+    display: block;
+    width: 100%; /* <<< STEJNĚ jako select */
+    padding: 0.8rem;
+    background-color: #3a3a55;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.file-upload-label:hover {
+    background-color: #505070;
+}
+
+
+.file-name-display {
+    display: block;
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+.recipe-image.zoomed {
+    transform: scale(1.8);
+    cursor: zoom-out;
+    border: 2px solid #194058;
+    border-radius: 12px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    height: auto;
+    z-index: 10;
+    position: relative;
 }

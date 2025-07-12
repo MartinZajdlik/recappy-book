@@ -11,34 +11,27 @@
 
     <header class="header">
         <h1 class="title" id="homeTitle" style="cursor: pointer;">
-            <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="gradLeft" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#7cc7ff"/>
-                        <stop offset="100%" stop-color="#3a3a55"/>
-                    </linearGradient>
-                    <linearGradient id="gradRight" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stop-color="#ffcc00"/>
-                        <stop offset="100%" stop-color="#b38f00"/>
-                    </linearGradient>
-                </defs>
-
-                <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="url(#gradLeft)" stroke="#1e1e2f" stroke-width="1.5"/>
-                <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="url(#gradRight)" stroke="#7a6e00" stroke-width="1.5"/>
-
+            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 280 64">
+              <!-- Kniha vlevo -->
+              <g transform="scale(0.9)">
+                <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#3aa8f0" stroke="#1e1e2f" stroke-width="1.5"/>
+                <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="#8ae832" stroke="#417d00" stroke-width="1.5"/>
                 <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
                 <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
-
-                <line x1="38" y1="35" x2="54" y2="27" stroke="#7a6e00" stroke-width="1"/>
-                <line x1="38" y1="39" x2="54" y2="31" stroke="#7a6e00" stroke-width="1"/>
-                <line x1="38" y1="43" x2="54" y2="35" stroke="#7a6e00" stroke-width="1"/>
-                <line x1="38" y1="47" x2="54" y2="39" stroke="#7a6e00" stroke-width="1"/>
+                <line x1="38" y1="35" x2="54" y2="27" stroke="#417d00" stroke-width="1"/>
+                <line x1="38" y1="39" x2="54" y2="31" stroke="#417d00" stroke-width="1"/>
+                <line x1="38" y1="43" x2="54" y2="35" stroke="#417d00" stroke-width="1"/>
+                <line x1="38" y1="47" x2="54" y2="39" stroke="#417d00" stroke-width="1"/>
+              </g>
+          
+              <!-- Text vpravo -->
+              <text x="75" y="40" font-family="'Segoe UI', sans-serif" font-size="24" fill="#3aa8f0" font-weight="bold">RecAPPy</text>
+              <text x="190" y="40" font-family="'Segoe UI', sans-serif" font-size="24" fill="#8ae832" font-weight="bold">BOOK</text>
             </svg>
-
-            RecAPPy <span class="highlight">BOOK</span>
-        </h1>
+          </h1>
+          
 
 
         <div class="user-info">
@@ -103,7 +96,12 @@
 
                 <textarea id="ingredients" placeholder="Ingredience" required></textarea>
                 <textarea id="instructions" placeholder="Postup" required></textarea>
-                <input type="file" id="imageInput" accept="image/*">
+                <!-- Skrytý input -->
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <!-- Vlastní tlačítko -->
+                <label for="imageInput" class="file-upload-label">📷 Vybrat obrázek</label>
+                <span id="fileNameDisplay" class="file-name-display">Žádný obrázek nevybrán</span>
+
                 <button type="submit">Přidat recept</button>
             </form>
 
@@ -153,13 +151,23 @@
         const usernameDisplay = document.getElementById("usernameDisplay");
         const logoutBtn = document.getElementById("logoutBtn");
 
+        const imageInput = document.getElementById("imageInput");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+        imageInput.addEventListener("change", () => {
+            fileNameDisplay.textContent = imageInput.files.length > 0
+                ? `Vybraný obrázek: ${imageInput.files[0].name}`
+                : "Žádný obrázek nevybrán";
+        });
+
+
 
 
     
         let jwtToken = localStorage.getItem("jwtToken") || null;
         let editingId = null;
-        let userRole = null;
         let currentUsername = localStorage.getItem("currentUsername") || null;
+        let userRole = localStorage.getItem("userRole") || null;
 
 
         if (jwtToken && currentUsername) {
@@ -229,6 +237,7 @@
 
                 localStorage.setItem("jwtToken", jwtToken);    
                 localStorage.setItem("currentUsername", currentUsername);
+                localStorage.setItem("userRole", userRole);
 
 
             if (data.role === "ROLE_ADMIN") {
@@ -459,9 +468,12 @@
                             </div>
                             <p class="recipe-instructions">${recipe.instructions}</p>
                             <div class="recipe-buttons">
-                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
-                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                                ${userRole === "ROLE_ADMIN" ? `
+                                    <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                                    <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                                ` : ""}
                             </div>
+
                         `;
 
                         publicRecipeList.appendChild(li);
@@ -525,6 +537,8 @@
             
             localStorage.removeItem("jwtToken");       
             localStorage.removeItem("currentUsername"); 
+            localStorage.removeItem("userRole");
+
 
 
             usernameDisplay.textContent = "";
@@ -690,11 +704,12 @@
             });
 
         }
-
-
-
-
-
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("recipe-image")) {
+                e.target.classList.toggle("zoomed");
+            }
+        });
+     
     });
     </script>
 
