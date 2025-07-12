@@ -704,14 +704,57 @@
             });
 
         }
-        document.addEventListener("click", function(e) {
-            if (e.target.classList.contains("recipe-image")) {
-                e.target.classList.toggle("zoomed");
-            }
-        });
+
      
     });
     </script>
+    <!-- Modal pro zobrazení obrázku přes celou obrazovku -->
+    <div id="imageModal" class="image-modal hidden">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage" />
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const modal = document.getElementById("imageModal");
+          const modalImg = document.getElementById("modalImage");
+          const closeModal = document.querySelector(".close-modal");
+      
+          document.querySelectorAll(".recipe-image").forEach(img => {
+            img.addEventListener("click", () => {
+              modal.classList.remove("hidden");
+              modalImg.src = img.src;
+            });
+          });
+      
+          closeModal.addEventListener("click", () => {
+            modal.classList.add("hidden");
+          });
+      
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+              modal.classList.add("hidden");
+            }
+          });
+        });
+      </script>
+      <script>
+        document.addEventListener("click", function (e) {
+          const modal = document.getElementById("imageModal");
+          const modalImg = document.getElementById("modalImage");
+          const closeModal = document.querySelector(".close-modal");
+      
+          if (e.target.classList.contains("recipe-image")) {
+            modal.classList.remove("hidden");
+            modalImg.src = e.target.src;
+          }
+      
+          if (e.target.classList.contains("close-modal") || e.target.id === "imageModal") {
+            modal.classList.add("hidden");
+          }
+        });
+      </script>
+        
+    
 
 </body>
 </html>
