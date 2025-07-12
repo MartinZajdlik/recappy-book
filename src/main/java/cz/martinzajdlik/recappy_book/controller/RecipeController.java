@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -68,9 +69,15 @@ public class RecipeController {
         return ResponseEntity.ok("Obrázek uložen");
     }
 
-
-
-
+    @GetMapping("/random")
+    public ResponseEntity<Recipe> getRandomRecipe() {
+        List<Recipe> allRecipes = recipeRepository.findAll();
+        if (allRecipes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        Recipe randomRecipe = allRecipes.get(new Random().nextInt(allRecipes.size()));
+        return ResponseEntity.ok(randomRecipe);
+    }
 
 
 

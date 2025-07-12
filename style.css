@@ -812,3 +812,42 @@ form select {
     color: #ccc;
 }
 
+/* --- TIP NA DNEŠNÍ DEN --- */
+#dailyTip {
+    background-color: #1f1f2e;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border-left: 5px solid #3aa8f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+#dailyTip h2 {
+    color: #3aa8f0;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+}
+
+#dailyTip p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+    color: #ddd;
+}
+
+/* TIP na dnešní den – název receptu */
+#dailyTip .recipe-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #5ad332; /* zelená */
+    margin-bottom: 0.5rem;
+}
+
+/* TIP na dnešní den – nadpisy sekcí (Ingredience, Postup) */
+#dailyTip .recipe-section-title {
+    color: #8ae832;  /* světle zelená nebo dle vkusu */
+    font-weight: bold;
+    margin-top: 1rem;
+    margin-bottom: 0.3rem;
+}
+

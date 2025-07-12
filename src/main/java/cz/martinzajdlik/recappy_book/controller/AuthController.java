@@ -90,6 +90,44 @@ public class AuthController {
         return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(org.springframework.security.core.Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Neautorizováno");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof cz.martinzajdlik.recappy_book.security.CustomUserDetails userDetails) {
+            return ResponseEntity.ok(new UserInfoResponse(
+                    userDetails.getUsername(),
+                    userDetails.getAuthorities().iterator().next().getAuthority()
+            ));
+        }
+
+        return ResponseEntity.status(401).body("Neplatný token");
+    }
+
+    // pomocná vnitřní třída pro odpověď
+    public static class UserInfoResponse {
+        private String username;
+        private String role;
+
+        public UserInfoResponse(String username, String role) {
+            this.username = username;
+            this.role = role;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getRole() {
+            return role;
+        }
+    }
+
+
     // Pomocná třída pro JSON odpověď s tokenem
     public static class JwtResponse {
         private String token;

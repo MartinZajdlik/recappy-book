@@ -53,6 +53,10 @@
         <section id="publicRecipes" class="hidden">
             <h2 id="categoriesTitle">Kategorie:</h2>
             <div id="categoriesList"></div>
+            <section id="dailyTip" class="daily-tip hidden">
+                <h2>TIP na dnešní den</h2>
+                <div id="tipContent">Načítám tip...</div>
+            </section>
             <ul id="publicRecipeList" class="recipe-list"></ul>
         </section>
 
@@ -247,6 +251,7 @@
             } else {
                 document.getElementById("publicRecipes").classList.remove("hidden");
                 loadPublicRecipes(); 
+                loadDailyTip(); 
             }
         })
 
@@ -414,6 +419,58 @@
                 }
             });
         });
+
+
+        function loadDailyTip() {
+            const tipSection = document.getElementById("dailyTip");
+            const tipDiv = document.getElementById("tipContent");
+
+            if (!jwtToken) {
+                tipDiv.innerHTML = "Přihlas se pro dnešní tip!";
+                tipSection.classList.remove("hidden");
+                return;
+            }
+
+            fetch("http://localhost:8080/recepty/random", {
+                headers: {
+                    "Authorization": "Bearer " + jwtToken
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Nepodařilo se načíst tip");
+                return response.json();
+            })
+            .then(recipe => {
+                tipDiv.innerHTML = `
+                    <div class="recipe-content">
+                        <div class="recipe-left">
+                            <div class="recipe-title">${recipe.title}</div>
+                            <em class="category">${recipe.category}</em><br><br>
+
+                            <div class="recipe-section-title">Ingredience:</div>
+                            <p>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</p>
+
+                            <div class="recipe-section-title">Postup:</div>
+                            <p>${recipe.instructions}</p>
+                        </div>
+
+                        <div class="recipe-right">
+                            ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                        </div>
+                    </div>
+                `;
+
+
+                tipSection.classList.remove("hidden");
+            })
+            .catch(error => {
+                console.warn("Chyba při načítání tipu:", error);
+                tipDiv.innerHTML = "Tip se nepodařilo načíst.";
+                tipSection.classList.remove("hidden");
+            });
+        }
+
+
 
 
     
@@ -736,6 +793,54 @@
             }
           });
         });
+
+                // === Po načtení stránky ověř roli uživatele pomocí tokenu ===
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("jwtToken");
+            if (token) {
+                jwtToken = token;
+
+                fetch("http://localhost:8080/auth/me", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + jwtToken
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Neplatný token");
+                    return response.json();
+                })
+                .then(data => {
+                    currentUsername = data.username;
+                    userRole = data.role;
+
+                    // Nastav do DOMu
+                    usernameDisplay.textContent = currentUsername;
+                    usernameDisplay.classList.remove("hidden");
+                    logoutBtn.classList.remove("hidden");
+                    loginSection.classList.add("hidden");
+
+                    localStorage.setItem("currentUsername", currentUsername);
+                    localStorage.setItem("userRole", userRole);
+
+                    if (userRole === "ROLE_ADMIN") {
+                        adminPanel.classList.remove("hidden");
+                        loadRecipes();
+                        loadUsers();
+                    } else {
+                        document.getElementById("publicRecipes").classList.remove("hidden");
+                        loadPublicRecipes();
+                        loadDailyTip();
+                    }
+                })
+                .catch(err => {
+                    console.warn("Chyba při ověřování uživatele:", err);
+                    logoutBtn.click(); // smaže tokeny a skryje vše
+                });
+            }
+        });
+
+
       </script>
       <script>
         document.addEventListener("click", function (e) {
