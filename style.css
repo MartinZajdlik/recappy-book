@@ -240,12 +240,14 @@ form select {
 
 #categoriesList {
     width: 100%;
-    box-sizing: border-box;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-direction: row; /* <<< zaručí zobrazení vedle sebe */
+    flex-wrap: wrap;     /* aby se to přizpůsobilo menším obrazovkám */
+    gap: 1rem;
     margin-bottom: 1rem;
+    justify-content: space-between; /* nebo center / flex-start */
 }
+
 
 #categoriesList button {
     width: 100%;
@@ -850,3 +852,54 @@ form select {
     margin-top: 1rem;
     margin-bottom: 0.3rem;
 }
+#categoriesList {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+    scroll-padding: 1rem;
+    scrollbar-width: none; /* Firefox */
+}
+
+#categoriesList::-webkit-scrollbar {
+    display: none;
+}
+
+  
+.category-card {
+    flex: 0 0 auto;
+    min-width: 80px; /* menší minimum místo pevné šířky */
+    max-width: 100px; /* nepřekročí max šířku */
+    background-color: #2d2d3a;
+    border-radius: 10px;
+    padding: 0.7rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+
+  
+  
+  .category-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .category-card span {
+    color: #f0f0f0;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  
+  .category-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }

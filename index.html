@@ -480,13 +480,34 @@
     
         function renderCategories() {
             categoriesList.innerHTML = "";
-            categories.forEach(category => {
-                const btn = document.createElement("button");
-                btn.textContent = category;
-                btn.addEventListener("click", () => loadPublicRecipes(category));
-                categoriesList.appendChild(btn);
+
+            const categoryData = [
+                { name: "Polévky", svg: "🍲" },
+                { name: "Hlavní jídla", svg: "🍽️" },
+                { name: "Dezerty", svg: "🍰" },
+                { name: "Snídaně", svg: "🥐" },
+                { name: "Svačiny", svg: "🥪" }
+            ];
+
+            categoryData.forEach(cat => {
+                const card = document.createElement("div");
+                card.classList.add("category-card");
+
+                const icon = document.createElement("div");
+                icon.classList.add("category-icon");
+                icon.textContent = cat.svg; // nebo sem později vložíme vlastní SVG
+
+                const label = document.createElement("span");
+                label.textContent = cat.name;
+
+                card.appendChild(icon);
+                card.appendChild(label);
+
+                card.addEventListener("click", () => loadPublicRecipes(cat.name));
+                categoriesList.appendChild(card);
             });
         }
+
     
         function loadPublicRecipes(category) {
             let url = "http://localhost:8080/recepty";
