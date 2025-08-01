@@ -39,7 +39,7 @@ main > section,
     max-width: 1000px;
     min-height: 100vh;
     margin: 2rem auto;
-    background-color: #25252b;
+    background-color: #14171b;
     padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -73,7 +73,7 @@ form textarea {
 form button {
     width: 100%;
     padding: 0.8rem;
-    background-color: #4caf50;
+    background-color: #8ae832;
     border: none;
     border-radius: 5px;
     color: white;
@@ -83,7 +83,7 @@ form button {
 }
 
 form button:hover {
-    background-color: #45a049;
+    background-color: #a05645;
 }
 
 form label {
@@ -131,7 +131,7 @@ form select {
 
 .recipe-list strong {
     font-size: 1.2rem;
-    color: #5ad332;
+    color: #8ae832;
 }
 
 .recipe-list em {
@@ -218,9 +218,11 @@ form select {
 
 .header {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    width: 100%;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    padding: 0.5rem 0;
 }
 
 #adminBtn {
@@ -250,26 +252,42 @@ form select {
 
 
 #categoriesList button {
+    display: inline-flex;         /* vedle sebe ikonka + text */
+    align-items: center;
+    gap: 0.35rem;
     width: 100%;
+    height: 2px;
     text-align: left;
-    padding: 0.7rem 1rem;
+    padding: 3px 10px;           /* menší vertikální výška */
     background-color: #739adf;
     border: none;
     border-radius: 5px;
     color: #0d1a33;
     font-weight: 600;
-    font-size: 1.1rem;
-    font-family: Comic Sans MS, cursive, sans-serif;
+    font-size: 1rem;             /* trochu menší než 1.1rem */
+    line-height: 1;
+    font-family: "Comic Sans MS", cursive, sans-serif;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
     box-sizing: border-box;
-    display: block;
+    min-height: auto;            /* nepřidává zbytečnou výšku */
+    white-space: nowrap;         /* zabrání zalamování textu */
+}
+
+
+#categoriesList button svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex-shrink: 0;
 }
 
 #categoriesList button:hover {
     background-color: #1e3a6e;
     color: #d0d9ff;
 }
+
+
+
 
 #categoriesTitle {
     font-family: Comic Sans MS;
@@ -394,11 +412,16 @@ form select {
     }
 
     .header {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-right {
         gap: 0.5rem;
-        text-align: center;
-        padding: 0.5rem;
+        flex-wrap: nowrap;
     }
 
     .title {
@@ -902,4 +925,25 @@ form select {
   .category-card:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  /* Strana s logem */
+.header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* Strana s ovládacími prvky */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: nowrap;
+}
+
+.category-icon svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0.5rem;
   }

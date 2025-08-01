@@ -10,39 +10,64 @@
 <div class="container">
 
     <header class="header">
-        <h1 class="title" id="homeTitle" style="cursor: pointer;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 280 64">
-              <!-- Kniha vlevo -->
-              <g transform="scale(0.9)">
-                <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#3aa8f0" stroke="#1e1e2f" stroke-width="1.5"/>
-                <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="#8ae832" stroke="#417d00" stroke-width="1.5"/>
-                <line x1="10" y1="27" x2="26" y2="35" stroke="#445577" stroke-width="1"/>
-                <line x1="10" y1="31" x2="26" y2="39" stroke="#445577" stroke-width="1"/>
-                <line x1="10" y1="35" x2="26" y2="43" stroke="#445577" stroke-width="1"/>
-                <line x1="10" y1="39" x2="26" y2="47" stroke="#445577" stroke-width="1"/>
-                <line x1="38" y1="35" x2="54" y2="27" stroke="#417d00" stroke-width="1"/>
-                <line x1="38" y1="39" x2="54" y2="31" stroke="#417d00" stroke-width="1"/>
-                <line x1="38" y1="43" x2="54" y2="35" stroke="#417d00" stroke-width="1"/>
-                <line x1="38" y1="47" x2="54" y2="39" stroke="#417d00" stroke-width="1"/>
-              </g>
-          
-              <!-- Text vpravo -->
-              <text x="75" y="40" font-family="'Segoe UI', sans-serif" font-size="24" fill="#3aa8f0" font-weight="bold">RecAPPy</text>
-              <text x="190" y="40" font-family="'Segoe UI', sans-serif" font-size="24" fill="#8ae832" font-weight="bold">BOOK</text>
-            </svg>
-          </h1>
-          
+        <div class="header-left">
+            <h1 class="title" id="homeTitle" style="cursor: pointer;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 280 64" role="img" aria-label="RecAPPY BOOK logo">
+                    <!-- Kniha -->
+                    <g transform="scale(0.9)">
+                    <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#f4f1e6" stroke="#f4f1e6" stroke-width="2"/>
+                    <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="none" stroke="#f4f1e6" stroke-width="2"/>
+                    <line x1="10" y1="27" x2="26" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="10" y1="31" x2="26" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="10" y1="35" x2="26" y2="43" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="10" y1="39" x2="26" y2="47" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="38" y1="35" x2="54" y2="27" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="38" y1="39" x2="54" y2="31" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="38" y1="43" x2="54" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
+                    <line x1="38" y1="47" x2="54" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
+                    </g>
+                
+                    <!-- Text -->
+                    <text x="75" y="34" font-family="'Segoe UI', sans-serif" font-size="26" fill="#f4f1e6" font-weight="bold">RecAPPY</text>
+                    <text x="75" y="54" font-family="'Georgia', serif" font-size="18" fill="#f4f1e6" font-weight="bold" letter-spacing="4">BOOK</text>
+                </svg>       
+            </h1>
+        </div>
 
 
-        <div class="user-info">
+        <div class="header-right">
             <span id="usernameDisplay" class="username hidden"></span>
             <button id="logoutBtn" class="logout-btn hidden" title="Odhlásit se">Odhlásit</button>
-            <button id="adminBtn" title="Admin přihlášení" aria-label="Admin přihlášení" style="background: none; border: none; cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="#7cc7ff" viewBox="0 0 24 24">
-                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-                </svg>
+            <button id="adminBtn" title="Admin přihlášení" aria-label="Admin přihlášení">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none">
+                    <!-- Hlava -->
+                    <circle cx="32" cy="28" r="10" fill="#fddbb0" stroke="#000" stroke-width="1"/>
+                    <!-- Knír -->
+                    <path d="M24 30c2-1 4-1 6 0s4-1 6 0" stroke="#000" stroke-width="1.5" fill="none"/>
+                    <!-- Úsměv -->
+                    <path d="M26 33c2 2 8 2 10 0" stroke="#000" stroke-width="1" fill="none"/>
+                    <!-- Oči -->
+                    <circle cx="28" cy="26" r="1.2" fill="#000"/>
+                    <circle cx="36" cy="26" r="1.2" fill="#000"/>
+                    
+                    <!-- Čepice -->
+                    <path d="M20 20c-1-5 3-9 8-9 2-4 12-4 14 0 5 0 9 5 7 9-7 2-18 3-29 0z" fill="#fff" stroke="#000" stroke-width="1"/>
+                    <rect x="23" y="20" width="18" height="4" rx="2" fill="#fff" stroke="#000" stroke-width="1"/>
+                    
+                    <!-- Tělo (uniforma) -->
+                    <path d="M22 38h20v16h-20z" fill="#fff" stroke="#000" stroke-width="1"/>
+                    <circle cx="32" cy="42" r="1" fill="#000"/>
+                    <circle cx="32" cy="46" r="1" fill="#000"/>
+                    <circle cx="32" cy="50" r="1" fill="#000"/>
+                    
+                    <!-- Vařečka -->
+                    <rect x="45" y="28" width="2" height="18" rx="1" fill="#c99c6a"/>
+                    <circle cx="46" cy="26" r="3" fill="#c99c6a"/>
+                  </svg>
+                  
             </button>
         </div>
+        
 
 
 
@@ -482,12 +507,91 @@
             categoriesList.innerHTML = "";
 
             const categoryData = [
-                { name: "Polévky", svg: "🍲" },
-                { name: "Hlavní jídla", svg: "🍽️" },
-                { name: "Dezerty", svg: "🍰" },
-                { name: "Snídaně", svg: "🥐" },
-                { name: "Svačiny", svg: "🥪" }
-            ];
+  {
+    name: "Polévky",
+    svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 10h18"/>
+  <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+  <path d="M9 4c.5 1 .5 2 0 3"/>
+  <path d="M15 4c.5 1 .5 2 0 3"/>
+</svg>`
+  },
+  {
+    name: "Hlavní jídla",
+    svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/>
+  <circle cx="12" cy="12" r="4"/>
+  <path d="M4 3v18"/>
+  <path d="M20 3v18"/>
+</svg>`
+  },
+  {
+    name: "Dezerty",
+    svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- plátek dortu -->
+  <path d="M4 10l8-6 8 6v6l-8 6-8-6z"/>
+  <!-- vrstvy -->
+  <path d="M6 12h12"/>
+  <path d="M6 14h12"/>
+  <!-- třešnička -->
+  <circle cx="12" cy="4" r="1.5"/>
+  <path d="M12 5.5v1"/>
+</svg>`
+    // alternativně: zmrzlina
+    // <svg ...>
+    //   <path d="M8 17l4 5 4-5z"/>
+    //   <circle cx="12" cy="11" r="4"/>
+    //   <path d="M8 12c1 1 3 1 4 0s3-1 4 0"/>
+    // </svg>
+  },
+  {
+    name: "Snídaně",
+    svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- volské oko -->
+  <ellipse cx="12" cy="12" rx="6" ry="4"/>
+  <circle cx="12" cy="12" r="2.5"/>
+</svg>`
+    // alternativně: toast s máslem
+    // <svg ...>
+    //   <rect x="6" y="6" width="12" height="12" rx="3"/>
+    //   <rect x="9" y="9" width="6" height="4" rx="1"/>
+    // </svg>
+  },
+  {
+    name: "Svačiny",
+    svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- jablko -->
+  <circle cx="12" cy="14" r="6"/>
+  <path d="M12 8v2"/>
+  <path d="M9 7c1-1 3-1 4 0s3 1 4 0"/>
+</svg>`
+    // alternativně: tyčinka / granola
+    // <svg ...>
+    //   <rect x="4" y="8" width="16" height="8" rx="2"/>
+    //   <circle cx="8" cy="12" r="1"/>
+    //   <circle cx="12" cy="12" r="1"/>
+    //   <circle cx="16" cy="12" r="1"/>
+    // </svg>
+  }
+];
+
+
+
 
             categoryData.forEach(cat => {
                 const card = document.createElement("div");
@@ -495,7 +599,8 @@
 
                 const icon = document.createElement("div");
                 icon.classList.add("category-icon");
-                icon.textContent = cat.svg; // nebo sem později vložíme vlastní SVG
+                icon.innerHTML = cat.svg;
+
 
                 const label = document.createElement("span");
                 label.textContent = cat.name;
