@@ -256,7 +256,6 @@ form select {
     align-items: center;
     gap: 0.35rem;
     width: 100%;
-    height: 2px;
     text-align: left;
     padding: 3px 10px;           /* menší vertikální výška */
     background-color: #739adf;
@@ -913,7 +912,7 @@ form select {
   
   .category-icon {
     font-size: 1.8rem;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.1rem;
   }
   
   .category-card span {
@@ -945,5 +944,5 @@ form select {
 .category-icon svg {
     width: 32px;
     height: 32px;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
   }

@@ -532,62 +532,59 @@
 </svg>`
   },
   {
-    name: "Dezerty",
-    svg: `
+  name: "Dezerty",
+  svg: `
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Horní zaoblená část muffinu -->
+  <path d="M6 10a4 4 0 0 1 12 0" fill="none"/>
+  
+  <!-- Spodní část muffinu -->
+  <path d="M7 10l1 7h8l1-7z" fill="none"/>
+  
+  <!-- Rýhy v košíčku -->
+  <path d="M9 10v7" />
+  <path d="M12 10v7" />
+  <path d="M15 10v7" />
+  
+  <!-- Třešnička na vrcholu -->
+  <circle cx="12" cy="5" r="1"/>
+</svg>`
+}
+,
+{
+  name: "Snídaně",
+  svg: `
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
      viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <!-- plátek dortu -->
-  <path d="M4 10l8-6 8 6v6l-8 6-8-6z"/>
-  <!-- vrstvy -->
-  <path d="M6 12h12"/>
-  <path d="M6 14h12"/>
-  <!-- třešnička -->
-  <circle cx="12" cy="4" r="1.5"/>
-  <path d="M12 5.5v1"/>
+     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Toast -->
+  <rect x="4" y="5" width="16" height="14" rx="3" ry="3"/>
+  
+  <!-- Vejce (bílek) -->
+  <circle cx="12" cy="12" r="4" />
+  
+  <!-- Žloutek -->
+  <circle cx="12" cy="12" r="1.5" fill="#f4f1e6" />
 </svg>`
-    // alternativně: zmrzlina
-    // <svg ...>
-    //   <path d="M8 17l4 5 4-5z"/>
-    //   <circle cx="12" cy="11" r="4"/>
-    //   <path d="M8 12c1 1 3 1 4 0s3-1 4 0"/>
-    // </svg>
-  },
-  {
-    name: "Snídaně",
-    svg: `
+}
+,
+{
+  name: "Svačiny",
+  svg: `
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
      viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <!-- volské oko -->
-  <ellipse cx="12" cy="12" rx="6" ry="4"/>
-  <circle cx="12" cy="12" r="2.5"/>
+     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Trojúhelník jako sendvič -->
+  <path d="M4 6l16 12H4z" />
+  
+  <!-- Náplň -->
+  <path d="M6 10l5 4" />
+  <path d="M8 8l8 6" />
 </svg>`
-    // alternativně: toast s máslem
-    // <svg ...>
-    //   <rect x="6" y="6" width="12" height="12" rx="3"/>
-    //   <rect x="9" y="9" width="6" height="4" rx="1"/>
-    // </svg>
-  },
-  {
-    name: "Svačiny",
-    svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <!-- jablko -->
-  <circle cx="12" cy="14" r="6"/>
-  <path d="M12 8v2"/>
-  <path d="M9 7c1-1 3-1 4 0s3 1 4 0"/>
-</svg>`
-    // alternativně: tyčinka / granola
-    // <svg ...>
-    //   <rect x="4" y="8" width="16" height="8" rx="2"/>
-    //   <circle cx="8" cy="12" r="1"/>
-    //   <circle cx="12" cy="12" r="1"/>
-    //   <circle cx="16" cy="12" r="1"/>
-    // </svg>
-  }
+}
+
 ];
 
 
