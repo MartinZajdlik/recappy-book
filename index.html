@@ -743,6 +743,39 @@
                 authError.textContent = "Chyba při načítání receptu.";
             });
         };
+
+        window.submitEditRecipe = function () {
+            if (!editingId) {
+                alert("Není vybrán recept k úpravě.");
+                return;
+            }
+
+            const form = document.getElementById("recipeForm");
+            const formData = new FormData(form);
+
+            fetch(`http://localhost:8080/recepty/${editingId}`, {
+                method: "PUT",
+                headers: {
+                "Authorization": "Bearer " + jwtToken
+                },
+                body: formData
+            })
+                .then(res => {
+                if (!res.ok) throw new Error("Chyba při úpravě receptu");
+                return res.json();
+                })
+                .then(() => {
+                alert("Recept byl úspěšně upraven");
+                recipeForm.reset();
+                editingId = null;
+                loadRecipes();
+                })
+                .catch(err => {
+                console.error(err);
+                alert("Nepodařilo se upravit recept");
+                });
+            };
+
     
         window.deleteRecipe = function(id) {
             if (!confirm("Opravdu chcete recept smazat?")) return;

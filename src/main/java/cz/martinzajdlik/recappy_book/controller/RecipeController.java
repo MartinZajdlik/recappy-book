@@ -31,7 +31,7 @@ public class RecipeController {
         this.recipeRepository = recipeRepository;
     }
 
-    //  Jen pro admina
+    // Jen pro admina
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody Recipe recipe) {
@@ -51,7 +51,6 @@ public class RecipeController {
         }
         Recipe recipe = recipeOpt.get();
 
-        // Ulož obrázek do složky na disku (např. "pictures/")
         String folder = "pictures/";
         String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
 
@@ -62,11 +61,46 @@ public class RecipeController {
         Path filePath = Paths.get(folder, filename);
         Files.write(filePath, imageFile.getBytes());
 
-        // Ulož cestu k obrázku do receptu
         recipe.setImagePath(filename);
         recipeRepository.save(recipe);
 
         return ResponseEntity.ok("Obrázek uložen");
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Recipe> updateRecipe(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("category") String category,
+            @RequestParam("ingredients") String ingredients,
+            @RequestParam("instructions") String instructions,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+    ) throws IOException {
+        Optional<Recipe> recipeOpt = recipeRepository.findById(id);
+        if (recipeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Recipe recipe = recipeOpt.get();
+
+        recipe.setTitle(title);
+        recipe.setCategory(category);
+        recipe.setIngredients(ingredients);
+        recipe.setInstructions(instructions);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String folder = "pictures/";
+            String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            File dir = new File(folder);
+            if (!dir.exists()) dir.mkdirs();
+            Path path = Paths.get(folder + filename);
+            Files.write(path, imageFile.getBytes());
+
+            recipe.setImagePath(filename);
+        }
+
+        Recipe updated = recipeRepository.save(recipe);
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/random")
@@ -79,8 +113,6 @@ public class RecipeController {
         return ResponseEntity.ok(randomRecipe);
     }
 
-
-
     @GetMapping
     public List<Recipe> getRecipesByCategory(@RequestParam(required = false) String category) {
         if (category == null || category.isEmpty()) {
@@ -89,7 +121,6 @@ public class RecipeController {
             return recipeRepository.findByCategory(category);
         }
     }
-
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/{id}")
@@ -102,26 +133,6 @@ public class RecipeController {
         return recipeRepository.findDistinctCategories();
     }
 
-
-    // Jen admin může upravovat
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public Recipe updateRecipe(@PathVariable Long id, @Valid @RequestBody Recipe updatedRecipe) {
-        return recipeRepository.findById(id)
-                .map(recipe -> {
-                    recipe.setTitle(updatedRecipe.getTitle());
-                    recipe.setCategory(updatedRecipe.getCategory());
-                    recipe.setIngredients(updatedRecipe.getIngredients());
-                    recipe.setInstructions(updatedRecipe.getInstructions());
-                    return recipeRepository.save(recipe);
-                })
-                .orElseGet(() -> {
-                    updatedRecipe.setId(id);
-                    return recipeRepository.save(updatedRecipe);
-                });
-    }
-
-    // Jen admin může mazat
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteRecipe(@PathVariable Long id) {
