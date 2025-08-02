@@ -937,7 +937,7 @@ form select {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.9rem;
     flex-wrap: nowrap;
 }
 
@@ -946,3 +946,28 @@ form select {
     height: 32px;
     margin-bottom: 0;
   }
+  #adminCategoriesList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.admin-tab {
+    padding: 0.5rem 1rem;
+    background-color: #2e2e3d;
+    color: #f4f1e6;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+.admin-tab:hover {
+    background-color: #3a3a4a;
+}
+.admin-tab.active {
+    background-color: #5ad332;
+    color: #101021;
+}

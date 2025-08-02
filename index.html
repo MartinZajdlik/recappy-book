@@ -12,7 +12,7 @@
     <header class="header">
         <div class="header-left">
             <h1 class="title" id="homeTitle" style="cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 280 64" role="img" aria-label="RecAPPY BOOK logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 280 64" role="img" aria-label="RecAPPy BOOK logo">
                     <!-- Kniha -->
                     <g transform="scale(0.9)">
                     <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#f4f1e6" stroke="#f4f1e6" stroke-width="2"/>
@@ -28,7 +28,7 @@
                     </g>
                 
                     <!-- Text -->
-                    <text x="75" y="34" font-family="'Segoe UI', sans-serif" font-size="26" fill="#f4f1e6" font-weight="bold">RecAPPY</text>
+                    <text x="75" y="34" font-family="'Segoe UI', sans-serif" font-size="26" fill="#f4f1e6" font-weight="bold">RecAPPy</text>
                     <text x="75" y="54" font-family="'Georgia', serif" font-size="18" fill="#f4f1e6" font-weight="bold" letter-spacing="4">BOOK</text>
                 </svg>       
             </h1>
@@ -76,7 +76,6 @@
 
     <main>
         <section id="publicRecipes" class="hidden">
-            <h2 id="categoriesTitle">Kategorie:</h2>
             <div id="categoriesList"></div>
             <section id="dailyTip" class="daily-tip hidden">
                 <h2>TIP na dnešní den</h2>
@@ -111,9 +110,23 @@
 
 
         <section id="adminPanel" class="hidden">
-            <form id="recipeForm">
-                <input type="text" id="title" placeholder="Název receptu" required/>
 
+            <div id="adminTabs" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                <button id="adminRecipesTab" class="admin-tab active">📋 Recepty</button>
+                <button id="adminUsersTab" class="admin-tab">👤 Uživatelé</button>
+            </div>
+            
+
+            <section id="adminRecipesSection" style="margin-top: 2rem;">
+                <h2 style="color:#8ae832;">Recepty podle kategorií</h2>
+                <div id="adminCategoriesList"></div>
+                <ul id="adminRecipeList" class="recipe-list"></ul>
+            </section>
+
+            <form id="recipeForm" class="admin-recipe-form">
+
+                <input type="text" id="title" placeholder="Název receptu" required/>
+        
                 <select id="category" required>
                     <option value="" disabled selected>Vyberte kategorii</option>
                     <option value="Polévky">Polévky</option>
@@ -122,40 +135,41 @@
                     <option value="Snídaně">Snídaně</option>
                     <option value="Svačiny">Svačiny</option>
                 </select>
-
+        
                 <textarea id="ingredients" placeholder="Ingredience" required></textarea>
                 <textarea id="instructions" placeholder="Postup" required></textarea>
+        
                 <!-- Skrytý input -->
                 <input type="file" id="imageInput" accept="image/*" style="display: none;">
                 <!-- Vlastní tlačítko -->
                 <label for="imageInput" class="file-upload-label">📷 Vybrat obrázek</label>
                 <span id="fileNameDisplay" class="file-name-display">Žádný obrázek nevybrán</span>
-
+        
                 <button type="submit">Přidat recept</button>
             </form>
-
+        
             <ul id="recipeList" class="recipe-list"></ul>
 
+        
             <section id="adminUsersSection" class="hidden" style="margin-top: 2rem;">
                 <h2>Správa uživatelů</h2>
                 <table id="usersTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Uživatelské jméno</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Akce</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <!-- Uživatelské řádky se doplní dynamicky -->
-                  </tbody>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Uživatelské jméno</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Uživatelské řádky se doplní dynamicky -->
+                    </tbody>
                 </table>
-              </section>
-              
-
+            </section>
         </section>
+        
     </main>
 
     <footer class="footer">
@@ -183,12 +197,38 @@
         const imageInput = document.getElementById("imageInput");
         const fileNameDisplay = document.getElementById("fileNameDisplay");
 
+        
+
+
+        
         imageInput.addEventListener("change", () => {
             fileNameDisplay.textContent = imageInput.files.length > 0
                 ? `Vybraný obrázek: ${imageInput.files[0].name}`
                 : "Žádný obrázek nevybrán";
         });
 
+        const adminRecipesTab = document.getElementById("adminRecipesTab");
+        const adminUsersTab = document.getElementById("adminUsersTab");
+        const adminRecipesSection = document.getElementById("adminRecipesSection");
+        
+
+        adminRecipesTab.addEventListener("click", () => {
+            adminRecipesTab.classList.add("active");
+            adminUsersTab.classList.remove("active");
+
+            adminRecipesSection.classList.remove("hidden");
+            recipeForm.classList.remove("hidden"); // zobrazíme formulář
+            adminUsersSection.classList.add("hidden");
+        });
+
+        adminUsersTab.addEventListener("click", () => {
+            adminUsersTab.classList.add("active");
+            adminRecipesTab.classList.remove("active");
+
+            adminUsersSection.classList.remove("hidden");
+            adminRecipesSection.classList.add("hidden");
+            recipeForm.classList.add("hidden"); // skryjeme formulář
+        });
 
 
 
@@ -204,11 +244,18 @@
             usernameDisplay.classList.remove("hidden");
             logoutBtn.classList.remove("hidden");
             loginSection.classList.add("hidden");
-            adminPanel.classList.remove("hidden");
-            loadRecipes();
-        } else {
-            recipeList.innerHTML = "";
+
+            if (userRole === "ROLE_ADMIN") {
+                adminPanel.classList.remove("hidden");
+                renderAdminCategories();
+                loadUsers();
+            } else {
+                document.getElementById("publicRecipes").classList.remove("hidden");
+                loadPublicRecipes(); 
+                loadDailyTip();
+            }
         }
+
     
         adminBtn.addEventListener("click", () => {
             if (!loginSection.classList.contains("hidden")) {
@@ -271,7 +318,7 @@
 
             if (data.role === "ROLE_ADMIN") {
                 adminPanel.classList.remove("hidden");
-                loadRecipes();
+                renderAdminCategories();
                 loadUsers();
             } else {
                 document.getElementById("publicRecipes").classList.remove("hidden");
@@ -417,8 +464,13 @@
             .then(() => {
                 recipeForm.reset();
                 editingId = null;
-                loadRecipes();
+
+                document.getElementById("recipeList").innerHTML = "";
+                renderAdminCategories();
+                document.getElementById("adminRecipeList").innerHTML = "";
+
                 console.log("Recept a případně i obrázek uložen.");
+
 
                 usernameDisplay.classList.remove("hidden");
                 logoutBtn.classList.remove("hidden");
@@ -470,7 +522,7 @@
                     <div class="recipe-content">
                         <div class="recipe-left">
                             <div class="recipe-title">${recipe.title}</div>
-                            <em class="category">${recipe.category}</em><br><br>
+                            <em class="category">${recipe.category}</em><br>
 
                             <div class="recipe-section-title">Ingredience:</div>
                             <p>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</p>
@@ -507,85 +559,85 @@
             categoriesList.innerHTML = "";
 
             const categoryData = [
-  {
-    name: "Polévky",
-    svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M3 10h18"/>
-  <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
-  <path d="M9 4c.5 1 .5 2 0 3"/>
-  <path d="M15 4c.5 1 .5 2 0 3"/>
-</svg>`
-  },
-  {
-    name: "Hlavní jídla",
-    svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-  <circle cx="12" cy="12" r="9"/>
-  <circle cx="12" cy="12" r="4"/>
-  <path d="M4 3v18"/>
-  <path d="M20 3v18"/>
-</svg>`
-  },
-  {
-  name: "Dezerty",
-  svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Horní zaoblená část muffinu -->
-  <path d="M6 10a4 4 0 0 1 12 0" fill="none"/>
-  
-  <!-- Spodní část muffinu -->
-  <path d="M7 10l1 7h8l1-7z" fill="none"/>
-  
-  <!-- Rýhy v košíčku -->
-  <path d="M9 10v7" />
-  <path d="M12 10v7" />
-  <path d="M15 10v7" />
-  
-  <!-- Třešnička na vrcholu -->
-  <circle cx="12" cy="5" r="1"/>
-</svg>`
-}
-,
-{
-  name: "Snídaně",
-  svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Toast -->
-  <rect x="4" y="5" width="16" height="14" rx="3" ry="3"/>
-  
-  <!-- Vejce (bílek) -->
-  <circle cx="12" cy="12" r="4" />
-  
-  <!-- Žloutek -->
-  <circle cx="12" cy="12" r="1.5" fill="#f4f1e6" />
-</svg>`
-}
-,
-{
-  name: "Svačiny",
-  svg: `
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-     viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
-     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Trojúhelník jako sendvič -->
-  <path d="M4 6l16 12H4z" />
-  
-  <!-- Náplň -->
-  <path d="M6 10l5 4" />
-  <path d="M8 8l8 6" />
-</svg>`
-}
+            {
+                name: "Polévky",
+                svg: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 10h18"/>
+            <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+            <path d="M9 4c.5 1 .5 2 0 3"/>
+            <path d="M15 4c.5 1 .5 2 0 3"/>
+            </svg>`
+            },
+            {
+                name: "Hlavní jídla",
+                svg: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/>
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M4 3v18"/>
+            <path d="M20 3v18"/>
+            </svg>`
+            },
+            {
+            name: "Dezerty",
+            svg: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Horní zaoblená část muffinu -->
+            <path d="M6 10a4 4 0 0 1 12 0" fill="none"/>
+            
+            <!-- Spodní část muffinu -->
+            <path d="M7 10l1 7h8l1-7z" fill="none"/>
+            
+            <!-- Rýhy v košíčku -->
+            <path d="M9 10v7" />
+            <path d="M12 10v7" />
+            <path d="M15 10v7" />
+            
+            <!-- Třešnička na vrcholu -->
+            <circle cx="12" cy="5" r="1"/>
+            </svg>`
+            }
+            ,
+            {
+            name: "Snídaně",
+            svg: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Toast -->
+            <rect x="4" y="5" width="16" height="14" rx="3" ry="3"/>
+            
+            <!-- Vejce (bílek) -->
+            <circle cx="12" cy="12" r="4" />
+            
+            <!-- Žloutek -->
+            <circle cx="12" cy="12" r="1.5" fill="#f4f1e6" />
+            </svg>`
+            }
+            ,
+            {
+            name: "Svačiny",
+            svg: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Trojúhelník jako sendvič -->
+            <path d="M4 6l16 12H4z" />
+            
+            <!-- Náplň -->
+            <path d="M6 10l5 4" />
+            <path d="M8 8l8 6" />
+            </svg>`
+            }
 
-];
+            ];
 
 
 
@@ -617,7 +669,10 @@
                 url += "?category=" + encodeURIComponent(category);
             }
     
-            adminPanel.classList.add("hidden");
+            if (userRole !== "ROLE_ADMIN") {
+                adminPanel.classList.add("hidden");
+            }
+
             document.getElementById("publicRecipes").classList.remove("hidden");
     
             if (!category) {
@@ -668,6 +723,12 @@
         renderCategories();
     
         window.editRecipe = function(id) {
+            adminRecipesTab.classList.add("active");
+            adminUsersTab.classList.remove("active");
+            adminRecipesSection.classList.remove("hidden");
+            recipeForm.classList.remove("hidden");
+            adminUsersSection.classList.add("hidden");
+
             fetch(`http://localhost:8080/recepty/${id}`, {
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
@@ -779,7 +840,12 @@
             })
             .then(users => {
                 console.log("Uživatelé z backendu:", users);
-                adminUsersSection.classList.remove("hidden");  // ODHAL sekci!
+                if (adminUsersTab.classList.contains("active")) {
+                    adminUsersSection.classList.remove("hidden");
+                } else {
+                    adminUsersSection.classList.add("hidden");
+                }
+
                 usersTableBody.innerHTML = "";
 
                 if (users.length === 0) {
@@ -948,7 +1014,6 @@
 
                     if (userRole === "ROLE_ADMIN") {
                         adminPanel.classList.remove("hidden");
-                        loadRecipes();
                         loadUsers();
                     } else {
                         document.getElementById("publicRecipes").classList.remove("hidden");
@@ -962,6 +1027,143 @@
                 });
             }
         });
+
+        function renderAdminCategories() {
+
+            const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
+            const categoryData = [
+                {
+                    name: "Polévky",
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 10h18"/>
+                        <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+                        <path d="M9 4c.5 1 .5 2 0 3"/>
+                        <path d="M15 4c.5 1 .5 2 0 3"/>
+                    </svg>`
+                },
+                {
+                    name: "Hlavní jídla",
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="9"/>
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M4 3v18"/>
+                        <path d="M20 3v18"/>
+                    </svg>`
+                },
+                {
+                    name: "Dezerty",
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                        viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 10a4 4 0 0 1 12 0"/>
+                        <path d="M7 10l1 7h8l1-7z"/>
+                        <path d="M9 10v7"/>
+                        <path d="M12 10v7"/>
+                        <path d="M15 10v7"/>
+                        <circle cx="12" cy="5" r="1"/>
+                    </svg>`
+                },
+                {
+                    name: "Snídaně",
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="5" width="16" height="14" rx="3" ry="3"/>
+                        <circle cx="12" cy="12" r="4" />
+                        <circle cx="12" cy="12" r="1.5" fill="#f4f1e6" />
+                    </svg>`
+                },
+                {
+                    name: "Svačiny",
+                    svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                        viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
+                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 6l16 12H4z" />
+                        <path d="M6 10l5 4" />
+                        <path d="M8 8l8 6" />
+                    </svg>`
+                }
+            ];
+
+            const adminCategoriesList = document.getElementById("adminCategoriesList");
+            adminCategoriesList.innerHTML = "";
+
+            categoryData.forEach(cat => {
+                const card = document.createElement("div");
+                card.classList.add("category-card");
+
+                const icon = document.createElement("div");
+                icon.classList.add("category-icon");
+                icon.innerHTML = cat.svg;
+
+                const label = document.createElement("span");
+                label.textContent = cat.name;
+
+                card.appendChild(icon);
+                card.appendChild(label);
+
+                card.addEventListener("click", () => loadAdminRecipesByCategory(cat.name));
+                adminCategoriesList.appendChild(card);
+            });
+        }
+
+        function loadAdminRecipesByCategory(category) {
+            window.loadAdminRecipesByCategory = loadAdminRecipesByCategory;
+
+            adminRecipesTab.classList.add("active");
+            adminUsersTab.classList.remove("active");
+            adminRecipesSection.classList.remove("hidden");
+            recipeForm.classList.remove("hidden");
+            adminUsersSection.classList.add("hidden");
+
+
+            fetch("http://localhost:8080/recepty?category=" + encodeURIComponent(category), {
+                headers: { "Authorization": "Bearer " + jwtToken }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Chyba při načítání receptů.");
+                return res.json();
+            })
+            .then(data => {
+                const adminRecipeList = document.getElementById("adminRecipeList");
+                adminRecipeList.innerHTML = "";
+
+                if (data.length === 0) {
+                    adminRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
+                    return;
+                }
+
+                data.forEach(recipe => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <div class="recipe-content">
+                            <div class="recipe-left">
+                                <strong>${recipe.title}</strong><br>
+                                <em class="category">${recipe.category}</em><br>
+                                <em>${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}</em><br>
+                            </div>
+                            <div class="recipe-right">
+                                ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                            </div>
+                        </div>
+                        <p class="recipe-instructions">${recipe.instructions}</p>
+                        <div class="recipe-buttons">
+                            <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                            <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                        </div>
+                    `;
+                    adminRecipeList.appendChild(li);
+                });
+            })
+            .catch(err => {
+                const adminRecipeList = document.getElementById("adminRecipeList");
+                adminRecipeList.innerHTML = `<li>Chyba: ${err.message}</li>`;
+            });
+        }
 
 
       </script>
