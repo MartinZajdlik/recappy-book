@@ -31,10 +31,32 @@ public class RecipeController {
         this.recipeRepository = recipeRepository;
     }
 
-    // Jen pro admina
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Recipe> createRecipe(@Valid @RequestBody Recipe recipe) {
+    public ResponseEntity<Recipe> createRecipe(
+            @RequestParam("title") String title,
+            @RequestParam("category") String category,
+            @RequestParam("ingredients") String ingredients,
+            @RequestParam("instructions") String instructions,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+    ) throws IOException {
+        Recipe recipe = new Recipe();
+        recipe.setTitle(title);
+        recipe.setCategory(category);
+        recipe.setIngredients(ingredients);
+        recipe.setInstructions(instructions);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String folder = "pictures/";
+            String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            File dir = new File(folder);
+            if (!dir.exists()) dir.mkdirs();
+            Path path = Paths.get(folder + filename);
+            Files.write(path, imageFile.getBytes());
+
+            recipe.setImagePath(filename);
+        }
+
         Recipe saved = recipeRepository.save(recipe);
         return ResponseEntity.ok(saved);
     }
@@ -71,11 +93,11 @@ public class RecipeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long id,
-            @RequestPart("title") String title,
-            @RequestPart("category") String category,
-            @RequestPart("ingredients") String ingredients,
-            @RequestPart("instructions") String instructions,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile
+            @RequestParam("title") String title,
+            @RequestParam("category") String category,
+            @RequestParam("ingredients") String ingredients,
+            @RequestParam("instructions") String instructions,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
     ) throws IOException {
         Optional<Recipe> recipeOpt = recipeRepository.findById(id);
         if (recipeOpt.isEmpty()) {
