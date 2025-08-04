@@ -71,11 +71,11 @@ public class RecipeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long id,
-            @RequestParam("title") String title,
-            @RequestParam("category") String category,
-            @RequestParam("ingredients") String ingredients,
-            @RequestParam("instructions") String instructions,
-            @RequestParam(value = "image", required = false) MultipartFile imageFile
+            @RequestPart("title") String title,
+            @RequestPart("category") String category,
+            @RequestPart("ingredients") String ingredients,
+            @RequestPart("instructions") String instructions,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
     ) throws IOException {
         Optional<Recipe> recipeOpt = recipeRepository.findById(id);
         if (recipeOpt.isEmpty()) {
