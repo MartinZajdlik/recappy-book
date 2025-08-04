@@ -248,7 +248,7 @@
                 adminPanel.classList.remove("hidden");
                 renderAdminCategories();
                 loadUsers();
-                loadRecipes();
+            
                 
             } else {
                 document.getElementById("publicRecipes").classList.remove("hidden");
@@ -1049,6 +1049,7 @@
                     if (userRole === "ROLE_ADMIN") {
                         adminPanel.classList.remove("hidden");
                         loadUsers();
+                        loadPublicRecipes();
                     } else {
                         document.getElementById("publicRecipes").classList.remove("hidden");
                         loadPublicRecipes();
