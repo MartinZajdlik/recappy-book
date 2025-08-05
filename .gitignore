@@ -34,3 +34,16 @@ build/
 
 
 src/main/resources/application.properties
+
+# Lokální SQLite databáze
+recepty.db
+
+# Lokální složka pro nahrané obrázky (pokud ji používáš)
+uploads/
+
+# Logy
+*.log
+
+# OS specifické soubory
+.DS_Store
+Thumbs.db

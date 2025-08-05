@@ -26,23 +26,34 @@ public class RecappyBookApplication {
 	@Bean
 	CommandLineRunner run(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
-			if (userRepository.findByUsername("admin").isEmpty()) {
+			String adminPassword = System.getenv("ADMIN_DEFAULT_PASSWORD");
+			String userPassword = System.getenv("USER_DEFAULT_PASSWORD");
+
+			if (adminPassword == null || adminPassword.isBlank()) {
+				System.err.println("⚠️ ADMIN_DEFAULT_PASSWORD není nastaven. Admin nebude vytvořen.");
+			} else if (userRepository.findByUsername("admin").isEmpty()) {
 				User admin = new User();
 				admin.setUsername("admin");
-				admin.setPassword(passwordEncoder.encode(adminPassword)); // 🧠 Heslo z proměnné
+				admin.setPassword(passwordEncoder.encode(adminPassword));
 				admin.setRole("ROLE_ADMIN");
 				admin.setEmail("m.zajdlik@seznam.cz");
 				userRepository.save(admin);
+				System.out.println("✅ Admin vytvořen.");
 			}
 
 			if (userRepository.findByUsername("user").isEmpty()) {
+				if (userPassword == null || userPassword.isBlank()) {
+					userPassword = "user"; // fallback default
+				}
 				User user = new User();
 				user.setUsername("user");
-				user.setPassword(passwordEncoder.encode(userPassword)); // 🧠 Heslo z proměnné
+				user.setPassword(passwordEncoder.encode(userPassword));
 				user.setRole("ROLE_USER");
 				user.setEmail("pomocny@seznam.cz");
 				userRepository.save(user);
+				System.out.println("✅ User vytvořen.");
 			}
 		};
 	}
+
 }
