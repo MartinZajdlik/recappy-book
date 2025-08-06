@@ -12,13 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 public class RecappyBookApplication {
 
-	// 🛡️ Načtení hesel z application.properties nebo prostředí
-	@Value("${admin.default.password}")
-	private String adminPassword;
-
-	@Value("${user.default.password}")
-	private String userPassword;
-
 	public static void main(String[] args) {
 		SpringApplication.run(RecappyBookApplication.class, args);
 	}
