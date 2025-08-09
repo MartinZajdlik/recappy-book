@@ -131,7 +131,7 @@ form select {
     flex-wrap: wrap;
     gap: 1rem;
     box-sizing: border-box;
-    width: 250px;
+    width: 100%;
     max-width: 100%;         /* zabrání přetečení */
     overflow: hidden;        /* skryje přetékající obsah */
     word-wrap: break-word;   /* zalomí dlouhý text */
