@@ -10,27 +10,28 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message= "Název receptu nesmí být prázdný")
+    @NotBlank(message = "Název receptu nesmí být prázdný")
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @NotBlank(message= "Ingredience nesmí být prázdné")
+    @NotBlank(message = "Ingredience nesmí být prázdné")
+    @Column(columnDefinition = "TEXT")
     private String ingredients;
 
-    @NotBlank(message= "Postup nesmí být prázdný")
+    @NotBlank(message = "Postup nesmí být prázdný")
+    @Column(columnDefinition = "TEXT")
     private String instructions;
 
     @NotBlank(message = "Kategorie nesmí být prázdná")
+    @Column(nullable = false, length = 100)
     private String category;
 
-    @Column(name = "image_path")
+    @Column(name = "image_path", length = 512)
     private String imagePath;
 
+    public Recipe() {}
 
-    // --- Konstruktory ---
-    public Recipe() {
-    }
-
-    public Recipe(String title,String category, String ingredients, String instructions) {
+    public Recipe(String title, String category, String ingredients, String instructions) {
         this.title = title;
         this.category = category;
         this.ingredients = ingredients;

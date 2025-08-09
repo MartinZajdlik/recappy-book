@@ -883,7 +883,7 @@ form select {
     font-weight: bold;
     margin-top: 1rem;
     margin-bottom: 0.3rem;
-
+}
 #dailyTip img {
   width: 100%;
   max-width: 100%;
@@ -895,40 +895,34 @@ form select {
   object-fit: cover;
 }
 
-
-}
-#categoriesList {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    gap: 1rem;
-    padding: 1rem 0.5rem;
-    scroll-padding: 1rem;
-    scrollbar-width: none; /* Firefox */
+/* Nahraď celý původní blok #categoriesList tímhle */
+#categoriesList,
+#adminCategoriesList {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-#categoriesList::-webkit-scrollbar {
-    display: none;
-}
 
   
 .category-card {
-    flex: 0 0 auto;
-    min-width: 80px; /* menší minimum místo pevné šířky */
-    max-width: 100px; /* nepřekročí max šířku */
-    background-color: #2d2d3a;
-    border-radius: 10px;
-    padding: 0.7rem;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
+  width: 100%;          /* ať vyplní svou gridovou buňku */
+  min-width: 0;         /* zrušíme tvrdé minimum */
+  background-color: #2d2d3a;
+  border-radius: 10px;
+  padding: 0.7rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
+
 
 
   
@@ -1050,4 +1044,48 @@ form select {
   font-style: italic;
   font-size: 1.2rem;
   margin: 0.1rem 0;
+}
+form textarea {
+    min-height: 120px; /* výška pole – klidně víc, třeba 200px */
+    resize: vertical;  /* umožní uživateli roztáhnout */
+}
+
+.recipe-instructions {
+    white-space: pre-wrap; /* zachová nové řádky a více mezer */
+}
+.recipe-instructions {
+white-space: pre-wrap;
+}
+
+#dailyTip .recipe-instructions {
+  white-space: pre-line; /* zachová jen nové řádky, mezery sloučí */
+}
+#categoriesList,
+#adminCategoriesList {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;       /* ❗ nikdy nezalomej na další řádek */
+  gap: 0.5rem;
+  overflow: hidden;        /* žádný horizontální posuvník */
+}
+
+.category-card {
+  flex: 1 1 0;              /* každá se roztáhne nebo smrskne stejně */
+  min-width: 0;             /* dovol menší šířku než obsah */
+  background-color: #2d2d3a;
+  border-radius: 10px;
+  padding: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.category-card svg {
+  max-width: 100%;          /* ikona se zmenší s kartou */
+  height: auto;
 }
