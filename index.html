@@ -362,7 +362,8 @@
           // schovat veřejnou část
           authSection.classList.add("hidden");
           document.getElementById("publicRecipes").classList.add("hidden");
-          document.getElementById("dailyTip")?.classList.add("hidden");
+          const tip = document.getElementById("dailyTip");
+          if (tip) tip.classList.add("hidden");
 
           // zobrazit admin panel
           adminPanel.classList.remove("hidden");
@@ -377,13 +378,26 @@
           renderAdminCategories();
           recipeForm.classList.remove("hidden");
 
-          // pro jistotu zavřít případné modaly/overlaye
-          document.getElementById("imageModal")?.classList.add("hidden");
-          document.getElementById("imagePopup")?.classList.add("hidden");
+          // VYČISTIT seznamy a stav filtru, ať je to skutečně "domů"
+          const adminRecipeList = document.getElementById("adminRecipeList");
+          const publicList = document.getElementById("recipeList");
+          if (adminRecipeList) adminRecipeList.innerHTML = "";
+          if (publicList) publicList.innerHTML = "";
+          editingId = null;
+
+          // reset formuláře (včetně názvu vybraného souboru)
+          const formEl = document.getElementById("recipeForm");
+          if (formEl) formEl.reset();
+          const fileNameDisplay = document.getElementById("fileNameDisplay");
+          if (fileNameDisplay) fileNameDisplay.textContent = "Žádný obrázek nevybrán";
+
+          // zavřít případné modaly/overlaye a posunout nahoru k formuláři
+          const imageModal = document.getElementById("imageModal");
+          const imagePopup = document.getElementById("imagePopup");
+          if (imageModal) imageModal.classList.add("hidden");
+          if (imagePopup) imagePopup.classList.add("hidden");
+          recipeForm.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-
-
-
 
 
     function loadRecipes() {
@@ -1268,26 +1282,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("publicRecipes").classList.add("hidden");
     authError.textContent = "";
   });
-
-    // (smaž případný původní addEventListener na #homeTitle)
-        document.addEventListener("click", (e) => {
-          const logo = e.target.closest("#homeTitle");
-          if (!logo) return;
-
-          if (!jwtToken || !userRole) {
-            authSection.classList.remove("hidden");
-            adminPanel.classList.add("hidden");
-            document.getElementById("publicRecipes").classList.add("hidden");
-            return;
-          }
-
-          if (userRole === "ROLE_ADMIN") {
-            showAdminHome();
-          } else {
-            showHome();
-          }
-        });
-
 
 
   // recepty po odeslání formuláře
