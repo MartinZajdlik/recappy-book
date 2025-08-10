@@ -207,62 +207,73 @@
 
     // === FUNKCE ===
     function loadPublicRecipes(category) {
-    let url = "http://localhost:8080/recepty";
-    if (category) {
-        url += "?category=" + encodeURIComponent(category);
-    }
 
-    if (userRole !== "ROLE_ADMIN") {
         adminPanel.classList.add("hidden");
-    }
+        adminRecipesSection.classList.add("hidden");
+        adminUsersSection.classList.add("hidden");
+        recipeForm.classList.add("hidden");
 
-    document.getElementById("publicRecipes").classList.remove("hidden");
+        const tipSection = document.getElementById("dailyTip");
+        if (category) {
+            tipSection.classList.add("hidden");
+        }
 
-    if (!category) {
-        publicRecipeList.innerHTML = "";
-        return;
-    }
+        let url = "http://localhost:8080/recepty";
+        if (category) {
+            url += "?category=" + encodeURIComponent(category);
+        }
 
-    fetch(url)
-        .then(res => res.json())
-        .then(data => {
+        if (userRole !== "ROLE_ADMIN") {
+            adminPanel.classList.add("hidden");
+        }
+
+        document.getElementById("publicRecipes").classList.remove("hidden");
+
+        if (!category) {
             publicRecipeList.innerHTML = "";
-            if (data.length === 0) {
-                publicRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
-                return;
-            }
-            data.forEach(recipe => {
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <div class="recipe-content">
-                        <div class="recipe-left">
-                            <strong>${recipe.title}</strong><br>
-                            <em class="category">${recipe.category}</em><br>
-                            <div class="recipe-ingredients">
-                                ${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}
+            return;
+        }
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                publicRecipeList.innerHTML = "";
+                if (data.length === 0) {
+                    publicRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
+                    return;
+                }
+                data.forEach(recipe => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <div class="recipe-content">
+                            <div class="recipe-left">
+                                <strong>${recipe.title}</strong><br>
+                                <em class="category">${recipe.category}</em><br>
+                                <div class="recipe-ingredients">
+                                    ${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}
+                                </div>
+                            </div>
+                            <div class="recipe-right">
+                                ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                             </div>
                         </div>
-                        <div class="recipe-right">
-                            ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                        <p class="recipe-instructions">${recipe.instructions}</p>
+                        <div class="recipe-buttons">
+                            ${userRole === "ROLE_ADMIN" ? `
+                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
+                            ` : ""}
                         </div>
-                    </div>
-                    <p class="recipe-instructions">${recipe.instructions}</p>
-                    <div class="recipe-buttons">
-                        ${userRole === "ROLE_ADMIN" ? `
-                            <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
-                            <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
-                        ` : ""}
-                    </div>
-                `;
+                    `;
 
-                publicRecipeList.appendChild(li);
+                    publicRecipeList.appendChild(li);
+                });
+
+            })
+            .catch(() => {
+                publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
             });
-
-        })
-        .catch(() => {
-            publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
-        });
-}
+    }
 
     function loadDailyTip() {
     const tipSection = document.getElementById("dailyTip");
@@ -322,62 +333,88 @@
     });
 }
 
+   function showHome() {
+      // Veřejná část vidět
+      authSection.classList.add("hidden");
+      document.getElementById("publicRecipes").classList.remove("hidden");
+
+
+      adminPanel.classList.add("hidden");
+      adminRecipesSection.classList.add("hidden");
+      adminUsersSection.classList.add("hidden");
+      recipeForm.classList.add("hidden");
+      // zruš "active" na admin záložkách
+      if (typeof adminRecipesTab !== "undefined") adminRecipesTab.classList.remove("active");
+      if (typeof adminUsersTab !== "undefined") adminUsersTab.classList.remove("active");
+
+
+      // Karty kategorií + čistý list
+      renderCategories();
+      publicRecipeList.innerHTML = "";
+
+      // TIP je na domovské obrazovce vždy vidět
+      const tipSection = document.getElementById("dailyTip");
+      tipSection.classList.remove("hidden");
+      loadDailyTip();
+    }
+
+
 
     function loadRecipes() {
-    fetch("http://localhost:8080/recepty", {
-        headers: { "Authorization": "Bearer " + jwtToken }
-    })
-    .then(res => {
-        if (!res.ok) {
-            if (res.status === 401 || res.status === 403) {
-                throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
-            } else {
-                throw new Error("Chyba při načítání receptů.");
+        fetch("http://localhost:8080/recepty", {
+            headers: { "Authorization": "Bearer " + jwtToken }
+        })
+        .then(res => {
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) {
+                    throw new Error("Byl jsi odhlášen. Přihlas se znovu.");
+                } else {
+                    throw new Error("Chyba při načítání receptů.");
+                }
             }
-        }
-        return res.json();
-    })
-    .then(data => {
-        recipeList.innerHTML = "";
-        data.forEach(recipe => {
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <div class="recipe-content">
-                    <div class="recipe-left">
-                        <strong>${recipe.title}</strong><br>
-                        <em class="category">${recipe.category}</em><br>
+            return res.json();
+        })
+        .then(data => {
+            recipeList.innerHTML = "";
+            data.forEach(recipe => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <div class="recipe-content">
+                        <div class="recipe-left">
+                            <strong>${recipe.title}</strong><br>
+                            <em class="category">${recipe.category}</em><br>
 
-                        <!-- 🆕 ingredience obalené do recipe-ingredients -->
-                        <div class="recipe-ingredients">
-                            ${recipe.ingredients
-                                .split(',')
-                                .map(i => '• ' + i.trim())
-                                .join('<br>')}
+                            <!-- 🆕 ingredience obalené do recipe-ingredients -->
+                            <div class="recipe-ingredients">
+                                ${recipe.ingredients
+                                    .split(',')
+                                    .map(i => '• ' + i.trim())
+                                    .join('<br>')}
+                            </div>
+                        </div>
+                        <div class="recipe-right">
+                            ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                         </div>
                     </div>
-                    <div class="recipe-right">
-                        ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+
+                    <!-- 🆕 instrukce se class recipe-instructions (CSS: white-space: pre-wrap) -->
+                    <p class="recipe-instructions">${recipe.instructions}</p>
+
+                    <div class="recipe-buttons">
+                        <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
+                        <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
                     </div>
-                </div>
-
-                <!-- 🆕 instrukce se class recipe-instructions (CSS: white-space: pre-wrap) -->
-                <p class="recipe-instructions">${recipe.instructions}</p>
-
-                <div class="recipe-buttons">
-                    <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
-                    <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
-                </div>
-            `;
-            recipeList.appendChild(li);
+                `;
+                recipeList.appendChild(li);
+            });
+        })
+        .catch(err => {
+            authError.textContent = err.message;
+            if (err.message.includes("odhlášen")) {
+                logoutBtn.click();
+            }
         });
-    })
-    .catch(err => {
-        authError.textContent = err.message;
-        if (err.message.includes("odhlášen")) {
-            logoutBtn.click();
-        }
-    });
-}
+    }
 
     function renderCategories() {
             categoriesList.innerHTML = "";
@@ -757,18 +794,30 @@
     window.editRecipe = function (id) {
           editingId = id;
 
-          // Přepnutí na záložku s recepty
+          // ⬇⬇⬇ PŘIDEJ TOTO – přepnout UI do režimu ADMIN/RECEPTY a schovat veřejnou část + TIP ⬇⬇⬇
+          document.getElementById("publicRecipes").classList.add("hidden");
+          document.getElementById("dailyTip").classList.add("hidden");
+          adminPanel.classList.remove("hidden");
+
           adminRecipesTab.classList.add("active");
           adminUsersTab.classList.remove("active");
+
           adminRecipesSection.classList.remove("hidden");
           adminUsersSection.classList.add("hidden");
+
+          // zobrazit formulář pro editaci
           recipeForm.classList.remove("hidden");
+
+          // reset stavu file inputu / popisku
+          const fileNameDisplay = document.getElementById("fileNameDisplay");
+          if (fileNameDisplay) fileNameDisplay.textContent = "Žádný obrázek nevybrán";
+          const imageInput = document.getElementById("imageInput");
+          if (imageInput) imageInput.value = "";
+          // ⬆⬆⬆ PŘIDEJ TOTO ⬆⬆⬆
 
           fetch(`http://localhost:8080/recepty/${id}`, {
             method: "GET",
-            headers: {
-              "Authorization": "Bearer " + jwtToken
-            }
+            headers: { "Authorization": "Bearer " + jwtToken }
           })
             .then(response => {
               if (!response.ok) throw new Error("Nepodařilo se načíst recept.");
@@ -780,36 +829,40 @@
               document.getElementById("ingredients").value = recipe.ingredients;
               document.getElementById("instructions").value = recipe.instructions;
 
-              // Necháváme input na obrázek prázdný – ten se nahrává jen pokud admin vybere nový
+              // volitelně posuň formulář do zorného pole
+              recipeForm.scrollIntoView({ behavior: "smooth", block: "start" });
             })
             .catch(err => {
               alert("Chyba při načítání receptu: " + err.message);
             });
         };
 
+
     window.submitEditRecipe = function () {
           const id = editingId;
+          if (!id) {
+            alert("Chybí ID receptu k úpravě.");
+            return;
+          }
+
           const title = document.getElementById("title").value;
           const category = document.getElementById("category").value;
           const ingredients = document.getElementById("ingredients").value;
           const instructions = document.getElementById("instructions").value;
           const imageInput = document.getElementById("imageInput");
-          const formData = new FormData();
 
+          const formData = new FormData();
           formData.append("title", title);
           formData.append("category", category);
           formData.append("ingredients", ingredients);
           formData.append("instructions", instructions);
-
           if (imageInput.files.length > 0) {
             formData.append("image", imageInput.files[0]); // nový obrázek
           }
 
           fetch(`http://localhost:8080/recepty/${id}`, {
             method: "PUT",
-            headers: {
-              "Authorization": "Bearer " + jwtToken
-            },
+            headers: { "Authorization": "Bearer " + jwtToken },
             body: formData
           })
             .then(response => {
@@ -818,10 +871,28 @@
             })
             .then(data => {
               alert("Recept upraven.");
+
+              // ⬇⬇⬇ PŘIDEJ TOTO – po uložení uklidit UI a obnovit seznam ⬇⬇⬇
               editingId = null;
               recipeForm.reset();
-              document.getElementById("fileNameDisplay").textContent = "Žádný obrázek nevybrán";
-              document.getElementById("adminRecipeList").innerHTML = "";
+              const fileNameDisplay = document.getElementById("fileNameDisplay");
+              if (fileNameDisplay) fileNameDisplay.textContent = "Žádný obrázek nevybrán";
+
+              // formulář schovat, zůstat v admin/recepty a refreshnout seznam
+              recipeForm.classList.add("hidden");
+
+              adminRecipesTab.classList.add("active");
+              adminUsersTab.classList.remove("active");
+              adminRecipesSection.classList.remove("hidden");
+              adminUsersSection.classList.add("hidden");
+
+              // vyčistit seznam v admin části (pokud to tak děláš) a načíst znovu
+              const adminRecipeList = document.getElementById("adminRecipeList");
+              if (adminRecipeList) adminRecipeList.innerHTML = "";
+              if (typeof loadRecipes === "function") {
+                loadRecipes(); // pokud máš loadAdminRecipes(), dej ho sem
+              }
+              // ⬆⬆⬆ PŘIDEJ TOTO ⬆⬆⬆
             })
             .catch(error => {
               alert("Chyba při úpravě receptu: " + error.message);
@@ -960,26 +1031,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // přepínání záložek
   adminRecipesTab.addEventListener("click", () => {
-    adminRecipesTab.classList.add("active");
-    adminUsersTab.classList.remove("active");
-    adminRecipesSection.classList.remove("hidden");
-    recipeForm.classList.remove("hidden");
-    adminUsersSection.classList.add("hidden");
-  });
+      // režim: ADMIN
+      document.getElementById("publicRecipes").classList.add("hidden");   // skryj veřejnou část
+      document.getElementById("dailyTip").classList.add("hidden");        // skryj TIP
+      adminPanel.classList.remove("hidden");                               // ukaž admin panel
+
+      // záložky
+      adminRecipesTab.classList.add("active");
+      adminUsersTab.classList.remove("active");
+
+      // sekce
+      adminRecipesSection.classList.remove("hidden");
+      adminUsersSection.classList.add("hidden");
+
+      // formulář nech skrytý (zobrazí se až při editaci / přidání)
+      recipeForm.classList.add("hidden");
+
+      // vyčištění veřejného seznamu (volitelně)
+      publicRecipeList.innerHTML = "";
+
+      // načti admin recepty (použij tu funkci, kterou máš)
+      loadRecipes(); // nebo loadAdminRecipes()
+    });
+
 
   adminUsersTab.addEventListener("click", () => {
-    adminUsersTab.classList.add("active");
-    adminRecipesTab.classList.remove("active");
-    adminUsersSection.classList.remove("hidden");
-    adminRecipesSection.classList.add("hidden");
-    recipeForm.classList.add("hidden");
+      // režim: ADMIN
+      document.getElementById("publicRecipes").classList.add("hidden");
+      document.getElementById("dailyTip").classList.add("hidden");
+      adminPanel.classList.remove("hidden");
 
-    document.getElementById("recipeList").innerHTML = "";
-    document.getElementById("adminRecipeList").innerHTML = "";
-    document.getElementById("publicRecipes").classList.add("hidden");
+      // záložky
+      adminUsersTab.classList.add("active");
+      adminRecipesTab.classList.remove("active");
 
-    loadUsers();
-  });
+      // sekce
+      adminUsersSection.classList.remove("hidden");
+      adminRecipesSection.classList.add("hidden");
+
+      // formulář skrytý
+      recipeForm.classList.add("hidden");
+
+      // vyčištění seznamů
+      document.getElementById("recipeList").innerHTML = "";
+      document.getElementById("adminRecipeList").innerHTML = "";
+      publicRecipeList.innerHTML = "";
+
+      // načíst uživatele
+      loadUsers();
+    });
+
 
   // vykreslení kategorií
   renderCategories();
@@ -1050,6 +1151,8 @@ document.addEventListener("DOMContentLoaded", () => {
         usernameDisplay.classList.remove("hidden");
         logoutBtn.classList.remove("hidden");
 
+        showHome();
+
         if (data.role === "ROLE_ADMIN") {
           adminPanel.classList.remove("hidden");
           renderAdminCategories();
@@ -1114,10 +1217,17 @@ document.addEventListener("DOMContentLoaded", () => {
     authError.textContent = "";
   });
 
-  // kliknutí na název = odhlásit
-  document.getElementById("homeTitle").addEventListener("click", () => {
-    logoutBtn.click();
-  });
+  // kliknutí na název = návrat "domů" (TIP + kategorie)
+    document.getElementById("homeTitle").addEventListener("click", () => {
+      // pokud nejsi přihlášený, ukážeme přihlášení
+      if (!jwtToken) {
+        authSection.classList.remove("hidden");
+        document.getElementById("publicRecipes").classList.add("hidden");
+        return;
+      }
+      showHome();
+    });
+
 
   // recepty po odeslání formuláře
   recipeForm.addEventListener("submit", function (e) {
