@@ -899,7 +899,7 @@ form select {
 #categoriesList,
 #adminCategoriesList {
   width: 100%;
-  display: grid;
+  display: flex;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
@@ -1088,4 +1088,16 @@ white-space: pre-wrap;
 .category-card svg {
   max-width: 100%;          /* ikona se zmenší s kartou */
   height: auto;
+}
+.header {
+  position: sticky;   /* nebo fixed, pokud chceš, aby držel pořád */
+  top: 0;
+  z-index: 20001;
+  background-color: #14171b; /* aby přes to nic neprosvítalo */
+}
+#adminPanel,
+#adminRecipesSection,
+#adminUsersSection {
+  position: relative;
+  z-index: 1;
 }
