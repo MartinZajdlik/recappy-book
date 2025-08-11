@@ -17,8 +17,10 @@ public class MailService {
     public MailService(JavaMailSender sender) {
         this.sender = sender;
     }
-
+    @Value("${feature.email.enabled:true}") boolean emailEnabled;
     public void send(String to, String subject, String html) {
+        if (!emailEnabled) { System.out.println("[Mail OFF] -> " + to); return; }
+
         try {
             MimeMessage msg = sender.createMimeMessage();
             MimeMessageHelper h = new MimeMessageHelper(msg, "UTF-8");
