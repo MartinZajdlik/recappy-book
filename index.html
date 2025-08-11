@@ -29,7 +29,7 @@
                     <!-- Text -->
                     <text x="75" y="34" font-family="'Segoe UI', sans-serif" font-size="26" fill="#f4f1e6" font-weight="bold">RecAPPy</text>
                     <text x="75" y="54" font-family="'Georgia', serif" font-size="18" fill="#f4f1e6" font-weight="bold" letter-spacing="4">BOOK</text>
-                </svg>       
+                </svg>
             </h1>
         </div>
 
@@ -406,7 +406,11 @@
           const imagePopup = document.getElementById("imagePopup");
           if (imageModal) imageModal.classList.add("hidden");
           if (imagePopup) imagePopup.classList.add("hidden");
-          recipeForm.scrollIntoView({ behavior: "smooth", block: "start" });
+          // recipeForm.scrollIntoView({ behavior: "smooth", block: "start" });
+            requestAnimationFrame(() => {
+              window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+            });
+
         }
 
 
