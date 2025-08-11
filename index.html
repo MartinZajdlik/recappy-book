@@ -108,6 +108,16 @@
                 <button type="submit">Registrovat</button>
             </form>
 
+
+            <a id="forgotLink" href="#" style="display:block;margin-top:.5rem;">Zapomněli jste heslo?</a>
+            <div id="forgotSection" class="hidden" style="margin-top:.5rem;">
+                <input id="forgotEmail" type="email" placeholder="E-mail" required>
+                <button id="forgotSubmit">Poslat odkaz pro reset</button>
+                <div id="forgotMsg" class="info"></div>
+            </div>
+
+
+
             <div id="authError" class="error"></div>
         </section>
 
@@ -1090,6 +1100,77 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const imageInput = document.getElementById("imageInput");
   const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+      // --- Zapomenuté heslo (toggle + odeslání) ---
+    const forgotLink = document.getElementById("forgotLink");
+    const forgotSection = document.getElementById("forgotSection");
+    const forgotSubmit = document.getElementById("forgotSubmit");
+    const forgotEmail = document.getElementById("forgotEmail");
+    const forgotMsg = document.getElementById("forgotMsg");
+
+    if (forgotLink) {
+      forgotLink.addEventListener("click", (e) => {
+        e.preventDefault();
+        forgotSection.classList.toggle("hidden");
+      });
+    }
+
+    if (forgotSubmit) {
+      forgotSubmit.addEventListener("click", () => {
+        const email = (forgotEmail.value || "").trim();
+        if (!email) return;
+        fetch("http://localhost:8080/auth/forgot", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ email })
+        }).then(() => {
+          forgotMsg.textContent = "Pokud e-mail existuje, poslali jsme odkaz pro reset.";
+        }).catch(() => {
+          forgotMsg.textContent = "Pokud e-mail existuje, poslali jsme odkaz pro reset.";
+        });
+      });
+    }
+
+    // --- Zpracování tokenů z URL (?verifyToken=..., ?resetToken=...) ---
+    const params = new URLSearchParams(location.search);
+    const verifyToken = params.get("verifyToken");
+    const resetToken = params.get("resetToken");
+
+    // Potvrzení účtu
+    if (verifyToken) {
+      fetch(`http://localhost:8080/auth/confirm?token=${encodeURIComponent(verifyToken)}`)
+        .then(r => r.ok ? r.text() : Promise.reject())
+        .then(() => {
+          alert("E-mail potvrzen. Můžeš se přihlásit.");
+          history.replaceState({}, "", location.pathname);
+        })
+        .catch(() => {
+          alert("Potvrzení se nepodařilo. Zkus to znovu nebo požádej o nový odkaz.");
+          history.replaceState({}, "", location.pathname);
+        });
+    }
+
+    // Reset hesla – minimalisticky přes prompt (můžeš nahradit vlastním UI)
+    if (resetToken) {
+      const newPass = prompt("Zadej nové heslo:");
+      if (newPass && newPass.length >= 6) {
+        fetch("http://localhost:8080/auth/reset", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ token: resetToken, newPassword: newPass })
+        }).then(r => {
+          if (r.ok) alert("Heslo změněno, můžeš se přihlásit.");
+          else alert("Reset se nepodařil.");
+          history.replaceState({}, "", location.pathname);
+        }).catch(() => {
+          alert("Reset se nepodařil.");
+          history.replaceState({}, "", location.pathname);
+        });
+      } else {
+        history.replaceState({}, "", location.pathname);
+      }
+    }
+
 
   imageInput.addEventListener("change", () => {
     fileNameDisplay.textContent = imageInput.files.length > 0
