@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.List;
 
@@ -55,10 +54,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5500","http://localhost:63342", "http://127.0.0.1:5500"));
+        // !!! Pokud budeš používat cookie s JWT, nastav níž allowCredentials(true)
+        config.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:63342"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
+        // Je lepší být explicitní:
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        // Pokud chceš číst hlavičku Authorization na frontendu, můžeš ji “expose-nout”:
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true); // <- dej true, pokud používáš cookie s JWT
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -68,24 +71,37 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+
+                        // Auth endpoints – explicitně vypsané pro přehlednost
+                        .requestMatchers("/auth/login",
+                                "/auth/register",
+                                "/auth/confirm",
+                                "/auth/forgot",
+                                "/auth/reset").permitAll()
+
+                        // Obrázky (pokud servíruješ veřejně)
                         .requestMatchers("/pictures/**").permitAll()
+
+                        // Veřejné čtení receptů
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()
+
+                        // Admin operace nad recepty
                         .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasRole("ADMIN")
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }
