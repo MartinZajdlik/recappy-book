@@ -40,6 +40,9 @@ public class AuthController {
     @Value("${app.frontend.baseUrl:http://localhost:5500}")
     private String frontendBase;
 
+    @Value("${feature.email.enabled:false}")       // ⬅️ přidáno: feature flag
+    private boolean emailEnabled;
+
     @Autowired
     public AuthController(UserRepository userRepository,
                           VerificationTokenRepository verificationTokenRepository,
@@ -55,7 +58,7 @@ public class AuthController {
         this.mailService = mailService;
     }
 
-    // ===== REGISTRACE s e-mail potvrzením =====
+    // ===== REGISTRACE (auto-aktivace pokud jsou e-maily vypnuté) =====
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid UserRegistrationDTO dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
@@ -70,22 +73,30 @@ public class AuthController {
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         newUser.setEmail(dto.getEmail());
         newUser.setRole("ROLE_USER");
-        newUser.setEnabled(false); // <- důležité
-        userRepository.save(newUser);
 
-        // vytvořit verifikační token
-        VerificationToken vt = new VerificationToken();
-        vt.setToken(UUID.randomUUID().toString());
-        vt.setUser(newUser);
-        vt.setExpiresAt(LocalDateTime.now().plusHours(24));
-        verificationTokenRepository.save(vt);
+        if (!emailEnabled) {
+            // ⬅️ e-maily vypnuté: rovnou aktivní, nevytváříme verifikační token, neposíláme mail
+            newUser.setEnabled(true);
+            userRepository.save(newUser);
+            return ResponseEntity.ok("Registrace hotová. Účet je aktivní – můžeš se přihlásit.");
+        } else {
+            // e-maily zapnuté: klasická verifikace
+            newUser.setEnabled(false);
+            userRepository.save(newUser);
 
-        // poslat e-mail (link na frontend, který vyčte ?verifyToken=...)
-        String link = frontendBase + "/?verifyToken=" + vt.getToken();
-        mailService.send(newUser.getEmail(), "Potvrzení registrace",
-                "<p>Ahoj, potvrď svůj účet kliknutím:</p><p><a href='" + link + "'>Potvrdit účet</a></p>");
+            VerificationToken vt = new VerificationToken();
+            vt.setToken(UUID.randomUUID().toString());
+            vt.setUser(newUser);
+            vt.setExpiresAt(LocalDateTime.now().plusHours(24));
+            vt.setUsed(false);
+            verificationTokenRepository.save(vt);
 
-        return ResponseEntity.ok("Registrace proběhla, zkontroluj e-mail pro potvrzení.");
+            String link = frontendBase + "/?verifyToken=" + vt.getToken();
+            mailService.send(newUser.getEmail(), "Potvrzení registrace",
+                    "<p>Ahoj, potvrď svůj účet kliknutím:</p><p><a href='" + link + "'>Potvrdit účet</a></p>");
+
+            return ResponseEntity.ok("Registrace proběhla. Zkontroluj e-mail pro potvrzení.");
+        }
     }
 
     // ===== LOGIN – bez potvrzení účtu nevydávej JWT =====
@@ -189,7 +200,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    // ===== Informace o uživateli (beze změn) =====
+    // ===== Informace o uživateli =====
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(org.springframework.security.core.Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
