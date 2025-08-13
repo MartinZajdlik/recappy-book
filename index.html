@@ -195,6 +195,9 @@
 
 
     <footer class="footer">
+        <div class="contact">
+            Kontakt: <a>recappybook@seznam.cz</a>
+        </div>
         &copy; <strong>RecAPPy Book</strong> — Martin Žajdlík © 2025
     </footer>
 
@@ -311,6 +314,10 @@
                     <div class="recipe-title">${recipe.title}</div>
                     <em class="category">${recipe.category}</em><br>
 
+                    <div class="recipe-right">
+                    ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                </div>
+
                     <div class="recipe-section-title">Ingredience:</div>
                     <div class="recipe-ingredients">
                         ${recipe.ingredients
@@ -329,9 +336,7 @@
 
                 </div>
 
-                <div class="recipe-right">
-                    ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
-                </div>
+
             </div>
         `;
         tipSection.classList.remove("hidden");
