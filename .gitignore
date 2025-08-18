@@ -47,3 +47,8 @@ uploads/
 # OS specifické soubory
 .DS_Store
 Thumbs.db
+
+# ENV a tajnosti
+.env
+.env.*
+!.env.example
