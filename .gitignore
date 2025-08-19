@@ -33,8 +33,6 @@ build/
 .vscode/
 
 
-src/main/resources/application.properties
-
 
 # Lokální složka pro nahrané obrázky (pokud ji používáš)
 uploads/
