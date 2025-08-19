@@ -1,0 +1,45 @@
+
+
+services:
+  db:
+    image: postgres:16
+    container_name: recappy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"   # na serveru můžeš odstranit
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: recappy-app
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      FEATURE_EMAIL_ENABLED: ${FEATURE_EMAIL_ENABLED}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      APP_MAIL_FROM: ${APP_MAIL_FROM}
+      APP_FRONTEND_BASEURL: ${APP_FRONTEND_BASEURL}
+      APP_BACKEND_BASEURL: ${APP_BACKEND_BASEURL}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./pictures:/app/pictures
+
+volumes:
+  pgdata:

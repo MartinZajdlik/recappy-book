@@ -35,8 +35,6 @@ build/
 
 src/main/resources/application.properties
 
-# Lokální SQLite databáze
-recepty.db
 
 # Lokální složka pro nahrané obrázky (pokud ji používáš)
 uploads/
@@ -52,3 +50,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+pictures/
+
