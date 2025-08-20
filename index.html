@@ -217,6 +217,9 @@
         const categoriesList = document.getElementById("categoriesList");
         const publicRecipeList = document.getElementById("publicRecipeList");
 
+        // URL backendu na Renderu ===
+        const API_BASE = "https://recappy-book.onrender.com";
+
 
     // === FUNKCE ===
     function loadPublicRecipes(category) {
@@ -231,7 +234,7 @@
             tipSection.classList.add("hidden");
         }
 
-        let url = "http://localhost:8080/recepty";
+        let url = `${API_BASE}/recepty`;
         if (category) {
             url += "?category=" + encodeURIComponent(category);
         }
@@ -267,7 +270,7 @@
                                 </div>
                             </div>
                             <div class="recipe-right">
-                                ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                                ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                             </div>
                         </div>
                         <p class="recipe-instructions">${recipe.instructions}</p>
@@ -298,7 +301,7 @@
         return;
     }
 
-    fetch("http://localhost:8080/recepty/random", {
+    fetch(`${API_BASE}/recepty/random`, {
         headers: {
             "Authorization": "Bearer " + jwtToken
         }
@@ -315,7 +318,7 @@
                     <em class="category">${recipe.category}</em><br>
 
                     <div class="recipe-right">
-                    ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                    ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                 </div>
 
                     <div class="recipe-section-title">Ingredience:</div>
@@ -420,7 +423,7 @@
 
 
     function loadRecipes() {
-        fetch("http://localhost:8080/recepty", {
+        fetch(`${API_BASE}/recepty`, {
             headers: { "Authorization": "Bearer " + jwtToken }
         })
         .then(res => {
@@ -452,7 +455,7 @@
                             </div>
                         </div>
                         <div class="recipe-right">
-                            ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                            ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                         </div>
                     </div>
 
@@ -583,7 +586,7 @@
         }
 
     function loadUsers() {
-            fetch("http://localhost:8080/admin/users", {
+            fetch(`${API_BASE}/admin/users`, {
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
             .then(res => {
@@ -659,7 +662,7 @@
         }
 
     function changeUserRole(id, role) {
-            fetch(`http://localhost:8080/admin/users/${id}/role?role=${role}`, {
+            fetch(`${API_BASE}/admin/users/${id}/role?role=${role}`, {
                 method: "PUT",
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
@@ -675,7 +678,7 @@
         }
 
         function deleteUser(id) {
-            fetch(`http://localhost:8080/admin/users/${id}`, {
+            fetch(`${API_BASE}/admin/users/${id}`, {
                 method: "DELETE",
                 headers: { "Authorization": "Bearer " + jwtToken }
             })
@@ -808,7 +811,7 @@
           const adminRecipeList = document.getElementById("adminRecipeList");
           adminRecipeList.innerHTML = "";
 
-          fetch("http://localhost:8080/recepty?category=" + encodeURIComponent(category), {
+          fetch(`${API_BASE}/recepty?category=` + encodeURIComponent(category), {
             headers: { "Authorization": "Bearer " + jwtToken }
           })
           .then(res => {
@@ -833,7 +836,7 @@
                     </div>
                   </div>
                   <div class="recipe-right">
-                    ${recipe.imagePath ? `<img class="recipe-image" src="http://localhost:8080/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                    ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
                   </div>
                 </div>
                 <p class="recipe-instructions">${recipe.instructions}</p>
@@ -875,7 +878,7 @@
           if (imageInput) imageInput.value = "";
           // ⬆⬆⬆ PŘIDEJ TOTO ⬆⬆⬆
 
-          fetch(`http://localhost:8080/recepty/${id}`, {
+          fetch(`${API_BASE}/recepty/${id}`, {
             method: "GET",
             headers: { "Authorization": "Bearer " + jwtToken }
           })
@@ -920,7 +923,7 @@
             formData.append("image", imageInput.files[0]); // nový obrázek
           }
 
-          fetch(`http://localhost:8080/recepty/${id}`, {
+          fetch(`${API_BASE}/recepty/${id}`, {
             method: "PUT",
             headers: { "Authorization": "Bearer " + jwtToken },
             body: formData
@@ -975,7 +978,7 @@
             formData.append("image", imageInput.files[0]);
           }
 
-          fetch("http://localhost:8080/recepty", {
+          fetch(`${API_BASE}/recepty`, {
             method: "POST",
             headers: {
               "Authorization": "Bearer " + jwtToken
@@ -1017,7 +1020,7 @@
     window.deleteRecipe = function (id) {
           if (!confirm("Opravdu chcete smazat tento recept?")) return;
 
-          fetch(`http://localhost:8080/recepty/${id}`, {
+          fetch(`${API_BASE}/recepty/${id}`, {
             method: "DELETE",
             headers: {
               "Authorization": "Bearer " + jwtToken
@@ -1128,7 +1131,7 @@ document.addEventListener("DOMContentLoaded", () => {
       forgotSubmit.addEventListener("click", () => {
         const email = (forgotEmail.value || "").trim();
         if (!email) return;
-        fetch("http://localhost:8080/auth/forgot", {
+        fetch(`${API_BASE}/auth/forgot`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify({ email })
@@ -1147,7 +1150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Potvrzení účtu
     if (verifyToken) {
-      fetch(`http://localhost:8080/auth/confirm?token=${encodeURIComponent(verifyToken)}`)
+      fetch(`${API_BASE}/auth/confirm?token=${encodeURIComponent(verifyToken)}`)
         .then(r => r.ok ? r.text() : Promise.reject())
         .then(() => {
           alert("E-mail potvrzen. Můžeš se přihlásit.");
@@ -1163,7 +1166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resetToken) {
       const newPass = prompt("Zadej nové heslo:");
       if (newPass && newPass.length >= 6) {
-        fetch("http://localhost:8080/auth/reset", {
+        fetch(`${API_BASE}/auth/reset`, {
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify({ token: resetToken, newPassword: newPass })
@@ -1288,7 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = document.getElementById("loginUsername").value;
     const password = document.getElementById("loginPassword").value;
 
-    fetch("http://localhost:8080/auth/login", {
+    fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -1332,7 +1335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = document.getElementById("registerEmail").value;
     const password = document.getElementById("registerPassword").value;
 
-    fetch("http://localhost:8080/auth/register", {
+    fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),

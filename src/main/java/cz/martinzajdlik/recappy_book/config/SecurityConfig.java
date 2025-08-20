@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // !!! Pokud budeš používat cookie s JWT, nastav níž allowCredentials(true)
-        config.setAllowedOrigins(List.of("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:63342"));
+        config.setAllowedOrigins(List.of("https://recappy-book.onrender.com","http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:63342"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Je lepší být explicitní:
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
