@@ -1185,3 +1185,41 @@ white-space: pre-wrap;
     width: 100%;
   }
 }
+
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;           /* dovolí zalomení, když je málo místa */
+    justify-content: center;   /* vše doprostřed */
+    gap: 0.5rem;
+  }
+
+  .header-left,
+  .header-right {
+    flex: 0 0 auto;            /* žádný prázdný prostor navíc */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Logo zůstane stejné jako na desktopu */
+  .title svg {
+    width: 100%;
+    max-width: 300px;   /* pořád limit 300px */
+    height: auto;
+  }
+
+  .user-info {
+    flex-direction: row;       /* jméno + tlačítko logout v řádku */
+    gap: 0.4rem;
+  }
+
+  .logout-btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  #adminBtn {
+    font-size: 1.8rem;         /* můžeš nechat stejně jako na desktopu */
+    padding: 0.3rem;
+  }
+}
