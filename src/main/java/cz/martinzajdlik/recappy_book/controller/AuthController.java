@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:5500", allowCredentials = "true")
+@CrossOrigin(origins = "https://recappy-book-official.onrender.com", allowCredentials = "true")
 public class AuthController {
 
     private final UserRepository userRepository;
