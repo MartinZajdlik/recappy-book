@@ -2,22 +2,18 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import cz.martinzajdlik.recappy_book.service.ImageStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
+
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -25,13 +21,15 @@ import java.util.UUID;
 public class RecipeController {
 
     private final RecipeRepository recipeRepository;
+    private final ImageStorageService imageStorageService;
 
-    @Autowired
-    public RecipeController(RecipeRepository recipeRepository) {
+    public RecipeController(RecipeRepository recipeRepository,
+                            ImageStorageService imageStorageService) {
         this.recipeRepository = recipeRepository;
+        this.imageStorageService = imageStorageService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Recipe> createRecipe(
             @RequestParam("title") String title,
@@ -47,21 +45,15 @@ public class RecipeController {
         recipe.setInstructions(instructions);
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            String folder = "pictures/";
-            String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-            File dir = new File(folder);
-            if (!dir.exists()) dir.mkdirs();
-            Path path = Paths.get(folder + filename);
-            Files.write(path, imageFile.getBytes());
-
-            recipe.setImagePath(filename);
+            String imageUrl = imageStorageService.upload(imageFile);
+            recipe.setImageUrl(imageUrl);
         }
 
         Recipe saved = recipeRepository.save(recipe);
         return ResponseEntity.ok(saved);
     }
 
-    @PostMapping("/{id}/image")
+    @PostMapping(path = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> uploadImage(
             @PathVariable Long id,
@@ -73,23 +65,15 @@ public class RecipeController {
         }
         Recipe recipe = recipeOpt.get();
 
-        String folder = "pictures/";
-        String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+        String imageUrl = imageStorageService.upload(imageFile);
+        recipe.setImageUrl(imageUrl);
 
-        File dir = new File(folder);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        Path filePath = Paths.get(folder, filename);
-        Files.write(filePath, imageFile.getBytes());
-
-        recipe.setImagePath(filename);
         recipeRepository.save(recipe);
 
         return ResponseEntity.ok("Obrázek uložen");
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long id,
@@ -111,14 +95,9 @@ public class RecipeController {
         recipe.setInstructions(instructions);
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            String folder = "pictures/";
-            String filename = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-            File dir = new File(folder);
-            if (!dir.exists()) dir.mkdirs();
-            Path path = Paths.get(folder + filename);
-            Files.write(path, imageFile.getBytes());
+            String imageUrl = imageStorageService.upload(imageFile);
+            recipe.setImageUrl(imageUrl);
 
-            recipe.setImagePath(filename);
         }
 
         Recipe updated = recipeRepository.save(recipe);

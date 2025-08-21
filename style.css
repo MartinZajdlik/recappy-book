@@ -1203,7 +1203,7 @@ white-space: pre-wrap;
 
   /* Logo zůstane stejné jako na desktopu */
   .title svg {
-    width: 100%;
+    width: 100%;        /* tady zkusit zvetsit */
     max-width: 300px;   /* pořád limit 300px */
     height: auto;
   }

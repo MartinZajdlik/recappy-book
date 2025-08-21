@@ -26,16 +26,19 @@ public class Recipe {
     @Column(nullable = false, length = 100)
     private String category;
 
-    @Column(name = "image_path", length = 512)
-    private String imagePath;
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
 
-    public Recipe() {}
+    // --- Bezparametrový konstruktor pro JPA ---
+    public Recipe() {
+    }
 
-    public Recipe(String title, String category, String ingredients, String instructions) {
+    public Recipe(String title, String category, String ingredients, String instructions, String imageUrl) {
         this.title = title;
         this.category = category;
         this.ingredients = ingredients;
         this.instructions = instructions;
+        this.imageUrl = imageUrl;
     }
 
     // --- Gettery a settery ---
@@ -78,8 +81,8 @@ public class Recipe {
         this.category = category;
     }
 
-    public String getImagePath() {return imagePath; }
+    public String getImageUrl() {return imageUrl; }
 
-    public void setImagePath(String imagePath) {this.imagePath = imagePath; }
+    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl; }
 
 }
