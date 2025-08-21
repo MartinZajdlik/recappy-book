@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 public class CloudinaryConfig {
     @Bean
     public Cloudinary cloudinary() {
+        String url = System.getenv("CLOUDINARY_URL");
+        if (url != null && !url.isBlank()) {
+            return new Cloudinary(url);
+        }
         return new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", System.getenv("CLOUDINARY_CLOUD_NAME"),
                 "api_key",    System.getenv("CLOUDINARY_API_KEY"),

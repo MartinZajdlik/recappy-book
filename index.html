@@ -270,8 +270,18 @@
                                 </div>
                             </div>
                             <div class="recipe-right">
-                                ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                              ${(() => {
+                                const imgSrc = recipe.imageUrl
+                                  ? recipe.imageUrl
+                                  : (recipe.imagePath
+                                      ? (recipe.imagePath.startsWith("http")
+                                          ? recipe.imagePath
+                                          : `${API_BASE}/pictures/${recipe.imagePath}`)
+                                      : null);
+                                return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
+                              })()}
                             </div>
+
                         </div>
                         <p class="recipe-instructions">${recipe.instructions}</p>
                         <div class="recipe-buttons">
@@ -318,8 +328,18 @@
                     <em class="category">${recipe.category}</em><br>
 
                     <div class="recipe-right">
-                    ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
-                </div>
+                      ${(() => {
+                        const imgSrc = recipe.imageUrl
+                          ? recipe.imageUrl
+                          : (recipe.imagePath
+                              ? (recipe.imagePath.startsWith("http")
+                                  ? recipe.imagePath
+                                  : `${API_BASE}/pictures/${recipe.imagePath}`)
+                              : null);
+                        return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
+                      })()}
+                    </div>
+
 
                     <div class="recipe-section-title">Ingredience:</div>
                     <div class="recipe-ingredients">
@@ -455,8 +475,18 @@
                             </div>
                         </div>
                         <div class="recipe-right">
-                            ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
+                          ${(() => {
+                            const imgSrc = recipe.imageUrl
+                              ? recipe.imageUrl
+                              : (recipe.imagePath
+                                  ? (recipe.imagePath.startsWith("http")
+                                      ? recipe.imagePath
+                                      : `${API_BASE}/pictures/${recipe.imagePath}`)
+                                  : null);
+                            return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
+                          })()}
                         </div>
+
                     </div>
 
                     <!-- 🆕 instrukce se class recipe-instructions (CSS: white-space: pre-wrap) -->
@@ -836,8 +866,18 @@
                     </div>
                   </div>
                   <div class="recipe-right">
-                    ${recipe.imagePath ? `<img class="recipe-image" src="${API_BASE}/pictures/${recipe.imagePath}" alt="Obrázek receptu">` : ""}
-                  </div>
+                      ${(() => {
+                        const imgSrc = recipe.imageUrl
+                          ? recipe.imageUrl
+                          : (recipe.imagePath
+                              ? (recipe.imagePath.startsWith("http")
+                                  ? recipe.imagePath
+                                  : `${API_BASE}/pictures/${recipe.imagePath}`)
+                              : null);
+                        return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
+                      })()}
+                    </div>
+
                 </div>
                 <p class="recipe-instructions">${recipe.instructions}</p>
                 <div class="recipe-buttons">
