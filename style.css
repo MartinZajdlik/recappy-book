@@ -1253,20 +1253,41 @@ white-space: pre-wrap;
     height: 24px !important;
   }
 }
-
-/* --- Úpravy pro mobil --- */
+/* --- new --- */
+/* --- Jemnější úpravy headeru na mobilu --- */
 @media (max-width: 480px) {
-  /* Logo víc od stěny */
-  .header-left {
-    padding-left: 0.5rem;  /* klidně zvětši třeba na 1rem */
+  .header {
+    gap: 0.2rem; /* menší mezera mezi levým a pravým blokem */
   }
 
-  /* Citát menší a vždy v jedné řadě */
-  .daily-quote {
-    font-size: 0.8rem;      /* zmenší text */
-    white-space: nowrap;    /* nedovolí zalomení */
+  .header-right {
+    gap: 0.3rem; /* zmenší rozestup mezi jménem, odhlášením a kuchaříkem */
+  }
+
+  .user-info {
+    gap: 0.3rem; /* jméno + logout blíž k sobě */
+  }
+
+  .username {
+    max-width: 22vw; /* o kousek menší než předtím */
+    font-size: 0.8rem;
     overflow: hidden;
-    text-overflow: ellipsis; /* když by byl moc dlouhý, dá ... */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .logout-btn {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote {
+    font-size: 0.9rem;    /* menší text */
+    white-space: nowrap;  /* vždy v jedné řádce */
+    overflow: hidden;
+    text-overflow: ellipsis; /* když se nevejde celý, dá "…" */
   }
 }
 
