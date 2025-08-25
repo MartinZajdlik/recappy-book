@@ -698,16 +698,11 @@ form select {
     margin-top: 1rem;
     margin-bottom: 0.3rem;
 }
-#dailyTip img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 10px;
-  object-fit: cover;
+/* TIP používá stejné chování jako recepty */
+#dailyTip .recipe-image {
+  display:block;
 }
+
 
 /* Nahraď celý původní blok #categoriesList tímhle */
 #categoriesList,
@@ -1024,7 +1019,7 @@ white-space: pre-wrap;
   .header {
     justify-content: center;
     /* “minimální” mezera mezi levým a pravým blokem: nikdy < 8px */
-    gap: clamp(8px, 2.8vw, 14px);
+    gap: clamp(2px, 1.8vw, 4px);
     padding-left: 0.6rem;
     padding-right: 0.6rem;
   }
@@ -1039,7 +1034,7 @@ white-space: pre-wrap;
   }
 
   /* user kousek kompaktnější (ponechávám tvoje předchozí hodnoty) */
-  .user-info { gap: .35rem; }
+  .user-info { gap: .1rem; }
   .username {
     max-width: 28vw;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -1063,9 +1058,164 @@ white-space: pre-wrap;
   .recipe-image {
     width: 100%;
     height: auto;
-    max-height: 260px;        /* rozumné omezení, nezabije scroll */
+    max-height: 200px;        /* rozumné omezení, nezabije scroll */
     object-fit: cover;
     display: block;
   }
   /* Pozn.: .recipe-instructions je mimo .recipe-content -> zůstane až ZA obrázkem */
 }
+/* === MOBILE HARD OVERRIDE (≤480px) — vlož NA ÚPLNÝ KONEC === */
+@media (max-width: 480px) {
+  /* HEADER: symetrické odsazení + malé mezery */
+  .container .header {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;     /* skupina uprostřed */
+    padding-left: 12px !important;          /* stejně vlevo/vpravo */
+    padding-right: 12px !important;
+    column-gap: 1px !important;             /* základní mezera mezi levým a pravým blokem */
+  }
+  .container .header-left,
+  .container .header-right {
+    flex: 0 0 auto !important;              /* nerosť podle volného místa */
+    min-width: 0 !important;
+  }
+  /* jemné odlepení: logo od levého okraje, kuchařík od pravého */
+  .container .header-left { margin-right: 1px !important; }
+  .container .header-right { gap: 5px !important; }       /* mezera mezi jménem, odhlášením a kuchaříkem */
+
+  .container .user-info { display: inline-flex !important; align-items: center !important; gap: 8px !important; }
+  .container .username {
+    max-width: 42vw !important;             /* ať se vejde i logout + ikona */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: .82rem !important;
+    line-height: 1.1 !important;
+  }
+  .container #logoutBtn,
+  .container .logout-btn {
+    padding: .2rem .48rem !important;
+    font-size: .78rem !important;
+    line-height: 1.1 !important;
+  }
+  .container #adminBtn { margin-left: 0px !important; }
+  .container #adminBtn svg { width: 40px !important; height: 40px !important; display: block !important; }
+
+  /* RECEPTY: obrázek pod ingredience (ve veřejném i admin seznamu) */
+  .container .recipe-content {
+    display: flex !important;
+    flex-direction: column !important;   /* left → right pod sebe */
+    align-items: stretch !important;
+    gap: .6rem !important;
+  }
+  .container .recipe-left  { order: 1 !important; }  /* ingredience (text) nahoře */
+  .container .recipe-right { order: 2 !important; max-width: 100% !important; margin: .2rem 0 0 0 !important; }
+  .container .recipe-image {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 220px !important;
+    object-fit: cover !important;
+  }
+
+  /* TIP NA DNEŠNÍ DEN: v tvém HTML je obrázek uvnitř .recipe-left → přeuspořádáme pořadí uvnitř */
+  #dailyTip .recipe-left { display: flex !important; flex-direction: column !important; }
+  #dailyTip .recipe-left .recipe-ingredients { order: 1 !important; }
+  #dailyTip .recipe-left .recipe-right      { order: 2 !important; margin: .4rem 0 !important; }
+  #dailyTip .recipe-left .recipe-section-title:nth-of-type(2),
+  #dailyTip .recipe-left .recipe-instructions { order: 3 !important; }  /* „Postup“ až za obrázkem */
+}
+  #adminBtn {
+    pointer-events: auto;
+    background: none;
+    border: none;
+    padding: 0;          /* žádný vnitřní polštář */
+    margin: 0;           /* žádná extra mezera kolem */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    cursor: pointer;
+  }
+
+  #adminBtn svg {
+    width: 40px;         /* uprav dle chuti */
+    height: 40px;
+    display: block;
+  }
+
+  /* mobilní úprava velikosti (volitelné) */
+  @media (max-width: 480px) {
+    #adminBtn svg { width: 44px; height: 44px; }
+  }
+
+.title svg {
+  width: 180px;   /* nebo kolik chceš */
+  height: auto;
+}
+@media (max-width: 480px) {
+  /* Jen TIP: obrázek jako první, pak ingredience */
+  #dailyTip .recipe-content {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #dailyTip .recipe-right {
+    order: 1 !important;
+    max-width: 100% !important;
+    margin: 0 0 .4rem 0 !important;
+  }
+  #dailyTip .recipe-left  {
+    order: 2 !important;
+  }
+  #dailyTip .recipe-image {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 220px !important;
+    object-fit: cover !important;
+  }
+}
+@media (max-width: 480px) {
+  #dailyTip .recipe-left {
+    display: flex;
+    flex-direction: column;
+  }
+  #dailyTip .recipe-title { order: 0; }
+  #dailyTip .category { order: 1; }
+  #dailyTip .recipe-image { order: 2; margin: .4rem 0; }
+  #dailyTip .recipe-section-title:nth-of-type(1),
+  #dailyTip .recipe-ingredients { order: 3; }
+  #dailyTip .recipe-section-title:nth-of-type(2),
+  #dailyTip .recipe-instructions { order: 4; }
+}
+/* ==== TIP: pevné vertikální pořadí a jednotné mezery ==== */
+#dailyTip .daily-tip-content { display: block; }
+#dailyTip .section-title {
+  color: #8ae832;
+  font-weight: 700;
+  margin: 0.8rem 0 0.4rem;
+}
+#dailyTip .recipe-title { margin: 0 0 .2rem 0; }
+#dailyTip .category { display: block; margin: 0 0 .6rem 0; }
+
+/* Obrázek v TIPu: vždy pod kategorií, na celou šířku boxu */
+#dailyTip .recipe-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 200px;       /* klidně uprav */
+  object-fit: cover;
+  border-radius: 10px;
+  margin: 0.4rem 0 0.8rem 0;
+}
+
+/* TIP – nenech nic “orderovat” z jiných pravidel */
+#dailyTip .recipe-left,
+#dailyTip .recipe-right,
+#dailyTip .recipe-content {
+  display: block !important;
+  order: initial !important;
+}
+
+/* Text v Postupu – žádné extra prázdné řádky */
+#dailyTip .recipe-instructions { white-space: normal; line-height: 1.5; }

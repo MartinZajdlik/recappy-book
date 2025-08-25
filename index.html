@@ -10,28 +10,34 @@
 <div class="container">
     <header class="header">
         <div class="header-left">
-            <h1 class="title" id="homeTitle" style="cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="220" height="64" viewBox="0 0 280 64" role="img" aria-label="RecAPPy BOOK logo">
-                    <!-- Kniha -->
-                    <g transform="scale(0.9)">
-                    <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#f4f1e6" stroke="#f4f1e6" stroke-width="2"/>
-                    <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="none" stroke="#f4f1e6" stroke-width="2"/>
-                    <line x1="10" y1="27" x2="26" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="10" y1="31" x2="26" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="10" y1="35" x2="26" y2="43" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="10" y1="39" x2="26" y2="47" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="38" y1="35" x2="54" y2="27" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="38" y1="39" x2="54" y2="31" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="38" y1="43" x2="54" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
-                    <line x1="38" y1="47" x2="54" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
+            <h1 class="title" id="homeTitle" style="cursor:pointer; margin:0;">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 205 64"
+                     preserveAspectRatio="xMinYMid meet"
+                     role="img" aria-label="RecAPPy BOOK logo">
+                    <!-- Kniha (zůstává stejná) -->
+                    <g transform="translate(0,0) scale(0.9)">
+                        <path d="M6 10 L30 22 L30 54 L6 46 Z" fill="#f4f1e6" stroke="#f4f1e6" stroke-width="2"/>
+                        <path d="M58 10 L34 22 L34 54 L58 46 Z" fill="none" stroke="#f4f1e6" stroke-width="2"/>
+                        <line x1="10" y1="27" x2="26" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="10" y1="31" x2="26" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="10" y1="35" x2="26" y2="43" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="10" y1="39" x2="26" y2="47" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="38" y1="35" x2="54" y2="27" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="38" y1="39" x2="54" y2="31" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="38" y1="43" x2="54" y2="35" stroke="#f4f1e6" stroke-width="1.5"/>
+                        <line x1="38" y1="47" x2="54" y2="39" stroke="#f4f1e6" stroke-width="1.5"/>
                     </g>
-                
-                    <!-- Text -->
-                    <text x="75" y="34" font-family="'Segoe UI', sans-serif" font-size="26" fill="#f4f1e6" font-weight="bold">RecAPPy</text>
-                    <text x="75" y="54" font-family="'Georgia', serif" font-size="18" fill="#f4f1e6" font-weight="bold" letter-spacing="4">BOOK</text>
+
+                    <!-- Text blíž ke knize, žádná extra rezerva -->
+                    <text x="68" y="34" font-family="'Segoe UI', sans-serif" font-size="26"
+                          fill="#f4f1e6" font-weight="bold">RecAPPy</text>
+                    <text x="68" y="54" font-family="'Georgia', serif" font-size="18"
+                          fill="#f4f1e6" font-weight="bold" letter-spacing="4">BOOK</text>
                 </svg>
             </h1>
         </div>
+
 
 
         <div class="header-right">
@@ -302,74 +308,67 @@
     }
 
     function loadDailyTip() {
-    const tipSection = document.getElementById("dailyTip");
-    const tipDiv = document.getElementById("tipContent");
+  const tipSection = document.getElementById("dailyTip");
+  const tipDiv = document.getElementById("tipContent");
 
-    if (!jwtToken) {
-        tipDiv.innerHTML = "Přihlas se pro dnešní tip!";
-        tipSection.classList.remove("hidden");
-        return;
-    }
+  if (!jwtToken) {
+    tipDiv.innerHTML = "Přihlas se pro dnešní tip!";
+    tipSection.classList.remove("hidden");
+    return;
+  }
 
-    fetch(`${API_BASE}/recepty/random`, {
-        headers: {
-            "Authorization": "Bearer " + jwtToken
-        }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error("Nepodařilo se načíst tip");
-        return response.json();
+  fetch(`${API_BASE}/recepty/random`, {
+    headers: { "Authorization": "Bearer " + jwtToken }
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Nepodařilo se načíst tip");
+      return res.json();
     })
     .then(recipe => {
-        tipDiv.innerHTML = `
-            <div class="recipe-content">
-                <div class="recipe-left">
-                    <div class="recipe-title">${recipe.title}</div>
-                    <em class="category">${recipe.category}</em><br>
+      const imgSrc = recipe.imageUrl
+        ? recipe.imageUrl
+        : (recipe.imagePath
+            ? (recipe.imagePath.startsWith("http")
+                ? recipe.imagePath
+                : `${API_BASE}/pictures/${recipe.imagePath}`)
+            : null);
 
-                    <div class="recipe-right">
-                      ${(() => {
-                        const imgSrc = recipe.imageUrl
-                          ? recipe.imageUrl
-                          : (recipe.imagePath
-                              ? (recipe.imagePath.startsWith("http")
-                                  ? recipe.imagePath
-                                  : `${API_BASE}/pictures/${recipe.imagePath}`)
-                              : null);
-                        return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
-                      })()}
-                    </div>
+      tipDiv.innerHTML = `
+        <div class="recipe-content">
+          <div class="recipe-left">
+            <div class="recipe-title">${recipe.title}</div>
+            <em class="category">${recipe.category}</em>
 
+            ${imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : ""}
 
-                    <div class="recipe-section-title">Ingredience:</div>
-                    <div class="recipe-ingredients">
-                        ${recipe.ingredients
-                            .split(',')
-                            .map(i => '• ' + i.trim())
-                            .join('<br>')}
-                    </div>
-
-                    <div class="recipe-section-title">Postup:</div>
-                    <div class="recipe-instructions">
-                        ${recipe.instructions
-                            .split('\n')
-                            .map(line => line.trimStart()) // odstraní mezery/taby na začátku řádku
-                            .join('\n')}
-                    </div>
-
-                </div>
-
-
+            <div class="recipe-section-title">Ingredience:</div>
+            <div class="recipe-ingredients">
+              ${recipe.ingredients
+                .split(',')
+                .map(i => '• ' + i.trim())
+                .join('<br>')}
             </div>
-        `;
-        tipSection.classList.remove("hidden");
+
+            <div class="recipe-section-title">Postup:</div>
+            <div class="recipe-instructions">
+              ${recipe.instructions
+                .split('\\n')
+                .map(line => line.trimStart())
+                .filter(line => line.length > 0)
+                .join('<br>')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      tipSection.classList.remove("hidden");
     })
-    .catch(error => {
-        console.warn("Chyba při načítání tipu:", error);
-        tipDiv.innerHTML = "Tip se nepodařilo načíst.";
-        tipSection.classList.remove("hidden");
+    .catch(() => {
+      tipDiv.innerHTML = "Tip se nepodařilo načíst.";
+      tipSection.classList.remove("hidden");
     });
 }
+
 
    function showHome() {
       // Veřejná část vidět
