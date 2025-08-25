@@ -1288,5 +1288,35 @@ white-space: pre-wrap;
     white-space: nowrap;                   /* vždy v jednom řádku */
   }
 }
+@media (max-width: 480px) {
+  .header-left {
+    flex: 0 0 auto; /* logo zabere jen svou přirozenou šířku */
+  }
+
+  .header-right {
+    flex: 0 0 auto; /* user část taky jen podle obsahu */
+    gap: 0.3rem;    /* menší rozestup uvnitř */
+  }
+
+  .header {
+    justify-content: center; /* celé zarovnáno ke středu */
+  }
+}
+@media (max-width: 480px) {
+  /* tlačítka kategorií */
+  #categoriesList button,
+  #adminCategoriesList button,
+  .category-card span {
+    font-size: 0.85rem;   /* menší text uvnitř */
+  }
+
+  /* ikony v tlačítkách taky o kousek menší */
+  #categoriesList button svg,
+  #adminCategoriesList button svg,
+  .category-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
 
 
