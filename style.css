@@ -1254,3 +1254,19 @@ white-space: pre-wrap;
   }
 }
 
+/* --- Úpravy pro mobil --- */
+@media (max-width: 480px) {
+  /* Logo víc od stěny */
+  .header-left {
+    padding-left: 0.5rem;  /* klidně zvětši třeba na 1rem */
+  }
+
+  /* Citát menší a vždy v jedné řadě */
+  .daily-quote {
+    font-size: 0.8rem;      /* zmenší text */
+    white-space: nowrap;    /* nedovolí zalomení */
+    overflow: hidden;
+    text-overflow: ellipsis; /* když by byl moc dlouhý, dá ... */
+  }
+}
+
