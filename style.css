@@ -1018,3 +1018,54 @@ white-space: pre-wrap;
   /* Recept – text a obrázek pod sebe */
   .recipe-content { flex-direction: column; align-items: stretch; }
 }
+/* === Mobile tweaks: header mezera + recept: obrazek pod ingredience === */
+@media (max-width: 480px) {
+  /* HEADER — vždy aspoň malá mezera mezi logem a userem */
+  .header {
+    justify-content: center;
+    /* “minimální” mezera mezi levým a pravým blokem: nikdy < 8px */
+    gap: clamp(8px, 2.8vw, 14px);
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+  .header-left,
+  .header-right {
+    flex: 0 0 auto;      /* neexpanduj, drž šířku podle obsahu */
+    min-width: 0;        /* dovol smrštění uvnitř, ať nic neuteče */
+  }
+  /* pojistka: i kdyby gap “došel”, ještě přidej min odlepení za logo */
+  .header-left {
+    margin-right: clamp(6px, 2vw, 12px);
+  }
+
+  /* user kousek kompaktnější (ponechávám tvoje předchozí hodnoty) */
+  .user-info { gap: .35rem; }
+  .username {
+    max-width: 28vw;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .logout-btn, #logoutBtn { padding: .22rem .5rem; font-size: .78rem; line-height: 1.1; }
+  #adminBtn svg { width: 24px; height: 24px; display: block; }
+
+  /* RECEPT — na mobilu: text (ingredience) -> obrázek -> (mimo flex) postup */
+  .recipe-content {
+    display: flex;
+    flex-direction: column;   /* zásadní: stack pod sebe */
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .recipe-left  { order: 1; } /* ingredience a další text */
+  .recipe-right {
+    order: 2;                 /* obrázek hned pod ingredience */
+    margin-top: 0.2rem;
+    max-width: 100%;
+  }
+  .recipe-image {
+    width: 100%;
+    height: auto;
+    max-height: 260px;        /* rozumné omezení, nezabije scroll */
+    object-fit: cover;
+    display: block;
+  }
+  /* Pozn.: .recipe-instructions je mimo .recipe-content -> zůstane až ZA obrázkem */
+}
