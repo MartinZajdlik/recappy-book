@@ -1223,3 +1223,34 @@ white-space: pre-wrap;
     padding: 0.3rem;
   }
 }
+
+/* --- FIX pro mobil: zmenšení jména a odhlášení --- */
+@media (max-width: 480px) {
+  .header {
+    flex-wrap: nowrap;        /* držet vše v jedné řadě */
+    gap: 0.4rem;
+  }
+
+  /* Uživatelské jméno menší + ellipsa */
+  .username {
+    max-width: 25vw;          /* užší, aby se vešlo */
+    font-size: 0.8rem;        /* menší text */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Tlačítko odhlášení kompaktnější */
+  #logoutBtn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  /* Ikonka kuchaře trochu menší */
+  #adminBtn svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
