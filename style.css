@@ -1284,10 +1284,9 @@ white-space: pre-wrap;
 
 @media (max-width: 480px) {
   .quote {
-    font-size: 0.9rem;    /* menší text */
-    white-space: nowrap;  /* vždy v jedné řádce */
-    overflow: hidden;
-    text-overflow: ellipsis; /* když se nevejde celý, dá "…" */
+    font-size: clamp(0.7rem, 3vw, 1.2rem); /* dynamická velikost */
+    white-space: nowrap;                   /* vždy v jednom řádku */
   }
 }
+
 
