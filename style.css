@@ -1518,3 +1518,72 @@ white-space: pre-wrap;
     white-space: nowrap !important;
   }
 }
+/* ===== PATCH: Header + kategorie (vložit na úplný konec) ===== */
+
+/* --- Header: udržet vepsané do šířky mobilu a vycentrovat --- */
+@media (max-width: 480px) {
+  .header {
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 0.35rem !important;
+    padding: 0.5rem 0.6rem 0 !important;
+  }
+
+  /* Zrušit rozpínání levého (logo) i pravého bloku na mobilu */
+  .header-left,
+  .header-right {
+    flex: 0 0 auto !important;
+    min-width: 0 !important;     /* povolí zmenšení obsahu */
+  }
+
+  .user-info { gap: 0.35rem !important; }
+
+  .username {
+    max-width: 28vw !important;  /* nedovolí vytlačit obsah mimo obraz */
+    font-size: 0.82rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .logout-btn,
+  #logoutBtn {
+    padding: 0.22rem 0.5rem !important;
+    font-size: 0.78rem !important;
+    line-height: 1.1 !important;
+  }
+
+  #adminBtn svg {
+    width: 24px !important;
+    height: 24px !important;
+    display: block !important;
+  }
+}
+
+/* --- Kategorie: wrap povolen, tlačítka NEMAJÍ 100% šířku, větší mezera ikona–text --- */
+#categoriesList,
+#adminCategoriesList {
+  flex-wrap: wrap !important;         /* přepíše tvoje dřívější nowrap */
+  justify-content: center !important;  /* hezky doprostřed */
+  gap: 0.8rem !important;              /* víc vzduchu mezi tlačítky */
+  margin-bottom: 1.1rem !important;
+}
+
+#categoriesList button,
+#adminCategoriesList button {
+  width: auto !important;              /* zruší 100% šířku tlačítek */
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.6rem !important;              /* <<< větší MEZERA mezi ikonou a textem */
+  padding: 10px 14px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;      /* ikona + text drží pohromadě */
+}
+
+#categoriesList button svg,
+#adminCategoriesList button svg {
+  display: block !important;           /* žádné inline mezery/zarovnání */
+  width: 1.1rem !important;
+  height: 1.1rem !important;
+  flex-shrink: 0 !important;
+}
