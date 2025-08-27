@@ -78,6 +78,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
 
                         // Auth endpoints – explicitně vypsané pro přehlednost
                         .requestMatchers("/auth/login",
