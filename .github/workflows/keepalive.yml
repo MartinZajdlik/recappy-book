@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: Ping health endpoint
         run: |
-          curl -fsS -m 10 https://recappy-book-official.onrender.com/actuator/health || true
+          curl -fsS -m 10 https://recappy-book.onrender.com/actuator/health || true
