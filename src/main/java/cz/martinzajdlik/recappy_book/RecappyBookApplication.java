@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
 @SpringBootApplication
 public class RecappyBookApplication {
 
@@ -56,5 +60,16 @@ public class RecappyBookApplication {
             }
         };
     }
+    @Bean
+    CommandLineRunner printDbInfo(DataSource dataSource) {
+        return args -> {
+            try (Connection conn = dataSource.getConnection()) {
+                DatabaseMetaData md = conn.getMetaData();
+                System.out.println("🔎 DB URL  : " + md.getURL());
+                System.out.println("🔎 DB User : " + md.getUserName());
+            }
+        };
+    }
+
 
 }
