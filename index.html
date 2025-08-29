@@ -151,7 +151,7 @@
                     <option value="Hlavní jídla">Hlavní jídla</option>
                     <option value="Dezerty">Dezerty</option>
                     <option value="Snídaně">Snídaně</option>
-                    <option value="Svačiny">Svačiny</option>
+                    <option value="Ostatní">Ostatní</option>
                 </select>
         
                 <textarea id="ingredients" placeholder="Ingredience" required></textarea>
@@ -219,7 +219,7 @@
 
         let usersTableBody;
 
-        const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
+        const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Ostatní"];
         const categoriesList = document.getElementById("categoriesList");
         const publicRecipeList = document.getElementById("publicRecipeList");
 
@@ -575,7 +575,7 @@
             }
             ,
             {
-            name: "Svačiny",
+            name: "Ostatní",
             svg: `
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                 viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
@@ -743,7 +743,7 @@
 
     function renderAdminCategories() {
 
-            const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Svačiny"];
+            const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Ostatní"];
             const categoryData = [
                 {
                     name: "Polévky",
@@ -791,7 +791,7 @@
                     </svg>`
                 },
                 {
-                    name: "Svačiny",
+                    name: "Ostatní",
                     svg: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
                         viewBox="0 0 24 24" fill="none" stroke="#f4f1e6"
                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
