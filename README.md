@@ -17,7 +17,4 @@ Aplikace pro správu a sdílení receptů. Podporuje přihlašování, role uži
 - Autentizace: JWT
 
 ## Jak spustit
-```bash
-git clone https://github.com/martinzajdlik/recappy-book.git
-cd recappy-book
-./mvnw spring-boot:run
+https://recappy-book-official.onrender.com
