@@ -1304,3 +1304,202 @@ white-space: pre-wrap;
     justify-content: flex-end;
   }
 }
+
+/* Výpis receptů – zhuštěné řádky */
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recipe-row {
+  display: grid;
+  grid-template-columns: 80px 1fr; /* obrázek | text */
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: #171729;
+  border: 1px solid #2a2a45;
+  border-radius: 10px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.recipe-row img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #0e0e1a;
+}
+
+.recipe-row h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.recipe-row h3 a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.recipe-row h3 a:hover {
+  text-decoration: underline;
+}
+
+.recipe-row .recipe-meta {
+  margin-top: 4px;
+  font-size: .9rem;
+  opacity: .85;
+}
+
+/* Detail receptu – vzhled jako na 2. screenshotu */
+.recipe-detail {
+  background: #171729;
+  border: 1px solid #2a2a45;
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.recipe-detail h2 {
+  margin: 0 0 6px 0;
+  font-size: 1.6rem;
+  color: #8ef07a;           /* sytější zelená pro název */
+}
+
+.recipe-detail .recipe-meta {
+  margin: 0 0 12px 0;
+  font-style: italic;
+  color: #cfd2ea;
+  opacity: .95;
+}
+
+.recipe-detail .section-title {
+  margin: 14px 0 8px 0;
+  font-weight: 800;
+  color: #e7e7ff;
+}
+
+/* Jedna sada odrážek – bez dvojitých teček */
+.recipe-detail .ingredients-list,
+.recipe-detail .instructions-list {
+  margin: 0 0 12px 18px;
+  padding: 0;
+  list-style: disc;         /* použijeme nativní tečky */
+}
+
+.recipe-detail .ingredients-list li,
+.recipe-detail .instructions-list li {
+  margin: 4px 0;
+  line-height: 1.45;
+}
+
+/* obrázek jemně zaoblený */
+.recipe-detail .recipe-image {
+  max-width: 100%;
+  border-radius: 14px;
+  margin: 8px 0 14px;
+  display: block;
+}
+
+.recipe-detail .instructions-text {
+  margin: 0 0 12px 0;
+  white-space: pre-wrap; /* zachovat odřádkování */
+  line-height: 1.45;
+}
+
+/* Tlačítko zpět */
+.back-btn {
+  margin-top: 16px;
+  padding: 10px 16px;
+  background: #2c2c4d;
+  color: #f4f1e6;
+  border: 1px solid #44446a;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #3a3a5c;
+  border-color: #5a5a8a;
+  transform: translateY(-1px);
+}
+
+/* === Recepty – dotažení k okrajům + menší mezery === */
+
+/* 1) Zruš "odskočení" <ul> a <li> a zmenši svislé mezery */
+#publicRecipes .recipe-list{
+  list-style: none;
+  padding: 0;              /* žádný vnitřní okraj UL */
+  margin: 10px 0 8px;      /* menší mezera nahoře i dole */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;                /* menší mezera mezi kartami (červené) */
+}
+#publicRecipes .recipe-list > li{
+  margin: 0;               /* jistota, že LI nepřidává mezeru navíc */
+}
+
+/* 2) Karta přes celou šířku kontejnereu (žluté) */
+.recipe-row{
+  width: 100%;
+  padding: 12px 16px;      /* můžeš klidně změnit na 10px 14px podle chuti */
+  background: #171729;
+  border: 1px solid #2a2a45;
+  border-radius: 12px;
+}
+
+/* 3) Název receptu = stejná barva jako citát */
+.quote p { color: #8ef07a; }        /* pokud už barvu máš jinou, tenhle řádek klidně vynech */
+.recipe-row h3{
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #8ef07a;                   /* stejná barva jako citát */
+  font-weight: 700;
+}
+.recipe-row h3 a{
+  color: inherit;
+  text-decoration: none;
+}
+.recipe-row h3 a:hover{
+  text-decoration: underline;
+}
+
+/* 4) Kategorie těsněji k nadpisu */
+.recipe-row .recipe-meta{
+  margin-top: 2px;
+  opacity: .9;
+  font-style: italic;
+}
+
+/* 5) Trocha vzduchu pod sekcí, ale menší než dřív (červené dole) */
+#publicRecipes{ margin-bottom: 10px; }
+
+/* Vypnout vnější rám z <li> – ať karta je jen .recipe-row */
+#publicRecipes .recipe-list > li {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Mezera mezi kartami – řiď jen přes gap na UL */
+#publicRecipes .recipe-list {
+  gap: 8px;          /* uprav podle chuti (6–12px) */
+  padding: 0;
+  margin: 10px 0 8px;
+}
+
+/* Vlastní karta receptu – jediný rámeček */
+.recipe-row {
+  width: 100%;
+  padding: 12px 16px;
+  background: #171729;
+  border: 1px solid #2a2a45;
+  border-radius: 12px;
+  box-sizing: border-box;
+}

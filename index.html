@@ -93,6 +93,9 @@
             <ul id="publicRecipeList" class="recipe-list"></ul>
         </section>
 
+        <section id="publicRecipeDetail" class="hidden"></section>
+
+
         <section id="authSection">
             <div class="auth-tabs">
                 <button id="loginTab" class="active">Přihlásit</button>
@@ -257,55 +260,105 @@
         }
 
         fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                publicRecipeList.innerHTML = "";
-                if (data.length === 0) {
-                    publicRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
-                    return;
-                }
-                data.forEach(recipe => {
-                    const li = document.createElement("li");
-                    li.innerHTML = `
-                        <div class="recipe-content">
-                            <div class="recipe-left">
-                                <strong>${recipe.title}</strong><br>
-                                <em class="category">${recipe.category}</em><br>
-                                <div class="recipe-ingredients">
-                                    ${recipe.ingredients.split(',').map(i => '• ' + i.trim()).join('<br>')}
-                                </div>
-                            </div>
-                            <div class="recipe-right">
-                              ${(() => {
-                                const imgSrc = recipe.imageUrl
-                                  ? recipe.imageUrl
-                                  : (recipe.imagePath
-                                      ? (recipe.imagePath.startsWith("http")
-                                          ? recipe.imagePath
-                                          : `${API_BASE}/pictures/${recipe.imagePath}`)
-                                      : null);
-                                return imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : "";
-                              })()}
-                            </div>
+          .then(res => res.json())
+          .then(data => {
+            const listSection = document.getElementById("publicRecipes");
+            const detailSection = document.getElementById("publicRecipeDetail");
 
-                        </div>
-                        <p class="recipe-instructions">${recipe.instructions}</p>
-                        <div class="recipe-buttons">
-                            ${userRole === "ROLE_ADMIN" ? `
-                                <button class="action-btn edit-btn" onclick="editRecipe(${recipe.id})">✏️ Upravit</button>
-                                <button class="action-btn delete-btn" onclick="deleteRecipe(${recipe.id})">🗑️ Smazat</button>
-                            ` : ""}
-                        </div>
-                    `;
+            // zobrazíme jen seznam, schováme detail
+            listSection.classList.remove("hidden");
+            detailSection.classList.add("hidden");
+            detailSection.innerHTML = "";
 
-                    publicRecipeList.appendChild(li);
-                });
+            publicRecipeList.innerHTML = "";
+            if (!Array.isArray(data) || data.length === 0) {
+              publicRecipeList.innerHTML = "<li>Žádné recepty v této kategorii.</li>";
+              return;
+            }
 
-            })
-            .catch(() => {
-                publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
-            });
+            // vygeneruj zhuštěné řádky: obrázek + název (klik) + kategorie
+            const rowsHtml = data.map(r => {
+              const imgSrc = r.imageUrl
+                ? r.imageUrl
+                : (r.imagePath
+                    ? (r.imagePath.startsWith("http") ? r.imagePath : `${API_BASE}/pictures/${r.imagePath}`)
+                    : "");
+
+              return `
+                <li>
+                  <div class="recipe-row" data-id="${r.id}">
+                    ${imgSrc
+                      ? `<img src="${imgSrc}" alt="Obrázek receptu">`
+                      : `<div style="width:80px;height:80px;border-radius:8px;background:#0e0e1a;"></div>`}
+                    <div>
+                      <h3><a href="#" class="recipe-link" data-id="${r.id}">${r.title}</a></h3>
+                      <div class="recipe-meta">Kategorie: ${r.category || ""}</div>
+                    </div>
+                  </div>
+                </li>
+              `;
+            }).join("");
+
+            publicRecipeList.innerHTML = rowsHtml;
+          })
+          .catch(() => {
+            publicRecipeList.innerHTML = "<li>Chyba při načítání receptů.</li>";
+          });
+
     }
+
+        function renderRecipeDetail(recipe) {
+          const listSection = document.getElementById("publicRecipes");
+          const detailSection = document.getElementById("publicRecipeDetail");
+
+          listSection.classList.add("hidden");
+          detailSection.classList.remove("hidden");
+
+          const imgSrc = recipe.imageUrl
+            ? recipe.imageUrl
+            : (recipe.imagePath
+                ? (recipe.imagePath.startsWith("http") ? recipe.imagePath : `${API_BASE}/pictures/${recipe.imagePath}`)
+                : null);
+
+          const ingredientsItems = (recipe.ingredients || "")
+            .split(",")
+            .map(s => s.trim())
+            .filter(Boolean)
+            .map(s => `<li>${s}</li>`)
+            .join("");
+
+          const instructionsText = (recipe.instructions || "")
+              .trim()
+
+
+
+
+          detailSection.innerHTML = `
+            <article class="recipe-detail">
+              <h2>${recipe.title}</h2>
+              <div class="recipe-meta">Kategorie: ${recipe.category || ""}</div>
+
+              <div class="section-title">Ingredience</div>
+              <ul class="ingredients-list">
+                ${ingredientsItems}
+              </ul>
+
+              ${imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : ""}
+
+              <div class="section-title">Postup</div>
+              <div class="instructions-text">${instructionsText}</div>
+
+             <button id="backToListBtn" class="back-btn">⬅ Zpět na kategorie</button>
+            </article>
+          `;
+
+          document.getElementById("backToListBtn").addEventListener("click", () => {
+            detailSection.classList.add("hidden");
+            listSection.classList.remove("hidden");
+            requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+          });
+        }
+
 
     function loadDailyTip() {
   const tipSection = document.getElementById("dailyTip");
@@ -372,6 +425,7 @@
 
    function showHome() {
       // Veřejná část vidět
+      document.getElementById("publicRecipeDetail").classList.add("hidden");
       authSection.classList.add("hidden");
       document.getElementById("publicRecipes").classList.remove("hidden");
 
@@ -397,6 +451,7 @@
 
     function showAdminHome() {
           // schovat veřejnou část
+          document.getElementById("publicRecipeDetail").classList.add("hidden");
           authSection.classList.add("hidden");
           document.getElementById("publicRecipes").classList.add("hidden");
           const tip = document.getElementById("dailyTip");
@@ -1132,6 +1187,45 @@
           }
           if (userRole === "ROLE_ADMIN") showAdminHome(); else showHome();
         });
+        // Klik na název/řádek/obrázek receptu -> načíst detail a zobrazit
+        document.addEventListener("click", (e) => {
+          const link = e.target.closest(".recipe-link");
+          const row  = e.target.closest(".recipe-row");
+          if (!link && !row) return;
+
+          e.preventDefault();
+
+          // 1) vezmeme ID přednostně z data-id na řádku, fallback z <a>
+          const idAttr = row?.getAttribute("data-id") || link?.getAttribute("data-id");
+          const id = idAttr ? idAttr.trim() : null;
+          if (!id) {
+            console.warn("Nebyl nalezen data-id receptu.");
+            return;
+          }
+
+          // 2) některé backendy můžou vyžadovat Authorization i pro detail
+          const fetchOpts = {};
+          if (jwtToken) {
+            fetchOpts.headers = { "Authorization": "Bearer " + jwtToken };
+          }
+
+          fetch(`${API_BASE}/recepty/${id}`, fetchOpts)
+            .then(r => {
+              if (!r.ok) {
+                // pro debug ukážeme status
+                return r.text().then(t => {
+                  throw new Error(`HTTP ${r.status}: ${t || 'Nepodařilo se načíst recept.'}`);
+                });
+              }
+              return r.json();
+            })
+            .then(recipe => renderRecipeDetail(recipe))
+            .catch(err => {
+              console.error(err);
+              alert("Chyba při načítání detailu receptu.");
+            });
+        });
+
 
 
     // === DOMCONTENTLOADED ===
@@ -1411,6 +1505,13 @@ document.addEventListener("DOMContentLoaded", () => {
     usernameDisplay.textContent = "";
     usernameDisplay.classList.add("hidden");
     logoutBtn.classList.add("hidden");
+
+    const detail = document.getElementById("publicRecipeDetail");
+      if (detail) {
+        detail.classList.add("hidden");
+        detail.innerHTML = "";
+      }
+
     loginSection.classList.remove("hidden");
     adminPanel.classList.add("hidden");
     document.getElementById("publicRecipes").classList.add("hidden");
