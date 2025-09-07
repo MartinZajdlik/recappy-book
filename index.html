@@ -646,18 +646,20 @@
                 users.forEach(user => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.username}</td>
-                        <td>${user.email}</td>
-                        <td>
+                      <td data-label="ID">${user.id}</td>
+                      <td data-label="Uživatel">${user.username}</td>
+                      <td data-label="Email">${user.email}</td>
+                      <td data-label="Role">
                         <select data-user-id="${user.id}" class="role-select">
-                            <option value="ROLE_USER" ${user.role === "ROLE_USER" ? "selected" : ""}>USER</option>
-                            <option value="ROLE_ADMIN" ${user.role === "ROLE_ADMIN" ? "selected" : ""}>ADMIN</option>
+                          <option value="ROLE_USER" ${user.role === "ROLE_USER" ? "selected" : ""}>USER</option>
+                          <option value="ROLE_ADMIN" ${user.role === "ROLE_ADMIN" ? "selected" : ""}>ADMIN</option>
                         </select>
-                        </td>
-                        <td>
-                        <button class="delete-user-btn" data-user-id="${user.id}">🗑️ Smazat</button>
-                        </td>
+                      </td>
+                      <td data-label="Akce">
+                        <div class="users-actions">
+                          <button class="delete-user-btn" data-user-id="${user.id}">🗑️ Smazat</button>
+                        </div>
+                      </td>
                     `;
                     usersTableBody.appendChild(tr);
                 });

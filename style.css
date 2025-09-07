@@ -1219,3 +1219,88 @@ white-space: pre-wrap;
 
 /* Text v Postupu – žádné extra prázdné řádky */
 #dailyTip .recipe-instructions { white-space: normal; line-height: 1.5; }
+
+/* === Admin: Users table – responsive fix === */
+/* Desktop vylepšení */
+#usersTable {
+  table-layout: fixed;          /* zabrání rozhazování šířek */
+  width: 100%;
+}
+#usersTable th:nth-child(1) { width: 60px; }   /* ID */
+#usersTable th:nth-child(4) { width: 140px; }  /* Role */
+#usersTable th:nth-child(5) { width: 140px; }  /* Akce */
+
+#usersTable th,
+#usersTable td {
+  word-break: break-word;       /* zalamuj dlouhé e-maily atd. */
+}
+
+.users-actions {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;              /* na úzkých šířkách se mohou zlomit na další řádek */
+}
+
+.role-select,
+.delete-user-btn {
+  max-width: 100%;
+}
+
+/* Mobilní režim – přepnout na karty */
+@media (max-width: 680px) {
+  #usersTable thead {
+    display: none;              /* skryj hlavičku */
+  }
+  #usersTable,
+  #usersTable tbody,
+  #usersTable tr,
+  #usersTable td {
+    display: block;
+    width: 100%;
+  }
+  #usersTable tr {
+    border: 1px solid #555577;
+    border-radius: 10px;
+    background: #1d1d2e;
+    padding: .75rem;
+    margin: 0 0 .75rem 0;
+  }
+  #usersTable td {
+    border: none;
+    padding: .35rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  #usersTable td::before {
+    content: attr(data-label);  /* zobrazí text hlavičky */
+    font-weight: 600;
+    opacity: .85;
+    white-space: nowrap;
+  }
+  /* Role + Akce hezky pod sebe, když je málo místa */
+
+  /* pro tyto dvě buňky necháme obsah srovnaný zleva... */
+  #usersTable td[data-label="Role"],
+  #usersTable td[data-label="Akce"] {
+    justify-content: flex-start;   /* label vlevo */
+  }
+
+  /* ...a konkrétní ovládací prvek odtlačíme na pravý okraj */
+  #usersTable td[data-label="Role"] .role-select {
+    margin-left: auto;             /* select doprava */
+  }
+
+  #usersTable td[data-label="Akce"] .users-actions {
+    margin-left: auto;             /* tlačítko/y doprava */
+  }
+
+  .role-select {
+    width: 140px;
+  }
+  .users-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
