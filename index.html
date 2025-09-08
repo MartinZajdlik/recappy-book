@@ -1195,14 +1195,14 @@
           if (userRole === "ROLE_ADMIN") showAdminHome(); else showHome();
         });
         // Klik na název/řádek/obrázek receptu -> načíst detail a zobrazit
-        document.addEventListener("click", (e) => {
+        document.addEventListener("click", async (e) => {
           const link = e.target.closest(".recipe-link");
           const row  = e.target.closest(".recipe-row");
           if (!link && !row) return;
 
           e.preventDefault();
 
-          // 1) vezmeme ID přednostně z data-id na řádku, fallback z <a>
+          // 1) ID receptu
           const idAttr = row?.getAttribute("data-id") || link?.getAttribute("data-id");
           const id = idAttr ? idAttr.trim() : null;
           if (!id) {
@@ -1210,28 +1210,30 @@
             return;
           }
 
-          // 2) některé backendy můžou vyžadovat Authorization i pro detail
-          const fetchOpts = {};
-          if (jwtToken) {
-            fetchOpts.headers = { "Authorization": "Bearer " + jwtToken };
-          }
+          // 2) Request options (když je token, vždy pošli Authorization)
+          const headers = {};
+          if (jwtToken) headers["Authorization"] = "Bearer " + jwtToken;
+          headers["Accept"] = "application/json";
 
-          fetch(`${API_BASE}/recepty/${id}`, fetchOpts)
-            .then(r => {
-              if (!r.ok) {
-                // pro debug ukážeme status
-                return r.text().then(t => {
-                  throw new Error(`HTTP ${r.status}: ${t || 'Nepodařilo se načíst recept.'}`);
-                });
-              }
-              return r.json();
-            })
-            .then(recipe => renderRecipeDetail(recipe))
-            .catch(err => {
-              console.error(err);
-              alert("Chyba při načítání detailu receptu.");
-            });
+          try {
+            const r = await fetch(`${API_BASE}/recepty/${encodeURIComponent(id)}`, { headers, mode: "cors" });
+
+            if (!r.ok) {
+              const text = await r.text().catch(() => "");
+              // logni detail do konzole a ukaž konkrétní HTTP kód
+              console.error(`Detail receptu: HTTP ${r.status}`, text);
+              alert(`Chyba při načítání detailu receptu (HTTP ${r.status}).`);
+              return;
+            }
+
+            const recipe = await r.json();
+            renderRecipeDetail(recipe);
+          } catch (err) {
+            console.error("Detail receptu – network/error:", err);
+            alert("Chyba při načítání detailu receptu (síťová chyba).");
+          }
         });
+
 
 
 
