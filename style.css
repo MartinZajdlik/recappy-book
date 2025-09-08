@@ -1503,3 +1503,210 @@ white-space: pre-wrap;
   border-radius: 12px;
   box-sizing: border-box;
 }
+
+/* === 1) Zelená pro „Ingredience“ a „Postup“ === */
+:root { --accent-green: #72e06a; } /* když máš jinou, přepiš jen tuto hodnotu */
+.recipe-detail h2,
+.recipe-detail h3 {
+  color: var(--accent-green) !important;
+}
+
+/* === 2) Mobil naležato – sjednocení velikostí textu === */
+@media (max-width: 900px) and (orientation: landscape) {
+  .recipe-detail h2,
+  .recipe-detail h3 { font-size: 1.1rem !important; }
+
+  /* sjednotíme těla obou sekcí (ať už jsou v <ul>/<p>/apod.) */
+  .recipe-detail .ingredients,
+  .recipe-detail .instructions,
+  .recipe-detail ul,
+  .recipe-detail ol,
+  .recipe-detail p {
+    font-size: 0.95rem !important;
+    line-height: 1.5;
+  }
+}
+
+/* === 3) PC – obrázek vedle ingrediencí (vpravo) === */
+@media (min-width: 1024px) {
+  /* kdy je obrázek přímo s class="recipe-image" */
+  .recipe-detail img.recipe-image {
+    float: right;
+    width: min(420px, 40%);
+    margin: 0 0 1rem 1.5rem;
+    border-radius: 10px;
+    height: auto;
+    display: block;
+  }
+
+  /* kdy je obalený v .recipe-right */
+  .recipe-detail .recipe-right {
+    float: right;
+    width: min(420px, 40%);
+    margin: 0 0 1rem 1.5rem;
+  }
+  .recipe-detail .recipe-right img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+  }
+
+  /* zrušíme přetékání layoutu kolem floatu */
+  .recipe-detail::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+/* obecně: obrázek nikdy nepřetéká */
+.recipe-detail img,
+.recipe-image { max-width: 100%; height: auto; }
+
+:root { --accent-green: #8ae832; } /* nebo tvoje přesná zelená */
+
+/* === DETAIL RECEPTU: 2 sloupce (ingredience | obrázek) + postup přes celou šířku === */
+@media (min-width: 1024px) {
+  /* Zruš předchozí floaty/šířky z dřívějších pravidel */
+  .recipe-detail img.recipe-image,
+  .recipe-detail .recipe-right {
+    float: none !important;
+    width: auto !important;
+    margin: 0 !important;
+  }
+
+  /* Kontejner detailu jako grid */
+  #publicRecipeDetail .recipe-detail {
+    display: grid;
+    grid-template-columns: 1fr 420px;           /* text | obrázek */
+    grid-template-areas:
+      "title title"
+      "meta  meta"
+      "ing   image"
+      "post  post"
+      "back  back";
+    gap: 1.2rem 1.5rem;                         /* řádková | sloupcová mezera */
+    align-items: start;
+  }
+
+  /* Rozmístění prvků do oblastí */
+  #publicRecipeDetail .recipe-detail > h2 { grid-area: title; }
+  #publicRecipeDetail .recipe-detail > .recipe-meta { grid-area: meta; }
+
+  /* 1. .section-title je „Ingredience“ + její UL */
+  #publicRecipeDetail .recipe-detail > .section-title:nth-of-type(1) { grid-area: ing; }
+  #publicRecipeDetail .recipe-detail > .ingredients-list { grid-area: ing; }
+
+  /* Obrázek do pravého sloupce */
+  #publicRecipeDetail .recipe-detail > img.recipe-image {
+    grid-area: image;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  /* 2. .section-title je „Postup“ + text pod oběma sloupci */
+  #publicRecipeDetail .recipe-detail > .section-title:nth-of-type(2) { grid-area: post; }
+  #publicRecipeDetail .recipe-detail > .instructions-text { grid-area: post; }
+
+  /* Zpět tlačítko taky pod celou šířku */
+  #publicRecipeDetail .recipe-detail > .back-btn { grid-area: back; }
+}
+
+/* === DETAIL RECEPTU: dvousloupec (Ingredience | Obrázek) a Postup pod tím === */
+@media (min-width: 1024px) {
+  #publicRecipeDetail .recipe-detail {
+    display: grid;
+    grid-template-columns: 1fr 420px;  /* levý text | pravý obrázek */
+    grid-template-areas:
+      "title   title"
+      "meta    meta"
+      "ing     image"
+      "post    post"
+      "back    back";
+    gap: 1.2rem 1.5rem;
+    align-items: start;
+  }
+
+  /* Titulek + kategorie */
+  #publicRecipeDetail .recipe-detail > h2 { grid-area: title; }
+  #publicRecipeDetail .recipe-detail > .recipe-meta { grid-area: meta; }
+
+  /* INGREDIENCE */
+  #publicRecipeDetail .recipe-detail > .section-title:nth-of-type(1),
+  #publicRecipeDetail .recipe-detail > .ingredients-list {
+    grid-area: ing;
+  }
+
+  /* OBRÁZEK */
+  #publicRecipeDetail .recipe-detail > img.recipe-image {
+    grid-area: image;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  /* POSTUP */
+  #publicRecipeDetail .recipe-detail > .section-title:nth-of-type(2),
+  #publicRecipeDetail .recipe-detail > .instructions-text {
+    grid-area: post;
+  }
+
+  /* ZPĚT */
+  #publicRecipeDetail .recipe-detail > .back-btn { grid-area: back; }
+}
+
+
+
+/* === Barevná proměnná pro nadpisy sekcí === */
+:root { --accent-green: #8ae832; }
+
+/* Základ vzhledu detailu */
+#publicRecipeDetail .recipe-detail{
+  background:#171729;border:1px solid #2a2a45;border-radius:16px;padding:16px 18px;
+}
+#publicRecipeDetail .recipe-detail h2{margin:0 0 6px;color:#8ef07a;font-size:1.6rem;}
+#publicRecipeDetail .recipe-detail .recipe-meta{margin:0 0 12px;font-style:italic;color:#cfd2ea;}
+
+/* Nadpisy „Ingredience“ / „Postup“ */
+#publicRecipeDetail .recipe-detail .section-title{margin:10px 0 8px;font-weight:800;color:var(--accent-green);}
+
+/* Obrázek – defaultně 100% šířky (na mobilech) */
+#publicRecipeDetail .recipe-detail .recipe-image{display:block;width:100%;height:auto;border-radius:12px}
+
+/* Postup – vždy přes celou šířku boxu */
+#publicRecipeDetail .recipe-detail .instructions-text{white-space:pre-wrap;line-height:1.5;margin:0}
+
+/* ---- Desktop rozložení: ingredience vlevo | obrázek vpravo; postup pod tím ---- */
+@media (min-width: 1024px){
+  #publicRecipeDetail .recipe-detail{
+    display:grid;
+    grid-template-columns: 1fr min(420px,40%);
+    grid-template-areas:
+      "head head"
+      "ing  media"
+      "inst inst"
+      "back back";
+    gap:1.2rem 1.5rem;
+    align-items:start;
+  }
+  #publicRecipeDetail .recipe-detail .recipe-head{grid-area:head}
+  #publicRecipeDetail .recipe-detail .recipe-body{display:contents} /* děti skáčou rovnou do gridu */
+  #publicRecipeDetail .recipe-detail .ingredients{grid-area:ing}
+  #publicRecipeDetail .recipe-detail .media{grid-area:media;margin:0}
+  #publicRecipeDetail .recipe-detail .instructions{grid-area:inst}
+  #publicRecipeDetail .recipe-detail .back-btn{grid-area:back}
+
+  /* pojistka proti starým pravidlům */
+  #publicRecipeDetail .recipe-detail .media,
+  #publicRecipeDetail .recipe-detail .recipe-image{float:none !important;margin:0 !important;width:100%}
+}
+
+/* TIP – zachovej Entery a mezery jako v detailu receptu */
+#dailyTip .recipe-instructions {
+  white-space: pre-wrap !important;
+  line-height: 1.5;
+}

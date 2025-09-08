@@ -334,23 +334,35 @@
 
 
           detailSection.innerHTML = `
-            <article class="recipe-detail">
-              <h2>${recipe.title}</h2>
-              <div class="recipe-meta">Kategorie: ${recipe.category || ""}</div>
+  <article class="recipe-detail">
+    <header class="recipe-head">
+      <h2>${recipe.title}</h2>
+      <div class="recipe-meta">Kategorie: ${recipe.category || ""}</div>
+    </header>
 
-              <div class="section-title">Ingredience</div>
-              <ul class="ingredients-list">
-                ${ingredientsItems}
-              </ul>
+    <section class="recipe-body">
+      <section class="ingredients">
+        <h3 class="section-title">Ingredience</h3>
+        <ul class="ingredients-list">
+          ${ingredientsItems}
+        </ul>
+      </section>
 
-              ${imgSrc ? `<img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">` : ""}
+      ${imgSrc ? `
+      <figure class="media">
+        <img class="recipe-image" src="${imgSrc}" alt="Obrázek receptu">
+      </figure>` : "" }
+    </section>
 
-              <div class="section-title">Postup</div>
-              <div class="instructions-text">${instructionsText}</div>
+    <section class="instructions">
+      <h3 class="section-title">Postup</h3>
+      <div class="instructions-text">${instructionsText}</div>
+    </section>
 
-             <button id="backToListBtn" class="back-btn">⬅ Zpět na kategorie</button>
-            </article>
-          `;
+    <button id="backToListBtn" class="back-btn">⬅ Zpět na kategorie</button>
+  </article>
+`;
+
 
           document.getElementById("backToListBtn").addEventListener("click", () => {
             detailSection.classList.add("hidden");
@@ -403,13 +415,8 @@
             </div>
 
             <div class="recipe-section-title">Postup:</div>
-            <div class="recipe-instructions">
-              ${recipe.instructions
-                .split('\\n')
-                .map(line => line.trimStart())
-                .filter(line => line.length > 0)
-                .join('<br>')}
-            </div>
+<div class="recipe-instructions">${(recipe.instructions || '').trim()}</div>
+
           </div>
         </div>
       `;
