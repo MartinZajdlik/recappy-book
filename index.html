@@ -1194,7 +1194,7 @@
           }
           if (userRole === "ROLE_ADMIN") showAdminHome(); else showHome();
         });
-        // Klik na název/řádek/obrázek receptu -> načíst detail a zobrazit
+        // Klik na název/řádek/obrázek receptu -> načíst detail a zobrazit (s fallbackem na auth/bez auth)
         document.addEventListener("click", async (e) => {
           const link = e.target.closest(".recipe-link");
           const row  = e.target.closest(".recipe-row");
@@ -1202,37 +1202,50 @@
 
           e.preventDefault();
 
-          // 1) ID receptu
           const idAttr = row?.getAttribute("data-id") || link?.getAttribute("data-id");
           const id = idAttr ? idAttr.trim() : null;
-          if (!id) {
-            console.warn("Nebyl nalezen data-id receptu.");
-            return;
-          }
+          if (!id) return;
 
-          // 2) Request options (když je token, vždy pošli Authorization)
-          const headers = {};
-          if (jwtToken) headers["Authorization"] = "Bearer " + jwtToken;
-          headers["Accept"] = "application/json";
+          const url = `${API_BASE}/recepty/${id}`;
 
+          // 1) zkus bez autorizace
           try {
-            const r = await fetch(`${API_BASE}/recepty/${encodeURIComponent(id)}`, { headers, mode: "cors" });
-
-            if (!r.ok) {
-              const text = await r.text().catch(() => "");
-              // logni detail do konzole a ukaž konkrétní HTTP kód
-              console.error(`Detail receptu: HTTP ${r.status}`, text);
-              alert(`Chyba při načítání detailu receptu (HTTP ${r.status}).`);
+            let r = await fetch(url);
+            if (r.ok) {
+              const recipe = await r.json();
+              renderRecipeDetail(recipe);
               return;
             }
 
-            const recipe = await r.json();
-            renderRecipeDetail(recipe);
+            // 2) pokud 401/403 a máme token → zkus s Bearer
+            if ((r.status === 401 || r.status === 403) && jwtToken) {
+              r = await fetch(url, { headers: { "Authorization": "Bearer " + jwtToken } });
+              if (r.ok) {
+                const recipe = await r.json();
+                renderRecipeDetail(recipe);
+                return;
+              }
+            }
+
+            // 3) pokud první pokus byl s tokenem a backend to nechce, zkus bez (obrácený případ)
+            if (jwtToken) {
+              const rNoAuth = await fetch(url);
+              if (rNoAuth.ok) {
+                const recipe = await rNoAuth.json();
+                renderRecipeDetail(recipe);
+                return;
+              }
+            }
+
+            // Pokud jsme se sem dostali, vyhoď chybu s detailem
+            const txt = await r.text().catch(() => "");
+            throw new Error(`HTTP ${r.status}: ${txt || "Nepodařilo se načíst recept."}`);
           } catch (err) {
-            console.error("Detail receptu – network/error:", err);
-            alert("Chyba při načítání detailu receptu (síťová chyba).");
+            console.error(err);
+            alert("Chyba při načítání detailu receptu.");
           }
         });
+
 
 
 
