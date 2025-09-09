@@ -225,10 +225,6 @@
 
         let usersTableBody;
 
-        let authSection, adminPanel, adminRecipesSection, adminUsersSection;
-        let adminRecipesTab, adminUsersTab;
-        let recipeForm, recipeList, authError, logoutBtn, usernameDisplay;
-
         const categories = ["Polévky", "Hlavní jídla", "Dezerty", "Snídaně", "Ostatní"];
         const categoriesList = document.getElementById("categoriesList");
         const publicRecipeList = document.getElementById("publicRecipeList");
@@ -1251,19 +1247,20 @@
     // === DOMCONTENTLOADED ===
 document.addEventListener("DOMContentLoaded", () => {
 
-  const adminBtn = document.getElementById("adminBtn");
-    authSection = document.getElementById("authSection");
-    adminPanel = document.getElementById("adminPanel");
+    const adminBtn = document.getElementById("adminBtn");
+    const loginSection = document.getElementById("authSection");
+    const adminPanel = document.getElementById("adminPanel");
     const loginForm = document.getElementById("loginForm");
-    authError = document.getElementById("authError");
-    recipeList = document.getElementById("recipeList");
-    recipeForm = document.getElementById("recipeForm");
+    const authError = document.getElementById("authError");
+    const recipeList = document.getElementById("recipeList");
+    const recipeForm = document.getElementById("recipeForm");
     const loginTab = document.getElementById("loginTab");
     const registerTab = document.getElementById("registerTab");
     const loginFormEl = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
-    usernameDisplay = document.getElementById("usernameDisplay");
-    logoutBtn = document.getElementById("logoutBtn");
+    const usernameDisplay = document.getElementById("usernameDisplay");
+    const logoutBtn = document.getElementById("logoutBtn");
+
 
 
   const imageInput = document.getElementById("imageInput");
@@ -1358,10 +1355,11 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Žádný obrázek nevybrán";
   });
 
-    adminRecipesTab = document.getElementById("adminRecipesTab");
-    adminUsersTab = document.getElementById("adminUsersTab");
-    adminRecipesSection = document.getElementById("adminRecipesSection");
-    adminUsersSection = document.getElementById("adminUsersSection");
+    const adminRecipesTab = document.getElementById("adminRecipesTab");
+    const adminUsersTab = document.getElementById("adminUsersTab");
+    const adminRecipesSection = document.getElementById("adminRecipesSection");
+    const adminUsersSection = document.getElementById("adminUsersSection");
+
 
   usersTableBody = document.querySelector("#usersTable tbody");
 
