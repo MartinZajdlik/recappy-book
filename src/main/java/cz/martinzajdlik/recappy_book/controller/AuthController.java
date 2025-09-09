@@ -166,6 +166,7 @@ public class AuthController {
     @PostMapping("/forgot")
     public ResponseEntity<?> forgot(@RequestBody EmailDto dto) {
         userRepository.findByEmail(dto.email()).ifPresent(u -> {
+            passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
             PasswordResetToken pr = new PasswordResetToken();
             pr.setToken(UUID.randomUUID().toString());
             pr.setUser(u);
@@ -196,6 +197,8 @@ public class AuthController {
 
         pr.setUsed(true);
         passwordResetTokenRepository.save(pr);
+
+        passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
 
         return ResponseEntity.ok().build();
     }

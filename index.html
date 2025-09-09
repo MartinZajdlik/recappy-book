@@ -216,6 +216,9 @@
 
     // === GLOBÁLNÍ PROMĚNNÉ ===
         let jwtToken = localStorage.getItem("jwtToken") || null;
+
+        ensureValidToken();
+
         let editingId = null;
         let currentUsername = localStorage.getItem("currentUsername") || null;
         let userRole = localStorage.getItem("userRole") || null;
@@ -504,9 +507,7 @@
 
 
     function loadRecipes() {
-        fetch(`${API_BASE}/recepty`, {
-            headers: { "Authorization": "Bearer " + jwtToken }
-        })
+        fetch(`${API_BASE}/recepty`)
         .then(res => {
             if (!res.ok) {
                 if (res.status === 401 || res.status === 403) {
@@ -678,7 +679,7 @@
 
     function loadUsers() {
             fetch(`${API_BASE}/admin/users`, {
-                headers: { "Authorization": "Bearer " + jwtToken }
+                headers: authHeaders()
             })
             .then(res => {
                 if (!res.ok) {
@@ -757,7 +758,7 @@
     function changeUserRole(id, role) {
             fetch(`${API_BASE}/admin/users/${id}/role?role=${role}`, {
                 method: "PUT",
-                headers: { "Authorization": "Bearer " + jwtToken }
+                headers: authHeaders()
             })
             .then(res => {
                 if (!res.ok) throw new Error("Chyba při změně role uživatele.");
@@ -773,7 +774,7 @@
         function deleteUser(id) {
             fetch(`${API_BASE}/admin/users/${id}`, {
                 method: "DELETE",
-                headers: { "Authorization": "Bearer " + jwtToken }
+                headers: authHeaders()
             })
             .then(res => {
                 console.log("Stav mazání uživatele:", res.status);
@@ -904,9 +905,7 @@
           const adminRecipeList = document.getElementById("adminRecipeList");
           adminRecipeList.innerHTML = "";
 
-          fetch(`${API_BASE}/recepty?category=` + encodeURIComponent(category), {
-            headers: { "Authorization": "Bearer " + jwtToken }
-          })
+          fetch(`${API_BASE}/recepty?category=` + encodeURIComponent(category))
           .then(res => {
             if (!res.ok) throw new Error("Chyba při načítání receptů.");
             return res.json();
@@ -981,10 +980,7 @@
           if (imageInput) imageInput.value = "";
           // ⬆⬆⬆ PŘIDEJ TOTO ⬆⬆⬆
 
-          fetch(`${API_BASE}/recepty/${id}`, {
-            method: "GET",
-            headers: { "Authorization": "Bearer " + jwtToken }
-          })
+          fetch(`${API_BASE}/recepty/${id}`, { method: "GET" })
             .then(response => {
               if (!response.ok) throw new Error("Nepodařilo se načíst recept.");
               return response.json();
@@ -1028,7 +1024,7 @@
 
           fetch(`${API_BASE}/recepty/${id}`, {
             method: "PUT",
-            headers: { "Authorization": "Bearer " + jwtToken },
+            headers: authHeaders(),
             body: formData
           })
             .then(response => {
@@ -1083,9 +1079,7 @@
 
           fetch(`${API_BASE}/recepty`, {
             method: "POST",
-            headers: {
-              "Authorization": "Bearer " + jwtToken
-            },
+            headers: authHeaders(),
             body: formData
           })
             .then(response => {
@@ -1125,9 +1119,7 @@
 
           fetch(`${API_BASE}/recepty/${id}`, {
             method: "DELETE",
-            headers: {
-              "Authorization": "Bearer " + jwtToken
-            }
+            headers: authHeaders(),
           })
             .then(response => {
               if (!response.ok) throw new Error("Chyba při mazání receptu.");
@@ -1176,6 +1168,33 @@
       });
     };
 
+    function parseJwt(token) {
+      try {
+        const base = token.split('.')[1];
+        const json = atob(base.replace(/-/g, '+').replace(/_/g, '/'));
+        return JSON.parse(decodeURIComponent(escape(json)));
+      } catch (e) { return null; }
+    }
+
+    function isJwtExpired(token) {
+      const p = parseJwt(token);
+      if (!p || !p.exp) return true;
+      return Date.now() >= p.exp * 1000;
+    }
+
+    function ensureValidToken() {
+      if (jwtToken && isJwtExpired(jwtToken)) {
+        localStorage.removeItem("jwtToken");
+        jwtToken = null;
+      }
+    }
+
+    function authHeaders() {
+      ensureValidToken();
+      if (!jwtToken) throw new Error("Nejsi přihlášen.");
+      return { "Authorization": "Bearer " + jwtToken };
+    }
+
    function closeOverlays() {
       document.querySelectorAll('.image-modal, .image-popup').forEach(el => el.classList.add('hidden'));
         }
@@ -1195,37 +1214,31 @@
           if (userRole === "ROLE_ADMIN") showAdminHome(); else showHome();
         });
         // Klik na název/řádek/obrázek receptu -> načíst detail a zobrazit
-document.addEventListener("click", async (e) => {
-  const link = e.target.closest(".recipe-link");
-  const row  = e.target.closest(".recipe-row");
-  if (!link && !row) return;
+        document.addEventListener("click", async (e) => {
+          const link = e.target.closest(".recipe-link");
+          const row  = e.target.closest(".recipe-row");
+          if (!link && !row) return;
 
-  e.preventDefault();
+          e.preventDefault();
 
-  const idAttr = row?.getAttribute("data-id") || link?.getAttribute("data-id");
-  const id = idAttr ? idAttr.trim() : null;
-  if (!id) return;
+          const idAttr = row?.getAttribute("data-id") || link?.getAttribute("data-id");
+          const id = idAttr ? idAttr.trim() : null;
+          if (!id) return;
 
-  const url = `${API_BASE}/recepty/${id}`;
-  const headers = {};
-  if (jwtToken) headers["Authorization"] = "Bearer " + jwtToken;
+          const url = `${API_BASE}/recepty/${id}`;
 
-  try {
-    const r = await fetch(url, { headers });
-    if (!r.ok) {
-      if (r.status === 401 || r.status === 403) {
-        alert("Pro zobrazení detailu se prosím přihlas.");
-        return;
-      }
-      throw new Error("Chyba při načítání detailu receptu.");
-    }
-    const recipe = await r.json();
-    renderRecipeDetail(recipe);
-  } catch (err) {
-    console.error(err);
-    alert("Chyba při načítání detailu receptu.");
-  }
-});
+          try {
+            const r = await fetch(url);
+            if (!r.ok) {
+              throw new Error("Chyba při načítání detailu receptu.");
+            }
+            const recipe = await r.json();
+            renderRecipeDetail(recipe);
+          } catch (err) {
+            console.error(err);
+            alert("Chyba při načítání detailu receptu.");
+          }
+        });
 
 
 

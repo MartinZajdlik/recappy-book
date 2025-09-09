@@ -19,17 +19,21 @@ public class JwtUtil {
     @Value("${app.jwt.secret}")
     private String secret;
 
+    @Value("${app.jwt.expirationMillis:86400000}") // default 24h
+    private long expirationMillis;
+
     private SecretKey getKey() {
         // Pro HS256 je potřeba minimálně 32 bajtů; použij dlouhý náhodný string (např. openssl rand -base64 64)
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String username, String role) {
+        long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10)) // 10 hodin
+                .setExpiration(new Date(now + expirationMillis))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
