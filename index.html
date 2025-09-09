@@ -1317,16 +1317,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Reset hesla – minimalisticky přes prompt (můžeš nahradit vlastním UI)
     if (resetToken) {
-
-      if (window.__didHandlePasswordReset) {
-
-        history.replaceState({}, "", location.pathname + location.hash);
-      } else {
-        window.__didHandlePasswordReset = true;
-      }
-
-      history.replaceState({}, "", location.pathname + location.hash);
-
       const newPass = prompt("Zadej nové heslo:");
       if (newPass && newPass.length >= 6) {
         fetch(`${API_BASE}/auth/reset`, {
@@ -1337,9 +1327,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .then(async (r) => {
             if (r.ok) {
               alert("Heslo změněno, můžeš se přihlásit.");
-            } else {
-              const msg = await r.text().catch(() => "");
-              alert("Reset se nepodařil." + (msg ? `\n\nServer: ${msg}` : ""));
             }
           })
           .catch(() => {

@@ -123,7 +123,7 @@ public class RecipeController {
         }
     }
 
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     public Optional<Recipe> getRecipeById(@PathVariable Long id) {
         return recipeRepository.findById(id);
