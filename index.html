@@ -1282,18 +1282,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (forgotSubmit) {
       forgotSubmit.addEventListener("click", () => {
-        const email = (forgotEmail.value || "").trim();
-        if (!email) return;
-        fetch(`${API_BASE}/auth/forgot`, {
-          method: "POST",
-          headers: {"Content-Type":"application/json"},
-          body: JSON.stringify({ email })
-        }).then(() => {
-          forgotMsg.textContent = "Pokud e-mail existuje, poslali jsme odkaz pro reset.";
-        }).catch(() => {
-          forgotMsg.textContent = "Pokud e-mail existuje, poslali jsme odkaz pro reset.";
+          const email = (forgotEmail.value || "").trim();
+          if (!email) return;
+
+          fetch(`${API_BASE}/auth/forgot`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ email })
+          })
+          .then(async (r) => {
+            const t = await r.text().catch(()=> "");
+            console.log("[/auth/forgot] status:", r.status, "ok:", r.ok, "body:", t);
+            // Server VŽDY vrací 200 i když mail neexistuje → na FE jen ukážem info
+            forgotMsg.textContent = "Pokud e-mail existuje, poslali jsme odkaz pro reset.";
+          })
+          .catch(err => {
+            console.error(err);
+            forgotMsg.textContent = "Nepodařilo se odeslat požadavek (síť/CORS).";
+          });
         });
-      });
+
     }
 
     // --- Zpracování tokenů z URL (?verifyToken=..., ?resetToken=...) ---
