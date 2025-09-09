@@ -162,62 +162,26 @@ public class AuthController {
         return ResponseEntity.ok("Účet potvrzen.");
     }
 
-    // ===== Zapomenuté heslo – požadavek =====
-    // ⬇⬇⬇ nahraď celou metodu forgot tímto ⬇⬇⬇
-    @PostMapping(value = "/forgot", consumes = "application/json")
-    public ResponseEntity<?> forgot(@RequestBody(required = false) EmailDto dto) {
-        try {
-            // 1) obrana proti prázdnému/neplatnému vstupu
-            if (dto == null || dto.email() == null || dto.email().isBlank()) {
-                return ResponseEntity.ok().build(); // nikdy neprozrazuj nic
-            }
+    // ===== Zapomenuté heslo – požadavek (PROD verze) =====
+    @PostMapping("/forgot")
+    public ResponseEntity<?> forgot(@RequestBody EmailDto dto) {
+        userRepository.findByEmail(dto.email()).ifPresent(u -> {
+            passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
+            PasswordResetToken pr = new PasswordResetToken();
+            pr.setToken(UUID.randomUUID().toString());
+            pr.setUser(u);
+            pr.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+            passwordResetTokenRepository.save(pr);
 
-            // 2) pokud e-maily jsou dočasně vypnuté (máŠ už flag emailEnabled)
-            if (!emailEnabled) {
-                // klidně tu jen vrať OK; token ani neposílej mailem
-                return ResponseEntity.ok().build();
-            }
-
-            userRepository.findByEmail(dto.email()).ifPresent(u -> {
-                // pro jistotu zneplatni staré tokeny uživatele (to už děláš – dobrá práce)
-                passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
-
-                PasswordResetToken pr = new PasswordResetToken();
-                pr.setToken(UUID.randomUUID().toString());
-                pr.setUser(u);
-                pr.setExpiresAt(LocalDateTime.now().plusMinutes(30));
-                passwordResetTokenRepository.save(pr);
-
-                // 3) fallback pro frontendBase, ať to nehodí NPE
-                String base = (frontendBase == null || frontendBase.isBlank())
-                        ? "https://recappy-book-official.onrender.com"
-                        : frontendBase;
-
-                String link = base + "/?resetToken=" + pr.getToken();
-
-                // 4) obal mail do try/catch -> aby nikdy neletěl 500
-                try {
-                    mailService.send(
-                            u.getEmail(),
-                            "Reset hesla",
-                            "<p>Požádal(a) jsi o reset hesla.</p>"
-                                    + "<p><a href='" + link + "'>Nastavit nové heslo</a></p>"
-                    );
-                } catch (Exception mailEx) {
-                    // zaloguj a dál pokračuj – klient stejně dostane OK
-                    System.err.println("Mail send failed: " + mailEx.getMessage());
-                }
-            });
-
-            // 5) vždy vrať OK (neprozrazujeme, zda e-mail existuje)
-            return ResponseEntity.ok().build();
-
-        } catch (Exception ex) {
-            // poslední pojistka – NIKDY ven 500
-            System.err.println("Forgot error: " + ex.getMessage());
-            return ResponseEntity.ok().build();
-        }
+            String link = frontendBase + "/?resetToken=" + pr.getToken();
+            mailService.send(u.getEmail(), "Reset hesla",
+                    "<p>Požádal(a) jsi o reset hesla.</p><p><a href='" + link + "'>Nastavit nové heslo</a></p>");
+        });
+        // vždy vracej OK (neprozrazujeme, zda e-mail existuje)
+        return ResponseEntity.ok().build();
     }
+
+
 
 
     // ===== Reset hesla – nastavení nového =====
