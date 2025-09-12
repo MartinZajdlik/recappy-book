@@ -71,7 +71,7 @@ public class AuthController {
         User newUser = new User();
         newUser.setUsername(dto.getUsername());
         newUser.setPassword(passwordEncoder.encode(dto.getPassword()));
-        newUser.setEmail(dto.getEmail());
+        newUser.setEmail(dto.getEmail().trim().toLowerCase());
         newUser.setRole("ROLE_USER");
 
         if (!emailEnabled) {
@@ -162,24 +162,49 @@ public class AuthController {
         return ResponseEntity.ok("Účet potvrzen.");
     }
 
-    // ===== Zapomenuté heslo – požadavek (PROD verze) =====
     @PostMapping("/forgot")
-    public ResponseEntity<?> forgot(@RequestBody EmailDto dto) {
-        userRepository.findByEmail(dto.email()).ifPresent(u -> {
-            passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
-            PasswordResetToken pr = new PasswordResetToken();
-            pr.setToken(UUID.randomUUID().toString());
-            pr.setUser(u);
-            pr.setExpiresAt(LocalDateTime.now().plusMinutes(30));
-            passwordResetTokenRepository.save(pr);
+    public ResponseEntity<?> forgot(@RequestBody(required = false) EmailDto dto) {
+        if (dto == null || dto.email() == null || dto.email().isBlank()) {
+            return ResponseEntity.badRequest().body("E-mail je povinný.");
+        }
 
-            String link = frontendBase + "/?resetToken=" + pr.getToken();
+        final String raw = dto.email().trim();
+        final String normalized = raw.toLowerCase(); // prevence „Admin@…“ vs „admin@…“
+
+        var userOpt = userRepository.findByEmail(normalized);
+        if (userOpt.isEmpty()) {
+            // Neprozrazujeme, ale do logu si to napiš
+            System.out.println("[/auth/forgot] E-mail v DB nenalezen: " + normalized);
+            return ResponseEntity.ok().build();
+        }
+
+        var u = userOpt.get();
+        passwordResetTokenRepository.deleteAllByUser_Id(u.getId());
+
+        PasswordResetToken pr = new PasswordResetToken();
+        pr.setToken(UUID.randomUUID().toString());
+        pr.setUser(u);
+        pr.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        passwordResetTokenRepository.save(pr);
+
+        String link = frontendBase + "/?resetToken=" + pr.getToken();
+
+        try {
             mailService.send(u.getEmail(), "Reset hesla",
                     "<p>Požádal(a) jsi o reset hesla.</p><p><a href='" + link + "'>Nastavit nové heslo</a></p>");
-        });
-        // vždy vracej OK (neprozrazujeme, zda e-mail existuje)
+            System.out.println("[/auth/forgot] Reset e-mail odeslán na: " + u.getEmail() + " link=" + link);
+        } catch (Exception e) {
+            // Uvidíš případné chyby odesílání rovnou v logu Renderu
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Odeslání e-mailu selhalo.");
+        }
+
+        // --- Nepovinné: v DEV můžeš vracet link přímo v těle (usnadní testování)
+        // return ResponseEntity.ok(link);
+
         return ResponseEntity.ok().build();
     }
+
 
 
 
