@@ -1710,3 +1710,5 @@ white-space: pre-wrap;
   white-space: pre-wrap !important;
   line-height: 1.5;
 }
+.success { color:#5ad97a; margin-bottom:1rem; font-weight:bold; text-align:center; }
+.hidden { display:none !important; }

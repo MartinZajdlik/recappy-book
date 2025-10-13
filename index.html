@@ -128,6 +128,8 @@
 
 
             <div id="authError" class="error"></div>
+            <div id="authInfo" class="success hidden"></div>
+
         </section>
 
 
@@ -1491,33 +1493,71 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // registrace
-  registerForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const username = document.getElementById("registerUsername").value;
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
+    registerForm.addEventListener("submit", e => {
+      e.preventDefault();
 
-    fetch(`${API_BASE}/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password }),
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Chyba při registraci uživatele");
-        return res.text();
+      const username = document.getElementById("registerUsername").value;
+      const email = document.getElementById("registerEmail").value;
+      const password = document.getElementById("registerPassword").value;
+
+      // volitelné: info box; když neexistuje, kód to nezkazí
+      const authInfo = document.getElementById("authInfo");
+      const showAuthInfo = (msg) => {
+        if (!authInfo) return;
+        authInfo.textContent = msg;
+        authInfo.classList.remove("hidden");
+      };
+      const clearAuthInfo = () => {
+        if (!authInfo) return;
+        authInfo.textContent = "";
+        authInfo.classList.add("hidden");
+      };
+
+      authError.textContent = "";
+      clearAuthInfo();
+
+      // krátký anti-spam cooldown (bezpečné i když to vynecháš)
+      const els = registerForm.querySelectorAll("input, button");
+      els.forEach(el => (el.disabled = true));
+      const reenable = () => els.forEach(el => (el.disabled = false));
+
+      fetch(`${API_BASE}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
       })
-      .then(() => {
-        authError.textContent = "Registrace proběhla úspěšně, potvrdtě na emailu";
-        registerTab.classList.remove("active");
-        loginTab.classList.add("active");
-        registerForm.classList.add("hidden");
-        loginFormEl.classList.remove("hidden");
-        registerForm.reset();
-      })
-      .catch(err => {
-        authError.textContent = err.message || "Chyba při registraci.";
-      });
-  });
+        .then(res => {
+          if (!res.ok) {
+            return res.text().then(t => {
+              throw new Error((t && t.trim()) || "Registrace se nepovedla.");
+            });
+          }
+          return res.text(); // nebo .json(), podle tvého controlleru
+        })
+        .then(() => {
+          // Úspěch: zůstaneme na REG tabu, neprepínáme na login
+          authError.textContent = "";
+          showAuthInfo("📩 Registrace proběhla. Poslali jsme ti e-mail s potvrzením účtu. Jakmile ho potvrdíš, můžeš se přihlásit.");
+
+          registerTab.classList.add("active");
+          loginTab.classList.remove("active");
+          registerForm.classList.remove("hidden");
+          loginFormEl.classList.add("hidden");
+
+          // registerForm.reset(); // nechávám zakomentované – ponechá zadaný e-mail
+          setTimeout(reenable, 10000); // ponech cooldown ~10 s
+        })
+        .catch(err => {
+          clearAuthInfo();
+          authError.textContent = err.message || "Chyba při registraci.";
+          registerTab.classList.add("active");
+          loginTab.classList.remove("active");
+          registerForm.classList.remove("hidden");
+          loginFormEl.classList.add("hidden");
+          reenable();
+        });
+    });
+
 
   // odhlášení
   logoutBtn.addEventListener("click", () => {
