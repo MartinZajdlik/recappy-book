@@ -91,7 +91,7 @@ public class AuthController {
             vt.setUsed(false);
             verificationTokenRepository.save(vt);
 
-            String link = frontendBase + "/?verifyToken=" + vt.getToken();
+            String link = "https://recappy-book.onrender.com/auth/confirm?token=" + vt.getToken();
             mailService.send(newUser.getEmail(), "Potvrzení registrace",
                     "<p>Ahoj, potvrď svůj účet kliknutím:</p><p><a href='" + link + "'>Potvrdit účet</a></p>");
 
