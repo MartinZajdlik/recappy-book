@@ -94,7 +94,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()
 
                         // Admin operace nad recepty
-                        .requestMatchers(HttpMethod.POST, "/recepty/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/recepty/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.PUT, "/recepty/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasRole("ADMIN")
 
