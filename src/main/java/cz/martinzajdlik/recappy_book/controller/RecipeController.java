@@ -36,7 +36,7 @@ public class RecipeController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<Recipe> createRecipe(
             @RequestParam("title") String title,
             @RequestParam("category") String category,
