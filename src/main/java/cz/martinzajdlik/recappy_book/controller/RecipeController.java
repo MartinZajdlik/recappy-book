@@ -2,12 +2,15 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
+import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import org.springframework.http.MediaType;
 import cz.martinzajdlik.recappy_book.service.ImageStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import cz.martinzajdlik.recappy_book.model.User;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,23 +25,33 @@ public class RecipeController {
 
     private final RecipeRepository recipeRepository;
     private final ImageStorageService imageStorageService;
+    private final UserRepository userRepository;
 
     public RecipeController(RecipeRepository recipeRepository,
-                            ImageStorageService imageStorageService) {
+                            ImageStorageService imageStorageService,
+                            UserRepository userRepository) {
         this.recipeRepository = recipeRepository;
         this.imageStorageService = imageStorageService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     public ResponseEntity<Recipe> createRecipe(
             @RequestParam("title") String title,
             @RequestParam("category") String category,
             @RequestParam("ingredients") String ingredients,
             @RequestParam("instructions") String instructions,
-            @RequestParam(value = "image", required = false) MultipartFile imageFile
+            @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            Authentication authentication
     ) throws IOException {
         Recipe recipe = new Recipe();
+        String username = authentication.getName();
+
+        User author = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        recipe.setAuthor(author);
         recipe.setTitle(title);
         recipe.setCategory(category);
         recipe.setIngredients(ingredients);

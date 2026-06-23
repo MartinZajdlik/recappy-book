@@ -29,6 +29,10 @@ public class Recipe {
     @Column(name = "image_url", length = 512)
     private String imageUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+
     // --- Bezparametrový konstruktor pro JPA ---
     public Recipe() {
     }
@@ -84,5 +88,12 @@ public class Recipe {
     public String getImageUrl() {return imageUrl; }
 
     public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl; }
+
+    public User getAuthor() {return author;}
+
+    public void setAuthor(User author) {this.author = author;}
+
+    public String getAuthorUsername() {return author != null ? author.getUsername() : null;}
+
 
 }
