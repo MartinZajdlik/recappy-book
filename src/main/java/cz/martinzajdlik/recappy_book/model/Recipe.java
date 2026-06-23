@@ -2,7 +2,7 @@ package cz.martinzajdlik.recappy_book.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Recipe {
 
@@ -88,7 +88,7 @@ public class Recipe {
     public String getImageUrl() {return imageUrl; }
 
     public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl; }
-
+    @JsonIgnore
     public User getAuthor() {return author;}
 
     public void setAuthor(User author) {this.author = author;}
