@@ -125,8 +125,6 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole());
 
-        System.out.println("JWT TOKEN:");
-        System.out.println(token);
 
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);

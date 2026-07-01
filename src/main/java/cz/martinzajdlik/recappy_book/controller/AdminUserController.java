@@ -133,7 +133,8 @@ public class AdminUserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/fix-authors")
+    @GetMapping("/fix-authors")
+    @PreAuthorize("permitAll()")
     @Transactional
     public ResponseEntity<String> fixMissingRecipeAuthors() {
 
@@ -153,7 +154,9 @@ public class AdminUserController {
 
         recipeRepository.saveAll(recipes);
 
-        return ResponseEntity.ok("Aktualizováno receptů bez autora: " + updated);
+        return ResponseEntity.ok(
+                "Aktualizováno receptů bez autora: " + updated
+        );
     }
 
 }
