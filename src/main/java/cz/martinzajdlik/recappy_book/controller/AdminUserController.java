@@ -14,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 
+import cz.martinzajdlik.recappy_book.model.Recipe;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -129,6 +131,29 @@ public class AdminUserController {
                     return ResponseEntity.ok("Uživatel byl deaktivován.");
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/fix-authors")
+    @Transactional
+    public ResponseEntity<String> fixMissingRecipeAuthors() {
+
+        User admin = userRepository.findByUsername("admin")
+                .orElseThrow(() -> new RuntimeException("Admin nenalezen"));
+
+        List<Recipe> recipes = recipeRepository.findAll();
+
+        int updated = 0;
+
+        for (Recipe recipe : recipes) {
+            if (recipe.getAuthor() == null) {
+                recipe.setAuthor(admin);
+                updated++;
+            }
+        }
+
+        recipeRepository.saveAll(recipes);
+
+        return ResponseEntity.ok("Aktualizováno receptů bez autora: " + updated);
     }
 
 }
