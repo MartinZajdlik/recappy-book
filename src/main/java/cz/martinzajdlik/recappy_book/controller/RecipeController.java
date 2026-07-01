@@ -87,20 +87,34 @@ public class RecipeController {
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public ResponseEntity<Recipe> updateRecipe(
             @PathVariable Long id,
             @RequestParam("title") String title,
             @RequestParam("category") String category,
             @RequestParam("ingredients") String ingredients,
             @RequestParam("instructions") String instructions,
-            @RequestParam(value = "image", required = false) MultipartFile imageFile
+            @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            Authentication authentication
     ) throws IOException {
+
         Optional<Recipe> recipeOpt = recipeRepository.findById(id);
         if (recipeOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
         Recipe recipe = recipeOpt.get();
+
+        String currentUsername = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isAuthor = recipe.getAuthor() != null &&
+                recipe.getAuthor().getUsername().equals(currentUsername);
+
+        if (!isAdmin && !isAuthor) {
+            return ResponseEntity.status(403).build();
+        }
 
         recipe.setTitle(title);
         recipe.setCategory(category);
@@ -110,7 +124,6 @@ public class RecipeController {
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = imageStorageService.upload(imageFile);
             recipe.setImageUrl(imageUrl);
-
         }
 
         Recipe updated = recipeRepository.save(recipe);
@@ -159,9 +172,29 @@ public class RecipeController {
         return recipeRepository.findDistinctCategories();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/{id}")
-    public void deleteRecipe(@PathVariable Long id) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, Authentication authentication) {
+
+        Optional<Recipe> recipeOpt = recipeRepository.findById(id);
+        if (recipeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Recipe recipe = recipeOpt.get();
+
+        String currentUsername = authentication.getName();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isAuthor = recipe.getAuthor() != null &&
+                recipe.getAuthor().getUsername().equals(currentUsername);
+
+        if (!isAdmin && !isAuthor) {
+            return ResponseEntity.status(403).body("Nemáš oprávnění smazat tento recept.");
+        }
+
         recipeRepository.deleteById(id);
+        return ResponseEntity.ok("Recept byl smazán.");
     }
 }
