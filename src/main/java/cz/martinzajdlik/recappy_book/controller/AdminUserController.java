@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,16 +25,19 @@ public class AdminUserController {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final RecipeRepository recipeRepository;
 
     @Autowired
     public AdminUserController(
             UserRepository userRepository,
             VerificationTokenRepository verificationTokenRepository,
-            PasswordResetTokenRepository passwordResetTokenRepository
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            RecipeRepository recipeRepository
     ) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.recipeRepository = recipeRepository;
     }
 
     // Získat všechny uživatele
@@ -91,6 +95,7 @@ public class AdminUserController {
         verificationTokenRepository.deleteByUser_Id(id);
         passwordResetTokenRepository.deleteAllByUser_Id(id);
 
+        recipeRepository.deleteByAuthor_Id(id);
         userRepository.deleteById(id);
         return ResponseEntity.ok("Uživatel byl smazán.");
     }
