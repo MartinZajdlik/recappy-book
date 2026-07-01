@@ -136,6 +136,18 @@ public class RecipeController {
         }
     }
 
+    @GetMapping("/my")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public List<Recipe> getMyRecipes(Authentication authentication) {
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        return recipeRepository.findByAuthor_Id(user.getId());
+    }
+
+
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     public Optional<Recipe> getRecipeById(@PathVariable Long id) {
