@@ -98,6 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/recepty/**").hasAnyRole("ADMIN", "USER")
                         .requestMatchers(HttpMethod.DELETE, "/recepty/**").hasAnyRole("ADMIN", "USER")
 
+                        .requestMatchers(HttpMethod.GET, "/admin/users/fix-authors").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
