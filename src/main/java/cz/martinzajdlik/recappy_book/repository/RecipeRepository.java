@@ -17,6 +17,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByAuthor_Id(Long authorId);
 
+    void deleteByAuthor_Id(Long authorId);
+
 
 
 }

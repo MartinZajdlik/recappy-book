@@ -21,6 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +37,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final RecipeRepository recipeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final MailService mailService;
@@ -47,12 +52,14 @@ public class AuthController {
     public AuthController(UserRepository userRepository,
                           VerificationTokenRepository verificationTokenRepository,
                           PasswordResetTokenRepository passwordResetTokenRepository,
+                          RecipeRepository recipeRepository,
                           PasswordEncoder passwordEncoder,
                           JwtUtil jwtUtil,
                           MailService mailService) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.recipeRepository = recipeRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.mailService = mailService;
@@ -140,6 +147,28 @@ public class AuthController {
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
+    }
+
+    @DeleteMapping("/me")
+    @Transactional
+    public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body("Neautorizováno.");
+        }
+
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        verificationTokenRepository.deleteByUser_Id(user.getId());
+        passwordResetTokenRepository.deleteAllByUser_Id(user.getId());
+        recipeRepository.deleteByAuthor_Id(user.getId());
+
+        userRepository.delete(user);
+
+        return ResponseEntity.ok("Účet a všechny recepty byly smazány.");
     }
 
     // ===== Potvrzení e-mailu =====
