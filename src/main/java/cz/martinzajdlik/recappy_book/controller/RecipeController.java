@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-
+import org.springframework.transaction.annotation.Transactional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -224,6 +224,7 @@ public class RecipeController {
         return recipeRepository.findDistinctCategories();
     }
 
+    @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
@@ -246,6 +247,12 @@ public class RecipeController {
         if (!isAdmin && !isAuthor) {
             return ResponseEntity.status(403).body("Nemáš oprávnění smazat tento recept.");
         }
+
+        for (User user : recipe.getLikedByUsers()) {
+            user.getFavoriteRecipes().remove(recipe);
+        }
+
+        recipe.getLikedByUsers().clear();
 
         imageStorageService.delete(recipe.getImageUrl());
 

@@ -112,4 +112,8 @@ public class Recipe {
     @Override
     public int hashCode() {return getClass().hashCode();}
 
+    public Set<User> getLikedByUsers() {
+        return likedByUsers;
+    }
+
 }
