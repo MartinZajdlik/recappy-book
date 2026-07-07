@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import cz.martinzajdlik.recappy_book.model.User;
 import org.springframework.security.core.Authentication;
-
+import cz.martinzajdlik.recappy_book.dto.RecipeResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -141,25 +141,77 @@ public class RecipeController {
     }
 
     @GetMapping
-    public List<Recipe> getRecipesByCategory(@RequestParam(required = false) String category) {
+    public List<RecipeResponse> getRecipesByCategory(
+            @RequestParam(required = false) String category,
+            Authentication authentication
+    ) {
+        User currentUser = getCurrentUserOrNull(authentication);
+
+        List<Recipe> recipes;
+
         if (category == null || category.isEmpty()) {
-            return recipeRepository.findAll();
+            recipes = recipeRepository.findAll();
         } else {
-            return recipeRepository.findByCategory(category);
+            recipes = recipeRepository.findByCategory(category);
         }
+
+        return recipes.stream()
+                .map(recipe -> new RecipeResponse(recipe, currentUser))
+                .toList();
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
-    public List<Recipe> getMyRecipes(Authentication authentication) {
+    public List<RecipeResponse> getMyRecipes(Authentication authentication) {
         String username = authentication.getName();
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
 
-        return recipeRepository.findByAuthor_Id(user.getId());
+        return recipeRepository.findByAuthor_Id(user.getId())
+                .stream()
+                .map(recipe -> new RecipeResponse(recipe, user))
+                .toList();
     }
 
+    @PostMapping("/{id}/favorite")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public ResponseEntity<String> toggleFavorite(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recept nenalezen"));
+
+        if (user.getFavoriteRecipes().contains(recipe)) {
+            user.getFavoriteRecipes().remove(recipe);
+            userRepository.save(user);
+            return ResponseEntity.ok("Recept odebrán z oblíbených.");
+        } else {
+            user.getFavoriteRecipes().add(recipe);
+            userRepository.save(user);
+            return ResponseEntity.ok("Recept přidán do oblíbených.");
+        }
+    }
+
+    @GetMapping("/favorites")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public List<RecipeResponse> getFavoriteRecipes(Authentication authentication) {
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+
+        return recipeRepository.findFavoriteRecipesByUser(user)
+                .stream()
+                .map(recipe -> new RecipeResponse(recipe, user))
+                .toList();
+    }
 
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
@@ -199,5 +251,14 @@ public class RecipeController {
 
         recipeRepository.deleteById(id);
         return ResponseEntity.ok("Recept byl smazán.");
+    }
+    private User getCurrentUserOrNull(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        String username = authentication.getName();
+
+        return userRepository.findByUsername(username).orElse(null);
     }
 }

@@ -3,6 +3,10 @@ package cz.martinzajdlik.recappy_book.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.HashSet;
+import java.util.Set;
+
+
 @Entity
 public class Recipe {
 
@@ -32,6 +36,10 @@ public class Recipe {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User author;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "favoriteRecipes")
+    private Set<User> likedByUsers = new HashSet<>();
 
     // --- Bezparametrový konstruktor pro JPA ---
     public Recipe() {
@@ -95,5 +103,13 @@ public class Recipe {
 
     public String getAuthorUsername() {return author != null ? author.getUsername() : null;}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe recipe)) return false;
+        return id != null && id.equals(recipe.id);}
+
+    @Override
+    public int hashCode() {return getClass().hashCode();}
 
 }

@@ -3,6 +3,8 @@ package cz.martinzajdlik.recappy_book.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "app_user")
@@ -29,6 +31,14 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_recipes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipe_id")
+    )
+    private Set<Recipe> favoriteRecipes = new HashSet<>();
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
@@ -59,6 +69,8 @@ public class User {
     public String getEmail() {return email;}
     public void setEmail(String email) {this.email = email;}
 
+    public Set<Recipe> getFavoriteRecipes() {return favoriteRecipes;}
 
+    public void setFavoriteRecipes(Set<Recipe> favoriteRecipes) {this.favoriteRecipes = favoriteRecipes;}
 
 }

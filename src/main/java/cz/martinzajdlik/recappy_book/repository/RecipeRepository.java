@@ -1,5 +1,5 @@
 package cz.martinzajdlik.recappy_book.repository;
-
+import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,6 +18,9 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByAuthor_Id(Long authorId);
 
     void deleteByAuthor_Id(Long authorId);
+
+    @Query("SELECT r FROM Recipe r JOIN r.likedByUsers u WHERE u = :user")
+    List<Recipe> findFavoriteRecipesByUser(User user);
 
 
 
