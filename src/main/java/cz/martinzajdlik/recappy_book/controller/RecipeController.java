@@ -174,7 +174,8 @@ public class RecipeController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id,
+                                          Authentication authentication) throws IOException {
 
         Optional<Recipe> recipeOpt = recipeRepository.findById(id);
         if (recipeOpt.isEmpty()) {
@@ -193,6 +194,8 @@ public class RecipeController {
         if (!isAdmin && !isAuthor) {
             return ResponseEntity.status(403).body("Nemáš oprávnění smazat tento recept.");
         }
+
+        imageStorageService.delete(recipe.getImageUrl());
 
         recipeRepository.deleteById(id);
         return ResponseEntity.ok("Recept byl smazán.");

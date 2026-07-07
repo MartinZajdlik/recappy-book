@@ -49,4 +49,43 @@ public class ImageStorageService {
         }
         return url;
     }
+    public void delete(String imageUrl) throws IOException {
+
+        if (imageUrl == null || imageUrl.isBlank()) {
+            return;
+        }
+
+        String publicId = extractPublicId(imageUrl);
+
+        if (publicId == null || publicId.isBlank()) {
+            return;
+        }
+
+        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+    }
+
+    private String extractPublicId(String imageUrl) {
+
+        int uploadIndex = imageUrl.indexOf("/upload/");
+        if (uploadIndex == -1) {
+            return null;
+        }
+
+        String path = imageUrl.substring(uploadIndex + "/upload/".length());
+
+        // odstraní verzi (např. v1751234567)
+        if (path.matches("^v\\d+/.*")) {
+            path = path.substring(path.indexOf("/") + 1);
+        }
+
+        // odstraní příponu (.jpg, .png...)
+        int dotIndex = path.lastIndexOf(".");
+        if (dotIndex != -1) {
+            path = path.substring(0, dotIndex);
+        }
+
+        return path;
+    }
+
+
 }
