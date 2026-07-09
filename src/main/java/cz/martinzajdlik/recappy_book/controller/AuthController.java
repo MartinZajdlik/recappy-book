@@ -17,9 +17,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import jakarta.transaction.Transactional;
@@ -42,8 +44,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final MailService mailService;
 
-    @Value("${app.frontend.baseUrl:http://localhost:5500}")
-    private String frontendBase;
+    @Value("${app.backend.baseUrl:http://localhost:8080}")
+    private String backendBaseUrl;
 
     @Value("${feature.email.enabled:false}")       // ⬅️ přidáno: feature flag
     private boolean emailEnabled;
@@ -217,7 +219,7 @@ public class AuthController {
         pr.setExpiresAt(LocalDateTime.now().plusMinutes(30));
         passwordResetTokenRepository.save(pr);
 
-        String link = frontendBase + "/?resetToken=" + pr.getToken();
+        String link = backendBaseUrl + "/auth/reset?token=" + pr.getToken();
 
         try {
             mailService.send(u.getEmail(), "Reset hesla",
@@ -238,6 +240,66 @@ public class AuthController {
 
 
 
+
+    // ===== Reset hesla – stránka s formulářem (odkaz z e-mailu) =====
+    @GetMapping(value = "/reset", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> resetPasswordPage(@RequestParam String token) {
+        String safeToken = HtmlUtils.htmlEscape(token);
+        String html = """
+                <!DOCTYPE html>
+                <html lang="cs">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Reset hesla – RecAPPy BOOK</title>
+                <style>
+                    body { font-family: 'Segoe UI', sans-serif; background:#101021; color:#f0f0f0; display:flex; justify-content:center; padding:48px 16px; margin:0; }
+                    .card { max-width:360px; width:100%%; background:#19182b; padding:24px; border-radius:12px; }
+                    h1 { font-size:20px; margin:0 0 16px; }
+                    input { width:100%%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #333; background:#101021; color:#f0f0f0; box-sizing:border-box; font-size:16px; }
+                    button { width:100%%; padding:10px; margin-top:12px; border:none; border-radius:6px; background:#7dff50; color:#101021; font-weight:bold; cursor:pointer; font-size:16px; }
+                    #msg { margin-top:12px; font-size:14px; }
+                </style>
+                </head>
+                <body>
+                <div class="card">
+                    <h1>Nastavit nové heslo</h1>
+                    <form id="f" data-token="%s">
+                        <input type="password" id="p1" placeholder="Nové heslo" required minlength="4" autocomplete="new-password">
+                        <input type="password" id="p2" placeholder="Zopakuj heslo" required minlength="4" autocomplete="new-password">
+                        <button type="submit">Uložit</button>
+                    </form>
+                    <div id="msg"></div>
+                </div>
+                <script>
+                    document.getElementById('f').addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        var p1 = document.getElementById('p1').value;
+                        var p2 = document.getElementById('p2').value;
+                        var msg = document.getElementById('msg');
+                        if (p1 !== p2) { msg.textContent = 'Hesla se neshodují.'; return; }
+                        try {
+                            var res = await fetch('/auth/reset', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ token: this.dataset.token, newPassword: p1 })
+                            });
+                            if (res.ok) {
+                                msg.textContent = 'Heslo bylo úspěšně změněno. Teď se můžeš přihlásit v appce.';
+                                document.getElementById('f').style.display = 'none';
+                            } else {
+                                msg.textContent = 'Odkaz je neplatný nebo expirovaný.';
+                            }
+                        } catch (err) {
+                            msg.textContent = 'Něco se nepovedlo, zkus to znovu.';
+                        }
+                    });
+                </script>
+                </body>
+                </html>
+                """.formatted(safeToken);
+        return ResponseEntity.ok(html);
+    }
 
     // ===== Reset hesla – nastavení nového =====
     @PostMapping("/reset")
