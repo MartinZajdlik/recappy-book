@@ -12,9 +12,9 @@ Aplikace pro správu a sdílení receptů. Podporuje přihlašování, role uži
 
 ## Technologie
 - Java 21, Spring Boot 3.4.5
-- Frontend: HTML, CSS, JS
+- Klient: nativní iOS app (SwiftUI, repo `recappy-book-ios`)
 - Databáze: SQLite (vývoj), PostgreSQL (produkce)
 - Autentizace: JWT
 
 ## Jak spustit
-https://recappy-book-official.onrender.com
+Backend běží na `https://recappy-book.onrender.com`. Lokálně: `./mvnw spring-boot:run` (viz `docker-compose.yml` pro Postgres).
