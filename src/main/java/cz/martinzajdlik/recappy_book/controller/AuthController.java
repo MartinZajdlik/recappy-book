@@ -11,12 +11,9 @@ import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import cz.martinzajdlik.recappy_book.repository.VerificationTokenRepository;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import cz.martinzajdlik.recappy_book.service.MailService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -109,7 +106,7 @@ public class AuthController {
 
     // ===== LOGIN – bez potvrzení účtu nevydávej JWT =====
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody User user) {
         Optional<User> opt = userRepository.findByUsername(user.getUsername());
         if (opt.isEmpty()) {
             return ResponseEntity.status(404).body("Uživatel nenalezen.");
@@ -126,28 +123,11 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole());
 
-
-        Cookie cookie = new Cookie("jwt", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // v produkci true a HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge(10 * 60 * 60); // 10 hodin
-        response.addCookie(cookie);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
-
         return ResponseEntity.ok(new JwtResponse(token, dbUser.getRole()));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("jwt", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // v produkci true a HTTPS
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+    public ResponseEntity<?> logout() {
         return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
     }
 

@@ -34,9 +34,6 @@ build/
 
 
 
-# Lokální složka pro nahrané obrázky (pokud ji používáš)
-uploads/
-
 # Logy
 *.log
 
@@ -48,6 +45,3 @@ Thumbs.db
 .env
 .env.*
 !.env.example
-
-pictures/
-

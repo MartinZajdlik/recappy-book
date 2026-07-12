@@ -64,9 +64,6 @@ public class SecurityConfig {
                                 "/auth/forgot",
                                 "/auth/reset").permitAll()
 
-                        // Obrázky (pokud servíruješ veřejně)
-                        .requestMatchers("/pictures/**").permitAll()
-
                         // Veřejné čtení receptů
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()
 

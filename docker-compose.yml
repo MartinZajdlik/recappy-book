@@ -37,8 +37,6 @@ services:
       APP_BACKEND_BASEURL: ${APP_BACKEND_BASEURL}
     ports:
       - "8080:8080"
-    volumes:
-      - ./pictures:/app/pictures
 
 volumes:
   pgdata:
