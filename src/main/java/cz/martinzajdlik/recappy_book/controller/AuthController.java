@@ -99,7 +99,7 @@ public class AuthController {
             vt.setUsed(false);
             verificationTokenRepository.save(vt);
 
-            String link = "https://recappy-book.onrender.com/auth/confirm?token=" + vt.getToken();
+            String link = backendBaseUrl + "/auth/confirm?token=" + vt.getToken();
             mailService.send(newUser.getEmail(), "Potvrzení registrace",
                     "<p>Ahoj, potvrď svůj účet kliknutím:</p><p><a href='" + link + "'>Potvrdit účet</a></p>");
 
@@ -173,24 +173,58 @@ public class AuthController {
         return ResponseEntity.ok("Účet a všechny recepty byly smazány.");
     }
 
-    // ===== Potvrzení e-mailu =====
-    @GetMapping("/confirm")
-    public ResponseEntity<?> confirm(@RequestParam String token) {
-        VerificationToken vt = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Token nenalezen"));
+    // ===== Potvrzení e-mailu (odkaz z registračního mailu) =====
+    @GetMapping(value = "/confirm", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> confirm(@RequestParam String token) {
+        boolean success;
+        String message;
 
-        if (vt.isUsed() || vt.getExpiresAt().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.badRequest().body("Token neplatný nebo expirovaný.");
+        Optional<VerificationToken> vtOpt = verificationTokenRepository.findByToken(token);
+        if (vtOpt.isEmpty()) {
+            success = false;
+            message = "Odkaz je neplatný.";
+        } else {
+            VerificationToken vt = vtOpt.get();
+            if (vt.isUsed() || vt.getExpiresAt().isBefore(LocalDateTime.now())) {
+                success = false;
+                message = "Odkaz je neplatný nebo expirovaný.";
+            } else {
+                User u = vt.getUser();
+                u.setEnabled(true);
+                userRepository.save(u);
+
+                vt.setUsed(true);
+                verificationTokenRepository.save(vt);
+
+                success = true;
+                message = "Účet byl úspěšně potvrzen. Teď se můžeš přihlásit v appce.";
+            }
         }
 
-        User u = vt.getUser();
-        u.setEnabled(true);
-        userRepository.save(u);
+        String html = """
+                <!DOCTYPE html>
+                <html lang="cs">
+                <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Potvrzení registrace – RecAPPy BOOK</title>
+                <style>
+                    body { font-family: 'Segoe UI', sans-serif; background:#101021; color:#f0f0f0; display:flex; justify-content:center; padding:48px 16px; margin:0; }
+                    .card { max-width:360px; width:100%%; background:#19182b; padding:24px; border-radius:12px; text-align:center; }
+                    h1 { font-size:20px; margin:0 0 16px; }
+                    p { font-size:14px; color:%s; }
+                </style>
+                </head>
+                <body>
+                <div class="card">
+                    <h1>%s</h1>
+                    <p>%s</p>
+                </div>
+                </body>
+                </html>
+                """.formatted(success ? "#7dff50" : "#ff6b6b", success ? "Hotovo!" : "Něco nesedí", message);
 
-        vt.setUsed(true);
-        verificationTokenRepository.save(vt);
-
-        return ResponseEntity.ok("Účet potvrzen.");
+        return ResponseEntity.ok(html);
     }
 
     @PostMapping("/forgot")
