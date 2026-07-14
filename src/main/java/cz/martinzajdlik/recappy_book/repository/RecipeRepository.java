@@ -1,8 +1,10 @@
 package cz.martinzajdlik.recappy_book.repository;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.model.Recipe;
+import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,17 +12,21 @@ import java.util.List;
 @Repository
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
-    @Query("SELECT DISTINCT r.category FROM Recipe r")
-    List<String> findDistinctCategories();
+    @Query("SELECT DISTINCT r.category FROM Recipe r WHERE r.status = :status")
+    List<String> findDistinctCategoriesByStatus(@Param("status") RecipeStatus status);
 
     List<Recipe> findByCategory(String category);
+
+    List<Recipe> findByStatus(RecipeStatus status);
+
+    List<Recipe> findByCategoryAndStatus(String category, RecipeStatus status);
 
     List<Recipe> findByAuthor_Id(Long authorId);
 
     void deleteByAuthor_Id(Long authorId);
 
-    @Query("SELECT r FROM Recipe r JOIN r.likedByUsers u WHERE u = :user")
-    List<Recipe> findFavoriteRecipesByUser(User user);
+    @Query("SELECT r FROM Recipe r JOIN r.likedByUsers u WHERE u = :user AND r.status = :status")
+    List<Recipe> findFavoriteRecipesByUser(@Param("user") User user, @Param("status") RecipeStatus status);
 
 
 

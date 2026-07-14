@@ -1,6 +1,7 @@
 package cz.martinzajdlik.recappy_book.dto;
 
 import cz.martinzajdlik.recappy_book.model.Recipe;
+import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import cz.martinzajdlik.recappy_book.model.User;
 
 public class RecipeResponse {
@@ -13,6 +14,7 @@ public class RecipeResponse {
     private String imageUrl;
     private String authorUsername;
     private boolean favorite;
+    private String status;
 
     public RecipeResponse(Recipe recipe, User currentUser) {
         this.id = recipe.getId();
@@ -25,6 +27,10 @@ public class RecipeResponse {
 
         this.favorite = currentUser != null
                 && currentUser.getFavoriteRecipes().contains(recipe);
+
+        this.status = recipe.getStatus() != null
+                ? recipe.getStatus().name()
+                : RecipeStatus.APPROVED.name();
     }
 
     public Long getId() { return id; }
@@ -35,4 +41,5 @@ public class RecipeResponse {
     public String getImageUrl() { return imageUrl; }
     public String getAuthorUsername() { return authorUsername; }
     public boolean isFavorite() { return favorite; }
+    public String getStatus() { return status; }
 }

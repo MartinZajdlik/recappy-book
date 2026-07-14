@@ -41,6 +41,10 @@ public class Recipe {
     @ManyToMany(mappedBy = "favoriteRecipes")
     private Set<User> likedByUsers = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20, columnDefinition = "varchar(20) default 'APPROVED'")
+    private RecipeStatus status = RecipeStatus.APPROVED;
+
     // --- Bezparametrový konstruktor pro JPA ---
     public Recipe() {
     }
@@ -114,6 +118,14 @@ public class Recipe {
 
     public Set<User> getLikedByUsers() {
         return likedByUsers;
+    }
+
+    public RecipeStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RecipeStatus status) {
+        this.status = status;
     }
 
 }

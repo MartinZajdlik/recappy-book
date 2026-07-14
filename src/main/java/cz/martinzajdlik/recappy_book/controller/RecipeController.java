@@ -1,6 +1,7 @@
 package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.model.Recipe;
+import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import org.springframework.http.MediaType;
@@ -55,6 +56,7 @@ public class RecipeController {
         recipe.setCategory(category);
         recipe.setIngredients(ingredients);
         recipe.setInstructions(instructions);
+        recipe.setStatus(isAdmin(authentication) ? RecipeStatus.APPROVED : RecipeStatus.PENDING);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             String imageUrl = imageStorageService.upload(imageFile);
@@ -105,8 +107,7 @@ public class RecipeController {
         Recipe recipe = recipeOpt.get();
 
         String currentUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = isAdmin(authentication);
 
         boolean isAuthor = recipe.getAuthor() != null &&
                 recipe.getAuthor().getUsername().equals(currentUsername);
@@ -120,9 +121,19 @@ public class RecipeController {
         recipe.setIngredients(ingredients);
         recipe.setInstructions(instructions);
 
-        if (imageFile != null && !imageFile.isEmpty()) {
+        boolean newImageUploaded = imageFile != null && !imageFile.isEmpty();
+
+        if (newImageUploaded) {
             String imageUrl = imageStorageService.upload(imageFile);
             recipe.setImageUrl(imageUrl);
+        }
+
+        if (!isAdmin) {
+            if (recipe.getStatus() != RecipeStatus.APPROVED) {
+                recipe.setStatus(RecipeStatus.PENDING);
+            } else if (newImageUploaded) {
+                recipe.setStatus(RecipeStatus.PENDING);
+            }
         }
 
         Recipe updated = recipeRepository.save(recipe);
@@ -131,7 +142,7 @@ public class RecipeController {
 
     @GetMapping("/random")
     public ResponseEntity<Recipe> getRandomRecipe() {
-        List<Recipe> allRecipes = recipeRepository.findAll();
+        List<Recipe> allRecipes = recipeRepository.findByStatus(RecipeStatus.APPROVED);
         if (allRecipes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -149,9 +160,9 @@ public class RecipeController {
         List<Recipe> recipes;
 
         if (category == null || category.isEmpty()) {
-            recipes = recipeRepository.findAll();
+            recipes = recipeRepository.findByStatus(RecipeStatus.APPROVED);
         } else {
-            recipes = recipeRepository.findByCategory(category);
+            recipes = recipeRepository.findByCategoryAndStatus(category, RecipeStatus.APPROVED);
         }
 
         return recipes.stream()
@@ -206,7 +217,7 @@ public class RecipeController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
 
-        return recipeRepository.findFavoriteRecipesByUser(user)
+        return recipeRepository.findFavoriteRecipesByUser(user, RecipeStatus.APPROVED)
                 .stream()
                 .map(recipe -> new RecipeResponse(recipe, user))
                 .toList();
@@ -214,13 +225,31 @@ public class RecipeController {
 
     @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
-    public Optional<Recipe> getRecipeById(@PathVariable Long id) {
-        return recipeRepository.findById(id);
+    public ResponseEntity<Recipe> getRecipeById(@PathVariable Long id, Authentication authentication) {
+        Optional<Recipe> recipeOpt = recipeRepository.findById(id);
+        if (recipeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Recipe recipe = recipeOpt.get();
+        if (recipe.getStatus() == RecipeStatus.APPROVED) {
+            return ResponseEntity.ok(recipe);
+        }
+
+        User currentUser = getCurrentUserOrNull(authentication);
+        boolean isAdmin = currentUser != null && "ROLE_ADMIN".equals(currentUser.getRole());
+        boolean isAuthor = currentUser != null && recipe.getAuthor() != null
+                && currentUser.getId().equals(recipe.getAuthor().getId());
+
+        if (isAdmin || isAuthor) {
+            return ResponseEntity.ok(recipe);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/categories")
     public List<String> getAllCategories() {
-        return recipeRepository.findDistinctCategories();
+        return recipeRepository.findDistinctCategoriesByStatus(RecipeStatus.APPROVED);
     }
 
     @Transactional
@@ -237,8 +266,7 @@ public class RecipeController {
         Recipe recipe = recipeOpt.get();
 
         String currentUsername = authentication.getName();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = isAdmin(authentication);
 
         boolean isAuthor = recipe.getAuthor() != null &&
                 recipe.getAuthor().getUsername().equals(currentUsername);
@@ -258,6 +286,11 @@ public class RecipeController {
         recipeRepository.deleteById(id);
         return ResponseEntity.ok("Recept byl smazán.");
     }
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     private User getCurrentUserOrNull(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;
