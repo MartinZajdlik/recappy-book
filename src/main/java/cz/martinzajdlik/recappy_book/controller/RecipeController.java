@@ -129,11 +129,7 @@ public class RecipeController {
         }
 
         if (!isAdmin) {
-            if (recipe.getStatus() != RecipeStatus.APPROVED) {
-                recipe.setStatus(RecipeStatus.PENDING);
-            } else if (newImageUploaded) {
-                recipe.setStatus(RecipeStatus.PENDING);
-            }
+            recipe.setStatus(RecipeStatus.PENDING);
         }
 
         Recipe updated = recipeRepository.save(recipe);
@@ -217,7 +213,7 @@ public class RecipeController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
 
-        return recipeRepository.findFavoriteRecipesByUser(user, RecipeStatus.APPROVED)
+        return recipeRepository.findFavoriteRecipesByUser(user)
                 .stream()
                 .map(recipe -> new RecipeResponse(recipe, user))
                 .toList();

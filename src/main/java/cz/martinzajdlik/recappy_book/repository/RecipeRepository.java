@@ -25,8 +25,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     void deleteByAuthor_Id(Long authorId);
 
-    @Query("SELECT r FROM Recipe r JOIN r.likedByUsers u WHERE u = :user AND r.status = :status")
-    List<Recipe> findFavoriteRecipesByUser(@Param("user") User user, @Param("status") RecipeStatus status);
+    @Query("SELECT r FROM Recipe r JOIN r.likedByUsers u WHERE u = :user")
+    List<Recipe> findFavoriteRecipesByUser(@Param("user") User user);
 
 
 
