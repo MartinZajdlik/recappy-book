@@ -36,6 +36,12 @@ public class AdminRecipeController {
                 .toList();
     }
 
+    // Počet receptů čekajících na schválení – pro badge v adminově menu
+    @GetMapping("/pending/count")
+    public long getPendingRecipesCount() {
+        return recipeRepository.countByStatus(RecipeStatus.PENDING);
+    }
+
     @PatchMapping("/{id}/approve")
     public ResponseEntity<String> approveRecipe(@PathVariable Long id) {
         return recipeRepository.findById(id)

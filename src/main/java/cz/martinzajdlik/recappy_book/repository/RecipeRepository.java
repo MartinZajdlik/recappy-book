@@ -19,6 +19,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByStatus(RecipeStatus status);
 
+    long countByStatus(RecipeStatus status);
+
     List<Recipe> findByCategoryAndStatus(String category, RecipeStatus status);
 
     List<Recipe> findByAuthor_Id(Long authorId);
