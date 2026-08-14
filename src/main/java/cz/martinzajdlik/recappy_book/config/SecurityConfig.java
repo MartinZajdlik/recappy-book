@@ -62,7 +62,8 @@ public class SecurityConfig {
                                 "/auth/register",
                                 "/auth/confirm",
                                 "/auth/forgot",
-                                "/auth/reset").permitAll()
+                                "/auth/reset",
+                                "/auth/refresh").permitAll()
 
                         // Veřejné čtení receptů
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()

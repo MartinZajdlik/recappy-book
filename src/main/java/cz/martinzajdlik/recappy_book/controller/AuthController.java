@@ -2,15 +2,19 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.dto.UserRegistrationDTO;
 import cz.martinzajdlik.recappy_book.dto.EmailDto;
+import cz.martinzajdlik.recappy_book.dto.RefreshRequest;
 import cz.martinzajdlik.recappy_book.dto.ResetDto;
 import cz.martinzajdlik.recappy_book.model.PasswordResetToken;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.model.VerificationToken;
 import cz.martinzajdlik.recappy_book.repository.PasswordResetTokenRepository;
+import cz.martinzajdlik.recappy_book.repository.RefreshTokenRepository;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import cz.martinzajdlik.recappy_book.repository.VerificationTokenRepository;
+import cz.martinzajdlik.recappy_book.security.InvalidRefreshTokenException;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import cz.martinzajdlik.recappy_book.service.MailService;
+import cz.martinzajdlik.recappy_book.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,9 +39,11 @@ public class AuthController {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final RecipeRepository recipeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RefreshTokenService refreshTokenService;
     private final MailService mailService;
 
     @Value("${app.backend.baseUrl:http://localhost:8080}")
@@ -50,16 +56,20 @@ public class AuthController {
     public AuthController(UserRepository userRepository,
                           VerificationTokenRepository verificationTokenRepository,
                           PasswordResetTokenRepository passwordResetTokenRepository,
+                          RefreshTokenRepository refreshTokenRepository,
                           RecipeRepository recipeRepository,
                           PasswordEncoder passwordEncoder,
                           JwtUtil jwtUtil,
+                          RefreshTokenService refreshTokenService,
                           MailService mailService) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
         this.recipeRepository = recipeRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.refreshTokenService = refreshTokenService;
         this.mailService = mailService;
     }
 
@@ -122,12 +132,34 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole());
+        String refreshToken = refreshTokenService.issue(dbUser);
 
-        return ResponseEntity.ok(new JwtResponse(token, dbUser.getRole()));
+        return ResponseEntity.ok(new JwtResponse(token, dbUser.getRole(), refreshToken));
+    }
+
+    // ===== Obnovení access tokenu pomocí refresh tokenu (rotace + detekce znovupoužití) =====
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody RefreshRequest dto) {
+        if (dto == null || dto.refreshToken() == null || dto.refreshToken().isBlank()) {
+            return ResponseEntity.badRequest().body("Refresh token je povinný.");
+        }
+
+        try {
+            RefreshTokenService.RotationResult result = refreshTokenService.rotate(dto.refreshToken());
+            User user = result.user;
+            String newAccessToken = jwtUtil.generateToken(user.getUsername(), user.getRole());
+
+            return ResponseEntity.ok(new JwtResponse(newAccessToken, user.getRole(), result.rawToken));
+        } catch (InvalidRefreshTokenException e) {
+            return ResponseEntity.status(401).body(e.getMessage());
+        }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<?> logout(@RequestBody(required = false) RefreshRequest dto) {
+        if (dto != null && dto.refreshToken() != null && !dto.refreshToken().isBlank()) {
+            refreshTokenService.revoke(dto.refreshToken());
+        }
         return ResponseEntity.ok("Odhlášení proběhlo úspěšně.");
     }
 
@@ -146,6 +178,7 @@ public class AuthController {
 
         verificationTokenRepository.deleteByUser_Id(user.getId());
         passwordResetTokenRepository.deleteAllByUser_Id(user.getId());
+        refreshTokenRepository.deleteAllByUser_Id(user.getId());
         recipeRepository.deleteByAuthor_Id(user.getId());
 
         userRepository.delete(user);
@@ -366,10 +399,15 @@ public class AuthController {
     public static class JwtResponse {
         private String token;
         private String role;
-        public JwtResponse(String token, String role) { this.token = token; this.role = role; }
+        private String refreshToken;
+        public JwtResponse(String token, String role, String refreshToken) {
+            this.token = token; this.role = role; this.refreshToken = refreshToken;
+        }
         public String getToken() { return token; }
         public void setToken(String token) { this.token = token; }
         public String getRole() { return role; }
         public void setRole(String role) { this.role = role; }
+        public String getRefreshToken() { return refreshToken; }
+        public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
     }
 }
