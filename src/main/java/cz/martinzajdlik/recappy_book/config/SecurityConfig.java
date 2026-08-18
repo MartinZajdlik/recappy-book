@@ -67,6 +67,7 @@ public class SecurityConfig {
 
                         // Veřejné čtení receptů
                         .requestMatchers(HttpMethod.GET, "/recepty/**").permitAll()
+                        .requestMatchers(HttpMethod.HEAD, "/recepty/**").permitAll()
 
                         // Admin operace nad recepty
                         .requestMatchers(HttpMethod.POST, "/recepty/**").hasAnyRole("ADMIN", "USER")
