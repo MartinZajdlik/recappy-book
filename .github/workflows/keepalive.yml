@@ -11,4 +11,10 @@ jobs:
     steps:
       - name: Ping health endpoint
         run: |
-          curl -fsS -m 10 https://recappy-book.onrender.com/actuator/health || true
+          status=$(curl -sS -m 10 -o /tmp/health.json -w "%{http_code}" https://recappy-book.onrender.com/actuator/health)
+          echo "Health endpoint returned HTTP $status"
+          cat /tmp/health.json
+          if [ "$status" != "200" ]; then
+            echo "Healthcheck failed (HTTP $status)"
+            exit 1
+          fi
