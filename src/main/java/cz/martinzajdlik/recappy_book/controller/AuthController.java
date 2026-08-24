@@ -11,6 +11,7 @@ import cz.martinzajdlik.recappy_book.repository.PasswordResetTokenRepository;
 import cz.martinzajdlik.recappy_book.repository.RefreshTokenRepository;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import cz.martinzajdlik.recappy_book.repository.VerificationTokenRepository;
+import cz.martinzajdlik.recappy_book.security.CustomUserDetails;
 import cz.martinzajdlik.recappy_book.security.InvalidRefreshTokenException;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import cz.martinzajdlik.recappy_book.service.MailService;
@@ -173,8 +174,7 @@ public class AuthController {
 
         String username = authentication.getName();
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        User user = userRepository.getByUsername(username);
 
         verificationTokenRepository.deleteByUser_Id(user.getId());
         passwordResetTokenRepository.deleteAllByUser_Id(user.getId());
@@ -371,12 +371,12 @@ public class AuthController {
 
     // ===== Informace o uživateli =====
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(org.springframework.security.core.Authentication authentication) {
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).body("Neautorizováno");
         }
         Object principal = authentication.getPrincipal();
-        if (principal instanceof cz.martinzajdlik.recappy_book.security.CustomUserDetails userDetails) {
+        if (principal instanceof CustomUserDetails userDetails) {
             return ResponseEntity.ok(new UserInfoResponse(
                     userDetails.getUsername(),
                     userDetails.getAuthorities().iterator().next().getAuthority()

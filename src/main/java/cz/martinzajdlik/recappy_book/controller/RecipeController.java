@@ -46,10 +46,7 @@ public class RecipeController {
             Authentication authentication
     ) throws IOException {
         Recipe recipe = new Recipe();
-        String username = authentication.getName();
-
-        User author = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        User author = userRepository.getByUsername(authentication.getName());
 
         recipe.setAuthor(author);
         recipe.setTitle(title);
@@ -169,10 +166,7 @@ public class RecipeController {
     @GetMapping("/my")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public List<RecipeResponse> getMyRecipes(Authentication authentication) {
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        User user = userRepository.getByUsername(authentication.getName());
 
         return recipeRepository.findByAuthor_Id(user.getId())
                 .stream()
@@ -186,10 +180,7 @@ public class RecipeController {
             @PathVariable Long id,
             Authentication authentication
     ) {
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        User user = userRepository.getByUsername(authentication.getName());
 
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Recept nenalezen"));
@@ -208,10 +199,7 @@ public class RecipeController {
     @GetMapping("/favorites")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public List<RecipeResponse> getFavoriteRecipes(Authentication authentication) {
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        User user = userRepository.getByUsername(authentication.getName());
 
         return recipeRepository.findFavoriteRecipesByUser(user)
                 .stream()
@@ -292,8 +280,6 @@ public class RecipeController {
             return null;
         }
 
-        String username = authentication.getName();
-
-        return userRepository.findByUsername(username).orElse(null);
+        return userRepository.findByUsername(authentication.getName()).orElse(null);
     }
 }

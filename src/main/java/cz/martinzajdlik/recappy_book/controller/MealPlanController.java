@@ -70,8 +70,6 @@ public class MealPlanController {
     }
 
     private User getCurrentUser(Authentication authentication) {
-        String username = authentication.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+        return userRepository.getByUsername(authentication.getName());
     }
 }

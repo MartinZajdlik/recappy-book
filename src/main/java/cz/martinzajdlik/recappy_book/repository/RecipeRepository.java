@@ -15,8 +15,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("SELECT DISTINCT r.category FROM Recipe r WHERE r.status = :status")
     List<String> findDistinctCategoriesByStatus(@Param("status") RecipeStatus status);
 
-    List<Recipe> findByCategory(String category);
-
     List<Recipe> findByStatus(RecipeStatus status);
 
     long countByStatus(RecipeStatus status);

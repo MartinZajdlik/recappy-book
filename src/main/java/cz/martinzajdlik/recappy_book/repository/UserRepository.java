@@ -10,4 +10,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
     long countByRole(String role);
+
+    default User getByUsername(String username) {
+        return findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Uživatel nenalezen"));
+    }
 }
