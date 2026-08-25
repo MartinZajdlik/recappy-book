@@ -17,6 +17,8 @@ import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import cz.martinzajdlik.recappy_book.service.MailService;
 import cz.martinzajdlik.recappy_book.service.RefreshTokenService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -36,6 +38,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
@@ -153,6 +157,14 @@ public class AuthController {
             return ResponseEntity.ok(new JwtResponse(newAccessToken, user.getRole(), result.rawToken));
         } catch (InvalidRefreshTokenException e) {
             return ResponseEntity.status(401).body(e.getMessage());
+        } catch (Exception e) {
+            // Dva souběžné /auth/refresh požadavky se stejným (dosud nerotovaným) tokenem
+            // se mohou na DB úrovni srazit (např. race na uložení revoked/nového tokenu) a
+            // shodit rotate() neočekávanou výjimkou. Klient si na 401 umí bezpečně vyžádat
+            // nové přihlášení / zopakovat požadavek s ještě platným tokenem – 500 by mu
+            // naopak session rovnou smazalo, i když refresh token samotný validní je.
+            logger.warn("Neočekávaná chyba při /auth/refresh, vracím 401 místo 500.", e);
+            return ResponseEntity.status(401).body("Obnovení přihlášení se nezdařilo, zkus to prosím znovu.");
         }
     }
 
