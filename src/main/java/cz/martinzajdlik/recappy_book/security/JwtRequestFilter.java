@@ -48,11 +48,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-                System.out.println("DEBUG JwtRequestFilter: uri=" + request.getRequestURI()
-                        + " username=" + username
-                        + " enabled=" + userDetails.isEnabled()
-                        + " authorities=" + userDetails.getAuthorities());
-
                 if (!userDetails.isEnabled()) {
                     filterChain.doFilter(request, response);
                     return;
