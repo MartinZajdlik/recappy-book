@@ -254,6 +254,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot")
+    @Transactional
     public ResponseEntity<?> forgot(@RequestBody(required = false) EmailDto dto) {
         if (dto == null || dto.email() == null || dto.email().isBlank()) {
             return ResponseEntity.badRequest().body("E-mail je povinný.");
@@ -362,6 +363,7 @@ public class AuthController {
 
     // ===== Reset hesla – nastavení nového =====
     @PostMapping("/reset")
+    @Transactional
     public ResponseEntity<?> reset(@RequestBody ResetDto dto) {
         PasswordResetToken pr = passwordResetTokenRepository.findByToken(dto.token())
                 .orElseThrow(() -> new IllegalArgumentException("Token nenalezen"));

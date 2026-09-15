@@ -8,6 +8,7 @@ import cz.martinzajdlik.recappy_book.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import jakarta.transaction.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class UserBlockController {
 
     @DeleteMapping("/{id}/block")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    @Transactional
     public ResponseEntity<String> unblockUser(@PathVariable Long id, Authentication authentication) {
         User blocker = userRepository.getByUsername(authentication.getName());
         blockedUserRepository.deleteByBlocker_IdAndBlocked_Id(blocker.getId(), id);
