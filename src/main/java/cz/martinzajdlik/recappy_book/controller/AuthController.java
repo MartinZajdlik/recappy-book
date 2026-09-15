@@ -16,6 +16,7 @@ import cz.martinzajdlik.recappy_book.security.InvalidRefreshTokenException;
 import cz.martinzajdlik.recappy_book.security.JwtUtil;
 import cz.martinzajdlik.recappy_book.service.MailService;
 import cz.martinzajdlik.recappy_book.service.RefreshTokenService;
+import cz.martinzajdlik.recappy_book.service.UserDeletionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final RefreshTokenService refreshTokenService;
     private final MailService mailService;
+    private final UserDeletionService userDeletionService;
 
     @Value("${app.backend.baseUrl:http://localhost:8080}")
     private String backendBaseUrl;
@@ -66,7 +68,8 @@ public class AuthController {
                           PasswordEncoder passwordEncoder,
                           JwtUtil jwtUtil,
                           RefreshTokenService refreshTokenService,
-                          MailService mailService) {
+                          MailService mailService,
+                          UserDeletionService userDeletionService) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
@@ -76,6 +79,7 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
         this.refreshTokenService = refreshTokenService;
         this.mailService = mailService;
+        this.userDeletionService = userDeletionService;
     }
 
     // ===== REGISTRACE (auto-aktivace pokud jsou e-maily vypnuté) =====
@@ -177,7 +181,6 @@ public class AuthController {
     }
 
     @DeleteMapping("/me")
-    @Transactional
     public ResponseEntity<?> deleteMyAccount(Authentication authentication) {
 
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -186,14 +189,12 @@ public class AuthController {
 
         String username = authentication.getName();
 
-        User user = userRepository.getByUsername(username);
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Uživatel nenalezen.");
+        }
 
-        verificationTokenRepository.deleteByUser_Id(user.getId());
-        passwordResetTokenRepository.deleteAllByUser_Id(user.getId());
-        refreshTokenRepository.deleteAllByUser_Id(user.getId());
-        recipeRepository.deleteByAuthor_Id(user.getId());
-
-        userRepository.delete(user);
+        userDeletionService.deleteUserCompletely(userOpt.get().getId());
 
         return ResponseEntity.ok("Účet a všechny recepty byly smazány.");
     }

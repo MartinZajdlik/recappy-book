@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface MealPlanRepository extends JpaRepository<MealPlanEntry, Long> {
     Optional<MealPlanEntry> findByUserAndDayOfWeek(User user, int dayOfWeek);
+
+    void deleteAllByUser_Id(Long userId);
 }

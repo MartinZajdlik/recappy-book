@@ -3,16 +3,13 @@ package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.dto.UserDTO;
 import cz.martinzajdlik.recappy_book.model.User;
-import cz.martinzajdlik.recappy_book.repository.PasswordResetTokenRepository;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
-import cz.martinzajdlik.recappy_book.repository.VerificationTokenRepository;
-import jakarta.transaction.Transactional;
+import cz.martinzajdlik.recappy_book.service.UserDeletionService;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,21 +20,15 @@ import java.util.Optional;
 public class AdminUserController {
 
     private final UserRepository userRepository;
-    private final VerificationTokenRepository verificationTokenRepository;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final RecipeRepository recipeRepository;
+    private final UserDeletionService userDeletionService;
 
     @Autowired
     public AdminUserController(
             UserRepository userRepository,
-            VerificationTokenRepository verificationTokenRepository,
-            PasswordResetTokenRepository passwordResetTokenRepository,
-            RecipeRepository recipeRepository
+            UserDeletionService userDeletionService
     ) {
         this.userRepository = userRepository;
-        this.verificationTokenRepository = verificationTokenRepository;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
-        this.recipeRepository = recipeRepository;
+        this.userDeletionService = userDeletionService;
     }
 
     // Získat všechny uživatele
@@ -69,7 +60,6 @@ public class AdminUserController {
 
     // Smazat uživatele
     @DeleteMapping("/{id}")
-    @Transactional
     public ResponseEntity<String> deleteUser(@PathVariable Long id, Authentication auth) {
         // 1) existuje?
         User toDelete = userRepository.findById(id).orElse(null);
@@ -91,12 +81,8 @@ public class AdminUserController {
             }
         }
 
-        // 4) nejdřív smaž závislosti (tokeny), pak uživatele
-        verificationTokenRepository.deleteByUser_Id(id);
-        passwordResetTokenRepository.deleteAllByUser_Id(id);
-
-        recipeRepository.deleteByAuthor_Id(id);
-        userRepository.deleteById(id);
+        // 4) nejdřív smaž všechny závislosti (tokeny, jídelníček, oblíbené, recepty), pak uživatele
+        userDeletionService.deleteUserCompletely(toDelete.getId());
         return ResponseEntity.ok("Uživatel byl smazán.");
     }
 
