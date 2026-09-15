@@ -3,6 +3,8 @@ package cz.martinzajdlik.recappy_book.service;
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.model.User;
 import cz.martinzajdlik.recappy_book.repository.MealPlanRepository;
+import cz.martinzajdlik.recappy_book.repository.RecipeReportRepository;
+import cz.martinzajdlik.recappy_book.repository.BlockedUserRepository;
 import cz.martinzajdlik.recappy_book.repository.PasswordResetTokenRepository;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import cz.martinzajdlik.recappy_book.repository.RefreshTokenRepository;
@@ -34,6 +36,8 @@ public class UserDeletionService {
     private final MealPlanRepository mealPlanRepository;
     private final RecipeRepository recipeRepository;
     private final ImageStorageService imageStorageService;
+    private final RecipeReportRepository recipeReportRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     public UserDeletionService(UserRepository userRepository,
                                VerificationTokenRepository verificationTokenRepository,
@@ -41,7 +45,9 @@ public class UserDeletionService {
                                RefreshTokenRepository refreshTokenRepository,
                                MealPlanRepository mealPlanRepository,
                                RecipeRepository recipeRepository,
-                               ImageStorageService imageStorageService) {
+                               ImageStorageService imageStorageService,
+                               RecipeReportRepository recipeReportRepository,
+                               BlockedUserRepository blockedUserRepository) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
@@ -49,6 +55,8 @@ public class UserDeletionService {
         this.mealPlanRepository = mealPlanRepository;
         this.recipeRepository = recipeRepository;
         this.imageStorageService = imageStorageService;
+        this.recipeReportRepository = recipeReportRepository;
+        this.blockedUserRepository = blockedUserRepository;
     }
 
     /**
@@ -67,6 +75,12 @@ public class UserDeletionService {
         passwordResetTokenRepository.deleteAllByUser_Id(userId);
         refreshTokenRepository.deleteAllByUser_Id(userId);
 
+        // 1b) Nahlášení, která tento uživatel podal, a blokace v obou směrech
+        //     (jako blokující i jako zablokovaný) – jinak by FK zabránil smazání.
+        recipeReportRepository.deleteByReportedBy_Id(userId);
+        blockedUserRepository.deleteByBlocker_Id(userId);
+        blockedUserRepository.deleteByBlocked_Id(userId);
+
         // 2) Jídelníček
         mealPlanRepository.deleteAllByUser_Id(userId);
 
@@ -81,6 +95,8 @@ public class UserDeletionService {
                 fan.getFavoriteRecipes().remove(recipe);
             }
             recipe.getLikedByUsers().clear();
+            // Nahlášení mazaných receptů taky – FK by jinak zabránil smazání receptu.
+            recipeReportRepository.deleteByRecipe_Id(recipe.getId());
         }
 
         // Vazební řádky musí jít do DB dřív než samotné DELETE receptů/uživatele

@@ -4,6 +4,9 @@ import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import cz.martinzajdlik.recappy_book.repository.UserRepository;
+import cz.martinzajdlik.recappy_book.repository.RecipeReportRepository;
+import cz.martinzajdlik.recappy_book.repository.BlockedUserRepository;
+import cz.martinzajdlik.recappy_book.model.RecipeReport;
 import org.springframework.http.MediaType;
 import cz.martinzajdlik.recappy_book.service.ImageStorageService;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +29,19 @@ public class RecipeController {
     private final RecipeRepository recipeRepository;
     private final ImageStorageService imageStorageService;
     private final UserRepository userRepository;
+    private final RecipeReportRepository recipeReportRepository;
+    private final BlockedUserRepository blockedUserRepository;
 
     public RecipeController(RecipeRepository recipeRepository,
                             ImageStorageService imageStorageService,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            RecipeReportRepository recipeReportRepository,
+                            BlockedUserRepository blockedUserRepository) {
         this.recipeRepository = recipeRepository;
         this.imageStorageService = imageStorageService;
         this.userRepository = userRepository;
+        this.recipeReportRepository = recipeReportRepository;
+        this.blockedUserRepository = blockedUserRepository;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -134,8 +143,13 @@ public class RecipeController {
     }
 
     @GetMapping("/random")
-    public ResponseEntity<Recipe> getRandomRecipe() {
-        List<Recipe> allRecipes = recipeRepository.findByStatus(RecipeStatus.APPROVED);
+    public ResponseEntity<Recipe> getRandomRecipe(Authentication authentication) {
+        User currentUser = getCurrentUserOrNull(authentication);
+        List<Long> blockedAuthorIds = blockedAuthorIdsFor(currentUser);
+
+        List<Recipe> allRecipes = recipeRepository.findByStatus(RecipeStatus.APPROVED).stream()
+                .filter(r -> !isFromBlockedAuthor(r, blockedAuthorIds))
+                .toList();
         if (allRecipes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -158,7 +172,10 @@ public class RecipeController {
             recipes = recipeRepository.findByCategoryAndStatus(category, RecipeStatus.APPROVED);
         }
 
+        List<Long> blockedAuthorIds = blockedAuthorIdsFor(currentUser);
+
         return recipes.stream()
+                .filter(r -> !isFromBlockedAuthor(r, blockedAuthorIds))
                 .map(recipe -> new RecipeResponse(recipe, currentUser))
                 .toList();
     }
@@ -205,6 +222,29 @@ public class RecipeController {
                 .stream()
                 .map(recipe -> new RecipeResponse(recipe, user))
                 .toList();
+    }
+
+    // Nahlášení nevhodného receptu – admin ho pak vidí v sekci "Nahlášené recepty".
+    @PostMapping("/{id}/report")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public ResponseEntity<String> reportRecipe(@PathVariable Long id, Authentication authentication) {
+        Optional<Recipe> recipeOpt = recipeRepository.findById(id);
+        if (recipeOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User reporter = userRepository.getByUsername(authentication.getName());
+
+        if (recipeReportRepository.existsByRecipe_IdAndReportedBy_IdAndResolvedFalse(id, reporter.getId())) {
+            return ResponseEntity.ok("Tento recept jsi už nahlásil/a, děkujeme.");
+        }
+
+        RecipeReport report = new RecipeReport();
+        report.setRecipe(recipeOpt.get());
+        report.setReportedBy(reporter);
+        recipeReportRepository.save(report);
+
+        return ResponseEntity.ok("Recept byl nahlášen, děkujeme.");
     }
 
     @PreAuthorize("permitAll()")
@@ -265,6 +305,9 @@ public class RecipeController {
 
         recipe.getLikedByUsers().clear();
 
+        // Nahlášení tohoto receptu už nemá smysl držet – FK by navíc zabránil smazání.
+        recipeReportRepository.deleteByRecipe_Id(id);
+
         imageStorageService.delete(recipe.getImageUrl());
 
         recipeRepository.deleteById(id);
@@ -281,5 +324,16 @@ public class RecipeController {
         }
 
         return userRepository.findByUsername(authentication.getName()).orElse(null);
+    }
+
+    private List<Long> blockedAuthorIdsFor(User currentUser) {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return blockedUserRepository.findBlockedIdsByBlocker(currentUser.getId());
+    }
+
+    private boolean isFromBlockedAuthor(Recipe recipe, List<Long> blockedAuthorIds) {
+        return recipe.getAuthor() != null && blockedAuthorIds.contains(recipe.getAuthor().getId());
     }
 }
