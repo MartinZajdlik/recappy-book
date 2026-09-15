@@ -1,12 +1,15 @@
 package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.dto.RecipeReportSummary;
+import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.model.RecipeReport;
 import cz.martinzajdlik.recappy_book.repository.RecipeReportRepository;
+import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,14 +25,20 @@ import java.util.List;
 public class AdminRecipeReportController {
 
     private final RecipeReportRepository recipeReportRepository;
+    private final RecipeRepository recipeRepository;
 
-    public AdminRecipeReportController(RecipeReportRepository recipeReportRepository) {
+    public AdminRecipeReportController(RecipeReportRepository recipeReportRepository,
+                                       RecipeRepository recipeRepository) {
         this.recipeReportRepository = recipeReportRepository;
+        this.recipeRepository = recipeRepository;
     }
 
     @GetMapping
     public List<RecipeReportSummary> getReportedRecipes() {
-        return recipeReportRepository.findDistinctReportedRecipes().stream()
+        List<Long> reportedIds = recipeReportRepository.findDistinctReportedRecipeIds();
+
+        return recipeRepository.findAllById(reportedIds).stream()
+                .sorted(Comparator.comparing(Recipe::getId).reversed())
                 .map(recipe -> new RecipeReportSummary(
                         recipe,
                         recipeReportRepository.countByRecipe_IdAndResolvedFalse(recipe.getId())))
@@ -39,7 +48,7 @@ public class AdminRecipeReportController {
     // Počet receptů s nevyřízeným nahlášením – pro badge v adminově menu.
     @GetMapping("/count")
     public long getReportedRecipesCount() {
-        return recipeReportRepository.findDistinctReportedRecipes().size();
+        return recipeReportRepository.findDistinctReportedRecipeIds().size();
     }
 
     // "Ponechat" – nahlášení tohoto receptu se označí za vyřízené, recept zůstává veřejný.

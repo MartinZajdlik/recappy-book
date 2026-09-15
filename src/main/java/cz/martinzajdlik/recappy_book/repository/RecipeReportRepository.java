@@ -19,9 +19,12 @@ public interface RecipeReportRepository extends JpaRepository<RecipeReport, Long
     long countByRecipe_IdAndResolvedFalse(Long recipeId);
 
     // Recepty, které mají alespoň jedno nevyřízené nahlášení – pro obrazovku
-    // "Nahlášené recepty" v adminu.
-    @Query("SELECT DISTINCT rr.recipe FROM RecipeReport rr WHERE rr.resolved = false ORDER BY rr.recipe.id DESC")
-    List<Recipe> findDistinctReportedRecipes();
+    // "Nahlášené recepty" v adminu. Vracíme jen id (ne rovnou entitu) –
+    // "SELECT DISTINCT entita ... ORDER BY entita.pole" umí u Postgresu
+    // spadnout na "ORDER BY expressions must appear in select list",
+    // takže řazení a načtení entit necháváme na volajícím.
+    @Query("SELECT DISTINCT rr.recipe.id FROM RecipeReport rr WHERE rr.resolved = false")
+    List<Long> findDistinctReportedRecipeIds();
 
     void deleteByRecipe_Id(Long recipeId);
 
