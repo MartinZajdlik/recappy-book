@@ -11,7 +11,7 @@ public class UserRegistrationDTO {
     private String username;
 
     @NotBlank(message = "Heslo nesmí být prázdné.")
-    @Size(min = 4, message = "Heslo musí mít alespoň 6 znaků.")
+    @Size(min = 4, message = "Heslo musí mít alespoň 4 znaky.")
     private String password;
 
     @NotBlank(message = "E-mail nesmí být prázdný.")
