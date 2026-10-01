@@ -26,6 +26,12 @@ public interface RecipeReportRepository extends JpaRepository<RecipeReport, Long
     @Query("SELECT DISTINCT rr.recipe.id FROM RecipeReport rr WHERE rr.resolved = false")
     List<Long> findDistinctReportedRecipeIds();
 
+    // Nevyřízená nahlášení daných receptů i s nahlašujícím uživatelem (JOIN FETCH),
+    // aby admin viděl, kdo a kdy recept nahlásil – jedním dotazem pro všechny recepty.
+    @Query("SELECT rr FROM RecipeReport rr JOIN FETCH rr.reportedBy " +
+           "WHERE rr.resolved = false AND rr.recipe.id IN :recipeIds")
+    List<RecipeReport> findUnresolvedWithReporterByRecipeIds(@Param("recipeIds") List<Long> recipeIds);
+
     void deleteByRecipe_Id(Long recipeId);
 
     void deleteByReportedBy_Id(Long userId);

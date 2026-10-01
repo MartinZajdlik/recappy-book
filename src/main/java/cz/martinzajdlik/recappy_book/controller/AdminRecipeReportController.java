@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Obrazovka "Nahlášené recepty" pro admina. Recepty se do fronty dostávají
@@ -36,12 +38,28 @@ public class AdminRecipeReportController {
     @GetMapping
     public List<RecipeReportSummary> getReportedRecipes() {
         List<Long> reportedIds = recipeReportRepository.findDistinctReportedRecipeIds();
+        if (reportedIds.isEmpty()) {
+            return List.of();
+        }
+
+        // Kdo a kdy nahlásil – seskupeno podle receptu, nejnovější nahlášení první.
+        Map<Long, List<RecipeReportSummary.Reporter>> reportersByRecipe =
+                recipeReportRepository.findUnresolvedWithReporterByRecipeIds(reportedIds).stream()
+                        .sorted(Comparator.comparing(RecipeReport::getCreatedAt).reversed())
+                        .collect(Collectors.groupingBy(
+                                r -> r.getRecipe().getId(),
+                                Collectors.mapping(
+                                        r -> new RecipeReportSummary.Reporter(
+                                                r.getReportedBy().getUsername(),
+                                                r.getCreatedAt().toEpochMilli()),
+                                        Collectors.toList())));
 
         return recipeRepository.findAllById(reportedIds).stream()
                 .sorted(Comparator.comparing(Recipe::getId).reversed())
                 .map(recipe -> new RecipeReportSummary(
                         recipe,
-                        recipeReportRepository.countByRecipe_IdAndResolvedFalse(recipe.getId())))
+                        recipeReportRepository.countByRecipe_IdAndResolvedFalse(recipe.getId()),
+                        reportersByRecipe.getOrDefault(recipe.getId(), List.of())))
                 .toList();
     }
 
