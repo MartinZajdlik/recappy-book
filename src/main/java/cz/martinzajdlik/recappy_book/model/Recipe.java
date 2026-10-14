@@ -3,6 +3,7 @@ package cz.martinzajdlik.recappy_book.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +50,12 @@ public class Recipe {
     // takže se k nikomu jinému nedostane. Při schválení se maže.
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
+
+    // Kdy byl recept zamítnut. Podle toho se zamítnuté recepty, se kterými autor
+    // nic neudělal, po RejectedRecipeCleanupService.RETENTION_DAYS dnech mažou.
+    // Při schválení nebo úpravě autorem se nuluje.
+    @Column(name = "rejected_at")
+    private Instant rejectedAt;
 
     // --- Bezparametrový konstruktor pro JPA ---
     public Recipe() {
@@ -139,5 +146,13 @@ public class Recipe {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
+    }
+
+    public Instant getRejectedAt() {
+        return rejectedAt;
+    }
+
+    public void setRejectedAt(Instant rejectedAt) {
+        this.rejectedAt = rejectedAt;
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.sql.DataSource;
@@ -13,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
 @SpringBootApplication
+@EnableScheduling
 public class RecappyBookApplication {
 
     public static void main(String[] args) {

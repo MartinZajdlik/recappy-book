@@ -3,6 +3,10 @@ package cz.martinzajdlik.recappy_book.dto;
 import cz.martinzajdlik.recappy_book.model.Recipe;
 import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import cz.martinzajdlik.recappy_book.model.User;
+import cz.martinzajdlik.recappy_book.service.RejectedRecipeCleanupService;
+
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 public class RecipeResponse {
 
@@ -17,6 +21,8 @@ public class RecipeResponse {
     private boolean favorite;
     private String status;
     private String rejectionReason;
+    // Den (yyyy-MM-dd, česká časová zóna), kdy bude zamítnutý recept smazán, pokud ho autor neupraví.
+    private String scheduledDeletionDate;
 
     public RecipeResponse(Recipe recipe, User currentUser) {
         this.id = recipe.getId();
@@ -39,6 +45,14 @@ public class RecipeResponse {
         this.rejectionReason = recipe.getStatus() == RecipeStatus.REJECTED
                 ? recipe.getRejectionReason()
                 : null;
+
+        this.scheduledDeletionDate = recipe.getStatus() == RecipeStatus.REJECTED && recipe.getRejectedAt() != null
+                ? recipe.getRejectedAt()
+                    .plus(RejectedRecipeCleanupService.RETENTION_DAYS, ChronoUnit.DAYS)
+                    .atZone(ZoneId.of("Europe/Prague"))
+                    .toLocalDate()
+                    .toString()
+                : null;
     }
 
     public Long getId() { return id; }
@@ -52,4 +66,5 @@ public class RecipeResponse {
     public boolean isFavorite() { return favorite; }
     public String getStatus() { return status; }
     public String getRejectionReason() { return rejectionReason; }
+    public String getScheduledDeletionDate() { return scheduledDeletionDate; }
 }

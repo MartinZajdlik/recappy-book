@@ -136,6 +136,8 @@ public class RecipeController {
 
         if (!isAdmin) {
             recipe.setStatus(RecipeStatus.PENDING);
+            // Autor recept opravil – odpočet do automatického smazání se ruší.
+            recipe.setRejectedAt(null);
         }
 
         Recipe updated = recipeRepository.save(recipe);
