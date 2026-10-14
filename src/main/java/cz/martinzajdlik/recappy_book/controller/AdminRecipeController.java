@@ -1,6 +1,7 @@
 package cz.martinzajdlik.recappy_book.controller;
 
 import cz.martinzajdlik.recappy_book.dto.RecipeResponse;
+import cz.martinzajdlik.recappy_book.dto.RejectRecipeRequest;
 import cz.martinzajdlik.recappy_book.model.RecipeStatus;
 import cz.martinzajdlik.recappy_book.repository.RecipeRepository;
 import org.springframework.http.ResponseEntity;
@@ -47,17 +48,28 @@ public class AdminRecipeController {
         return recipeRepository.findById(id)
                 .map(r -> {
                     r.setStatus(RecipeStatus.APPROVED);
+                    r.setRejectionReason(null);
                     recipeRepository.save(r);
                     return ResponseEntity.ok("Recept byl schválen.");
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    private static final int MAX_REJECTION_REASON_LENGTH = 500;
+
     @PatchMapping("/{id}/reject")
-    public ResponseEntity<String> rejectRecipe(@PathVariable Long id) {
+    public ResponseEntity<String> rejectRecipe(@PathVariable Long id,
+                                               @RequestBody(required = false) RejectRecipeRequest body) {
+        String reason = body != null && body.reason() != null ? body.reason().trim() : "";
+        if (reason.length() > MAX_REJECTION_REASON_LENGTH) {
+            return ResponseEntity.badRequest()
+                    .body("Důvod zamítnutí může mít nejvýš " + MAX_REJECTION_REASON_LENGTH + " znaků.");
+        }
+
         return recipeRepository.findById(id)
                 .map(r -> {
                     r.setStatus(RecipeStatus.REJECTED);
+                    r.setRejectionReason(reason.isEmpty() ? null : reason);
                     recipeRepository.save(r);
                     return ResponseEntity.ok("Recept byl zamítnut.");
                 })

@@ -16,6 +16,7 @@ public class RecipeResponse {
     private String authorUsername;
     private boolean favorite;
     private String status;
+    private String rejectionReason;
 
     public RecipeResponse(Recipe recipe, User currentUser) {
         this.id = recipe.getId();
@@ -33,6 +34,11 @@ public class RecipeResponse {
         this.status = recipe.getStatus() != null
                 ? recipe.getStatus().name()
                 : RecipeStatus.APPROVED.name();
+
+        // Důvod posíláme jen u zamítnutých receptů – u ostatních nemá smysl.
+        this.rejectionReason = recipe.getStatus() == RecipeStatus.REJECTED
+                ? recipe.getRejectionReason()
+                : null;
     }
 
     public Long getId() { return id; }
@@ -45,4 +51,5 @@ public class RecipeResponse {
     public String getAuthorUsername() { return authorUsername; }
     public boolean isFavorite() { return favorite; }
     public String getStatus() { return status; }
+    public String getRejectionReason() { return rejectionReason; }
 }

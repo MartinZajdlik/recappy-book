@@ -45,6 +45,11 @@ public class Recipe {
     @Column(nullable = false, length = 20, columnDefinition = "varchar(20) default 'APPROVED'")
     private RecipeStatus status = RecipeStatus.APPROVED;
 
+    // Důvod zamítnutí od admina. Zamítnutý recept vidí jen autor a admin,
+    // takže se k nikomu jinému nedostane. Při schválení se maže.
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
     // --- Bezparametrový konstruktor pro JPA ---
     public Recipe() {
     }
@@ -128,4 +133,11 @@ public class Recipe {
         this.status = status;
     }
 
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
 }
